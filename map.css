@@ -1,0 +1,4 @@
+#map-wrapper canvas {
+    image-rendering: pixelated; /* Для современных браузеров */
+    image-rendering: crisp-edges; /* Для Safari и некоторых других */
+}
