@@ -194,8 +194,6 @@ function showPopup(imgX, imgY, info, hex) {
     popupContent.innerHTML = `
         <strong>Провинция #${info.id}</strong><br>
         Площадь: ${info.area} px<br>
-        Центр: [${info.center[0]}, ${info.center[1]}]<br>
-        HEX: ${hex}
     `;
     popup.style.display = 'block';
     updatePopupPosition();
