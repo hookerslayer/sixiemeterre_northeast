@@ -231,7 +231,7 @@ function renderMarkers() {
         markersCtx.drawImage(img, x - w / 2, y - h / 2, w, h);
 
         if (showMarkerNames && marker.name) {
-            drawMarkerLabel(markersCtx, marker.name, x + w / 2 + 2, y - h / 2, marker.type === 'large_city');
+            drawMarkerLabel(markersCtx, marker.name, x + w / 2 + 2, y - h / 2);
         }
     });
 
@@ -243,7 +243,7 @@ function renderMarkers() {
     }
 }
 
-function drawMarkerLabel(ctx, text, x, y, isLargeCity) {
+function drawMarkerLabel(ctx, text, x, y) {
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
@@ -254,26 +254,6 @@ function drawMarkerLabel(ctx, text, x, y, isLargeCity) {
 
     ctx.fillStyle = '#ffffff';
     ctx.fillText(text, x, y);
-
-    if (isLargeCity) {
-        const metrics = ctx.measureText(text);
-        const width = metrics.width;
-        const lineY = y + 16;
-
-        ctx.beginPath();
-        ctx.moveTo(x, lineY);
-        ctx.lineTo(x + width, lineY);
-        ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 3.5;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(x, lineY);
-        ctx.lineTo(x + width, lineY);
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-    }
 }
 
 function updateLegend() {

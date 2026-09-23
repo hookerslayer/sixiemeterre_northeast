@@ -36,13 +36,16 @@ body, html {
     display: block;
     pointer-events: none;
     image-rendering: pixelated;
+    position: relative;
+    z-index: 1;
 }
 
-#layer-canvas, #highlight-canvas, #labels-canvas, #markers-canvas {
+#layer-canvas {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
+    z-index: 2;
 }
 
 #rivers-map {
@@ -53,7 +56,31 @@ body, html {
     height: 100%;
     pointer-events: none;
     image-rendering: pixelated;
-    z-index: 2;
+    z-index: 3;
+}
+
+#highlight-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 4;
+}
+
+#markers-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 5;
+}
+
+#labels-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 6;
 }
 
 #controls-panel {
