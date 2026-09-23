@@ -2,3 +2,69 @@
     image-rendering: pixelated; /* Для современных браузеров */
     image-rendering: crisp-edges; /* Для Safari и некоторых других */
 }
+
+#labels-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+#controls-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #444;
+}
+
+.search-box {
+    display: flex;
+    gap: 6px;
+}
+
+#search-input {
+    width: 150px;
+    padding: 6px 8px;
+    background: #222;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
+    outline: none;
+}
+
+#controls-panel button {
+    padding: 6px 12px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+#controls-panel button:hover {
+    background: #444;
+}
+
+#controls-panel button.active {
+    background: #2e6885;
+    border-color: #4a90b5;
+}
+
+#rivers-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    image-rendering: pixelated;
+    z-index: 2;
+}
