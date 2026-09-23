@@ -6,14 +6,35 @@ const VISUAL_MAP_SRC = 'map.png';
 const COLOR_MAP_SRC = 'color_map.png';
 const META_JSON_SRC = 'provinces_meta.json';
 
+const MARKER_TYPES = ['large_city', 'city', 'monastery', 'fortress', 'ruins'];
+const markerImages = {};
+MARKER_TYPES.forEach(type => {
+    markerImages[type] = new Image();
+    markerImages[type].src = `${type}.png`;
+});
+
 let provincesMeta = {};
 let idToHexMap = {};
 
 let dbProvinces = {};
 let dbRegionColors = {};
 let dbOwnerColors = {};
+let dbMarkers = [];
 
 let activeLayer = 'political';
+let showMarkerNames = true;
+let visibleMarkerTypes = {
+    large_city: true,
+    city: true,
+    monastery: true,
+    fortress: true,
+    ruins: true
+};
+
+let trackerActive = false;
+let trackerPos = { x: 0, y: 0 };
+let isDraggingTracker = false;
+let activePopupType = null; // 'province', 'marker', 'tracker'
 
 const viewport = document.getElementById('viewport');
 const mapWrapper = document.getElementById('map-wrapper');
@@ -21,6 +42,8 @@ const layerCanvas = document.getElementById('layer-canvas');
 const layerCtx = layerCanvas.getContext('2d');
 const highlightCanvas = document.getElementById('highlight-canvas');
 const highlightCtx = highlightCanvas.getContext('2d');
+const markersCanvas = document.getElementById('markers-canvas');
+const markersCtx = markersCanvas.getContext('2d');
 const labelsCanvas = document.getElementById('labels-canvas');
 const labelsCtx = labelsCanvas.getContext('2d');
 
@@ -31,8 +54,11 @@ const popupClose = document.getElementById('popup-close');
 const searchInput = document.getElementById('search-input');
 const searchBtn = document.getElementById('search-btn');
 const toggleIdsBtn = document.getElementById('toggle-ids-btn');
+const trackerBtn = document.getElementById('tracker-btn');
+const toggleMarkerNamesBtn = document.getElementById('toggle-marker-names-btn');
 const legendContent = document.getElementById('legend-content');
 const layerButtons = document.querySelectorAll('.layer-btn');
+const markerTypeCheckboxes = document.querySelectorAll('.marker-type-checkbox');
 
 const hiddenCanvas = document.createElement('canvas');
 const hiddenCtx = hiddenCanvas.getContext('2d', { willReadFrequently: true });
@@ -66,38 +92,34 @@ function updatePopupPosition() {
 }
 
 async function loadSupabaseData() {
-    const [resProvinces, resRegions, resOwners] = await Promise.all([
+    const [resProvinces, resRegions, resOwners, resMarkers] = await Promise.all([
         supabaseClient.from('Provinces').select('*'),
         supabaseClient.from('region_color').select('*'),
-        supabaseClient.from('owner_color').select('*')
+        supabaseClient.from('owner_color').select('*'),
+        supabaseClient.from('markers').select('*')
     ]);
 
     if (resProvinces.data) {
-        resProvinces.data.forEach(row => {
-            dbProvinces[row.id] = row;
-        });
+        resProvinces.data.forEach(row => dbProvinces[row.id] = row);
     }
-
     if (resRegions.data) {
         resRegions.data.forEach(row => {
-            if (row.region && row.region_color) {
-                dbRegionColors[row.region] = row.region_color;
-            }
+            if (row.region && row.region_color) dbRegionColors[row.region] = row.region_color;
         });
     }
-
     if (resOwners.data) {
         resOwners.data.forEach(row => {
-            if (row.owner && row.owner_color) {
-                dbOwnerColors[row.owner] = row.owner_color;
-            }
+            if (row.owner && row.owner_color) dbOwnerColors[row.owner] = row.owner_color;
         });
+    }
+    if (resMarkers.data) {
+        dbMarkers = resMarkers.data;
     }
 }
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
-    new Promise((resolve) => {
+    new Promise(resolve => {
         colorMapImage.onload = resolve;
         colorMapImage.src = COLOR_MAP_SRC;
     }),
@@ -120,6 +142,8 @@ Promise.all([
     layerCanvas.height = height;
     highlightCanvas.width = width;
     highlightCanvas.height = height;
+    markersCanvas.width = width;
+    markersCanvas.height = height;
     labelsCanvas.width = width;
     labelsCanvas.height = height;
 
@@ -133,6 +157,7 @@ Promise.all([
 
     updateTransform();
     renderActiveLayer();
+    renderMarkers();
 }).catch(err => {
     console.error('Ошибка инициализации данных:', err);
     legendContent.innerHTML = 'Ошибка загрузки данных';
@@ -191,6 +216,66 @@ function renderActiveLayer() {
     updateLegend();
 }
 
+function renderMarkers() {
+    markersCtx.clearRect(0, 0, markersCanvas.width, markersCanvas.height);
+
+    dbMarkers.forEach(marker => {
+        if (!visibleMarkerTypes[marker.type]) return;
+
+        const img = markerImages[marker.type];
+        const x = marker.coord_1;
+        const y = marker.coord_2;
+        const w = img.naturalWidth || 24;
+        const h = img.naturalHeight || 24;
+
+        markersCtx.drawImage(img, x - w / 2, y - h / 2, w, h);
+
+        if (showMarkerNames && marker.name) {
+            drawMarkerLabel(markersCtx, marker.name, x + w / 2 + 2, y - h / 2, marker.type === 'large_city');
+        }
+    });
+
+    if (trackerActive) {
+        const img = markerImages.ruins;
+        const w = img.naturalWidth || 24;
+        const h = img.naturalHeight || 24;
+        markersCtx.drawImage(img, trackerPos.x - w / 2, trackerPos.y - h / 2, w, h);
+    }
+}
+
+function drawMarkerLabel(ctx, text, x, y, isLargeCity) {
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, x, y);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, x, y);
+
+    if (isLargeCity) {
+        const metrics = ctx.measureText(text);
+        const width = metrics.width;
+        const lineY = y + 16;
+
+        ctx.beginPath();
+        ctx.moveTo(x, lineY);
+        ctx.lineTo(x + width, lineY);
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3.5;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x, lineY);
+        ctx.lineTo(x + width, lineY);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+    }
+}
+
 function updateLegend() {
     legendContent.innerHTML = '';
     const items = activeLayer === 'political' ? dbOwnerColors : dbRegionColors;
@@ -226,6 +311,46 @@ layerButtons.forEach(btn => {
     });
 });
 
+markerTypeCheckboxes.forEach(cb => {
+    cb.addEventListener('change', (e) => {
+        visibleMarkerTypes[e.target.value] = e.target.checked;
+        renderMarkers();
+    });
+});
+
+toggleMarkerNamesBtn.addEventListener('click', () => {
+    showMarkerNames = !showMarkerNames;
+    toggleMarkerNamesBtn.classList.toggle('active', showMarkerNames);
+    renderMarkers();
+});
+
+trackerBtn.addEventListener('click', () => {
+    trackerActive = !trackerActive;
+    trackerBtn.classList.toggle('active', trackerActive);
+
+    if (trackerActive) {
+        trackerPos.x = Math.round((window.innerWidth / 2 - tx) / scale);
+        trackerPos.y = Math.round((window.innerHeight / 2 - ty) / scale);
+        showTrackerPopup();
+    } else {
+        if (activePopupType === 'tracker') clearSelection();
+    }
+    renderMarkers();
+});
+
+function showTrackerPopup() {
+    activePopupType = 'tracker';
+    selectedImgX = trackerPos.x;
+    selectedImgY = trackerPos.y;
+    popupContent.innerHTML = `
+        <strong>Отслеживание координат</strong><br>
+        coord_1 (X): ${trackerPos.x}<br>
+        coord_2 (Y): ${trackerPos.y}
+    `;
+    popup.style.display = 'block';
+    updatePopupPosition();
+}
+
 viewport.addEventListener('wheel', (e) => {
     e.preventDefault();
     const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
@@ -247,6 +372,22 @@ viewport.addEventListener('wheel', (e) => {
 
 viewport.addEventListener('mousedown', (e) => {
     if (e.target === popup || popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel')) return;
+
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const imgX = Math.floor((mouseX - tx) / scale);
+    const imgY = Math.floor((mouseY - ty) / scale);
+
+if (trackerActive) {
+        const dx = imgX - trackerPos.x;
+        const dy = imgY - trackerPos.y;
+        if (Math.hypot(dx, dy) <= 20) {
+            isDraggingTracker = true;
+            return;
+        }
+    }
+
     isDragging = true;
     startX = e.clientX - tx;
     startY = e.clientY - ty;
@@ -254,6 +395,20 @@ viewport.addEventListener('mousedown', (e) => {
 });
 
 window.addEventListener('mousemove', (e) => {
+    const rect = viewport.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const imgX = Math.round((mouseX - tx) / scale);
+    const imgY = Math.round((mouseY - ty) / scale);
+
+    if (isDraggingTracker) {
+        trackerPos.x = imgX;
+        trackerPos.y = imgY;
+        renderMarkers();
+        showTrackerPopup();
+        return;
+    }
+
     if (!isDragging) return;
     const newTx = e.clientX - startX;
     const newTy = e.clientY - startY;
@@ -265,6 +420,7 @@ window.addEventListener('mousemove', (e) => {
 
 window.addEventListener('mouseup', () => {
     isDragging = false;
+    isDraggingTracker = false;
 });
 
 viewport.addEventListener('click', (e) => {
@@ -278,6 +434,20 @@ viewport.addEventListener('click', (e) => {
     const imgX = Math.floor((mouseX - tx) / scale);
     const imgY = Math.floor((mouseY - ty) / scale);
 
+    for (const marker of dbMarkers) {
+        if (!visibleMarkerTypes[marker.type]) continue;
+        const mx = marker.coord_1;
+        const my = marker.coord_2;
+        const img = markerImages[marker.type];
+        const w = img.naturalWidth || 24;
+        const h = img.naturalHeight || 24;
+
+        if (imgX >= mx - w / 2 && imgX <= mx + w / 2 && imgY >= my - h / 2 && imgY <= my + h / 2) {
+            showMarkerPopup(marker);
+            return;
+        }
+    }
+
     if (imgX < 0 || imgX >= hiddenCanvas.width || imgY < 0 || imgY >= hiddenCanvas.height) {
         clearSelection();
         return;
@@ -290,7 +460,7 @@ viewport.addEventListener('click', (e) => {
 
     if (info) {
         highlightProvince(hex);
-        showPopup(imgX, imgY, info, hex);
+        showProvincePopup(imgX, imgY, info);
     } else {
         clearSelection();
     }
@@ -321,7 +491,8 @@ function highlightProvince(targetHex) {
     highlightCtx.putImageData(highlightImgData, 0, 0);
 }
 
-function showPopup(imgX, imgY, info, hex) {
+function showProvincePopup(imgX, imgY, info) {
+    activePopupType = 'province';
     selectedImgX = imgX;
     selectedImgY = imgY;
 
@@ -340,7 +511,22 @@ function showPopup(imgX, imgY, info, hex) {
     updatePopupPosition();
 }
 
+function showMarkerPopup(marker) {
+    activePopupType = 'marker';
+    highlightCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
+    selectedImgX = marker.coord_1;
+    selectedImgY = marker.coord_2;
+
+    popupContent.innerHTML = `
+        <strong>${marker.name || 'Маркер'}</strong><br>
+        ${marker.description || 'Описание отсутствует'}
+    `;
+    popup.style.display = 'block';
+    updatePopupPosition();
+}
+
 function clearSelection() {
+    activePopupType = null;
     selectedImgX = null;
     selectedImgY = null;
     highlightCtx.clearRect(0, 0, highlightCanvas.width, highlightCanvas.height);
@@ -364,7 +550,7 @@ function goToProvince(provinceId) {
 
     updateTransform();
     highlightProvince(hex);
-    showPopup(Math.floor(centerX), Math.floor(centerY), info, hex);
+    showProvincePopup(Math.floor(centerX), Math.floor(centerY), info);
 }
 
 searchBtn.addEventListener('click', () => {
