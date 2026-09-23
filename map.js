@@ -19,6 +19,7 @@ let idToHexMap = {};
 let dbProvinces = {};
 let dbRegionColors = {};
 let dbOwnerColors = {};
+let dbCultureColors = {};
 let dbMarkers = [];
 
 let activeLayer = 'political';
@@ -92,11 +93,12 @@ function updatePopupPosition() {
 }
 
 async function loadSupabaseData() {
-    const [resProvinces, resRegions, resOwners, resMarkers] = await Promise.all([
+    const [resProvinces, resRegions, resOwners, resMarkers, resCultures] = await Promise.all([
         supabaseClient.from('Provinces').select('*'),
         supabaseClient.from('region_color').select('*'),
         supabaseClient.from('owner_color').select('*'),
-        supabaseClient.from('markers').select('*')
+        supabaseClient.from('markers').select('*'),
+        supabaseClient.from('culture_color').select('*')
     ]);
 
     if (resProvinces.data) {
@@ -114,6 +116,11 @@ async function loadSupabaseData() {
     }
     if (resMarkers.data) {
         dbMarkers = resMarkers.data;
+    }
+    if (resCultures.data) {
+        resCultures.data.forEach(row => {
+            if (row.culture && row.culture_color) dbCultureColors[row.culture] = row.culture_color;
+        });
     }
 }
 
@@ -179,6 +186,8 @@ function renderActiveLayer() {
                 targetHex = dbOwnerColors[dbRow.owner];
             } else if (activeLayer === 'region' && dbRow.region) {
                 targetHex = dbRegionColors[dbRow.region];
+            } else if (activeLayer === 'culture' && dbRow.main_culture) {
+                targetHex = dbCultureColors[dbRow.main_culture];
             }
         }
 
@@ -258,7 +267,15 @@ function drawMarkerLabel(ctx, text, x, y) {
 
 function updateLegend() {
     legendContent.innerHTML = '';
-    const items = activeLayer === 'political' ? dbOwnerColors : dbRegionColors;
+    let items = {};
+
+    if (activeLayer === 'political') {
+        items = dbOwnerColors;
+    } else if (activeLayer === 'region') {
+        items = dbRegionColors;
+    } else if (activeLayer === 'culture') {
+        items = dbCultureColors;
+    }
 
     if (Object.keys(items).length === 0) {
         legendContent.innerHTML = '<em>Нет данных</em>';
@@ -359,7 +376,7 @@ viewport.addEventListener('mousedown', (e) => {
     const imgX = Math.floor((mouseX - tx) / scale);
     const imgY = Math.floor((mouseY - ty) / scale);
 
-if (trackerActive) {
+    if (trackerActive) {
         const dx = imgX - trackerPos.x;
         const dy = imgY - trackerPos.y;
         if (Math.hypot(dx, dy) <= 20) {
@@ -480,11 +497,13 @@ function showProvincePopup(imgX, imgY, info) {
     const name = dbRow.province_name || '—';
     const region = dbRow.region || '—';
     const owner = dbRow.owner || '—';
+    const culture = dbRow.main_culture || '—';
 
     popupContent.innerHTML = `
         <strong>Провинция #${info.id} (${name})</strong><br>
         Область: ${region}<br>
         Владелец: ${owner}<br>
+        Культура: ${culture}<br>
         Площадь: ${info.area} px
     `;
     popup.style.display = 'block';
