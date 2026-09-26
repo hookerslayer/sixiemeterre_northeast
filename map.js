@@ -20,6 +20,7 @@ let dbProvinces = {};
 let dbRegionColors = {};
 let dbOwnerColors = {};
 let dbCultureColors = {};
+let dbReligionColors = {};
 let dbMarkers = [];
 
 let activeLayer = 'political';
@@ -93,12 +94,13 @@ function updatePopupPosition() {
 }
 
 async function loadSupabaseData() {
-    const [resProvinces, resRegions, resOwners, resMarkers, resCultures] = await Promise.all([
+    const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions] = await Promise.all([
         supabaseClient.from('Provinces').select('*'),
         supabaseClient.from('region_color').select('*'),
         supabaseClient.from('owner_color').select('*'),
         supabaseClient.from('markers').select('*'),
-        supabaseClient.from('culture_color').select('*')
+        supabaseClient.from('culture_color').select('*'),
+        supabaseClient.from('religion_color').select('*')
     ]);
 
     if (resProvinces.data) {
@@ -120,6 +122,11 @@ async function loadSupabaseData() {
     if (resCultures.data) {
         resCultures.data.forEach(row => {
             if (row.culture && row.culture_color) dbCultureColors[row.culture] = row.culture_color;
+        });
+    }
+    if (resReligions.data) {
+        resReligions.data.forEach(row => {
+            if (row.religion && row.religion_color) dbReligionColors[row.religion] = row.religion_color;
         });
     }
 }
@@ -188,6 +195,8 @@ function renderActiveLayer() {
                 targetHex = dbRegionColors[dbRow.region];
             } else if (activeLayer === 'culture' && dbRow.main_culture) {
                 targetHex = dbCultureColors[dbRow.main_culture];
+            } else if (activeLayer === 'religion' && dbRow.main_religion) {
+                targetHex = dbReligionColors[dbRow.main_religion];
             }
         }
 
@@ -201,7 +210,7 @@ function renderActiveLayer() {
             const trgG = parseInt(targetHex.slice(3, 5), 16);
             const trgB = parseInt(targetHex.slice(5, 7), 16);
 
-            rgbLookup[key] = [trgR, trgG, trgB, 200];
+            rgbLookup[key] = [trgR, trgG, trgB, 153];
         }
     }
 
@@ -275,6 +284,8 @@ function updateLegend() {
         items = dbRegionColors;
     } else if (activeLayer === 'culture') {
         items = dbCultureColors;
+    } else if (activeLayer === 'religion') {
+        items = dbReligionColors;
     }
 
     if (Object.keys(items).length === 0) {
@@ -498,12 +509,14 @@ function showProvincePopup(imgX, imgY, info) {
     const region = dbRow.region || '—';
     const owner = dbRow.owner || '—';
     const culture = dbRow.main_culture || '—';
+    const religion = dbRow.main_religion || '—';
 
     popupContent.innerHTML = `
         <strong>Провинция #${info.id} (${name})</strong><br>
         Область: ${region}<br>
         Владелец: ${owner}<br>
         Культура: ${culture}<br>
+        Религия: ${religion}<br>
         Площадь: ${info.area} px
     `;
     popup.style.display = 'block';
