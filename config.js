@@ -44,7 +44,9 @@ export const state = {
     dragDistance: 0,
     selectedImgX: null,
     selectedImgY: null,
-    showIDs: false
+    showIDs: false,
+    currentUser: null,
+    userProfile: null
 };
 
 export const elements = {
@@ -76,9 +78,17 @@ export const elements = {
     openLoginBtn: document.getElementById('open-login-btn'),
     loginModal: document.getElementById('login-modal'),
     loginModalClose: document.getElementById('login-modal-close'),
+    authEmailInput: document.getElementById('auth-email'),
+    authPasswordInput: document.getElementById('auth-password'),
+    authLoginBtn: document.getElementById('auth-login-btn'),
     openRegisterBtn: document.getElementById('open-register-btn'),
     registerModal: document.getElementById('register-modal'),
     registerModalClose: document.getElementById('register-modal-close'),
+    regNicknameInput: document.getElementById('reg-nickname'),
+    regEmailInput: document.getElementById('reg-email'),
+    regPasswordInput: document.getElementById('reg-password'),
+    regPasswordConfirmInput: document.getElementById('reg-password-confirm'),
+    regSubmitBtn: document.getElementById('reg-submit-btn'),
     hiddenCanvas: document.createElement('canvas'),
     colorMapImage: new Image()
 };
