@@ -3,8 +3,7 @@ import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from '
 
 export function updateTransform() {
     elements.mapWrapper.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
-    elements.mapWrapper.classList.toggle('pixelated', state.scale >= 1.5);
-
+    elements.mapWrapper.classList.toggle('pixelated', state.scale >= 1.0);
     updatePopupPosition();
 }
 
@@ -95,22 +94,22 @@ export function goToProvince(provinceId) {
 
 export function initEventListeners() {
     if (window.innerWidth <= 768) {
-        elements.legendPanel.classList.add('collapsed');
-        elements.controlsPanel.classList.add('collapsed');
-        elements.legendToggleBtn.textContent = '+';
-        elements.controlsToggleBtn.textContent = '+';
+        elements.legendPanel?.classList.add('collapsed');
+        elements.controlsPanel?.classList.add('collapsed');
+        if (elements.legendToggleBtn) elements.legendToggleBtn.textContent = '+';
+        if (elements.controlsToggleBtn) elements.controlsToggleBtn.textContent = '+';
     }
 
-    elements.legendToggleBtn.addEventListener('click', () => {
+    elements.legendToggleBtn?.addEventListener('click', () => {
         const isCollapsed = elements.legendPanel.classList.toggle('collapsed');
         elements.legendToggleBtn.textContent = isCollapsed ? '+' : '−';
     });
 
-    elements.controlsToggleBtn.addEventListener('click', () => {
+    elements.controlsToggleBtn?.addEventListener('click', () => {
         const isCollapsed = elements.controlsPanel.classList.toggle('collapsed');
         elements.controlsToggleBtn.textContent = isCollapsed ? '+' : '−';
     });
-    
+
     elements.layerButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             elements.layerButtons.forEach(b => b.classList.remove('active'));
@@ -127,13 +126,13 @@ export function initEventListeners() {
         });
     });
 
-    elements.toggleMarkerNamesBtn.addEventListener('click', () => {
+    elements.toggleMarkerNamesBtn?.addEventListener('click', () => {
         state.showMarkerNames = !state.showMarkerNames;
         elements.toggleMarkerNamesBtn.classList.toggle('active', state.showMarkerNames);
         renderMarkers();
     });
 
-    elements.trackerBtn.addEventListener('click', () => {
+    elements.trackerBtn?.addEventListener('click', () => {
         state.trackerActive = !state.trackerActive;
         elements.trackerBtn.classList.toggle('active', state.trackerActive);
 
@@ -147,7 +146,7 @@ export function initEventListeners() {
         renderMarkers();
     });
 
-    elements.viewport.addEventListener('wheel', (e) => {
+    elements.viewport?.addEventListener('wheel', (e) => {
         e.preventDefault();
         const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
         const newScale = Math.min(Math.max(state.minScale, state.scale * zoomFactor), 2.5);
@@ -166,7 +165,7 @@ export function initEventListeners() {
         updateTransform();
     }, { passive: false });
 
-    elements.viewport.addEventListener('mousedown', (e) => {
+    elements.viewport?.addEventListener('mousedown', (e) => {
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
@@ -191,6 +190,7 @@ export function initEventListeners() {
     });
 
     window.addEventListener('mousemove', (e) => {
+        if (!elements.viewport) return;
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
@@ -219,7 +219,7 @@ export function initEventListeners() {
         state.isDraggingTracker = false;
     });
 
-    elements.viewport.addEventListener('click', (e) => {
+    elements.viewport?.addEventListener('click', (e) => {
         if (state.dragDistance > 5) return;
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel')) return;
 
@@ -262,16 +262,16 @@ export function initEventListeners() {
         }
     });
 
-    elements.popupClose.addEventListener('click', clearSelection);
+    elements.popupClose?.addEventListener('click', clearSelection);
 
-    elements.searchBtn.addEventListener('click', () => {
+    elements.searchBtn?.addEventListener('click', () => {
         const id = parseInt(elements.searchInput.value, 10);
         if (!isNaN(id)) {
             goToProvince(id);
         }
     });
 
-    elements.searchInput.addEventListener('keydown', (e) => {
+    elements.searchInput?.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
             const id = parseInt(elements.searchInput.value, 10);
             if (!isNaN(id)) {
@@ -280,7 +280,7 @@ export function initEventListeners() {
         }
     });
 
-    elements.toggleIdsBtn.addEventListener('click', () => {
+    elements.toggleIdsBtn?.addEventListener('click', () => {
         state.showIDs = !state.showIDs;
         elements.toggleIdsBtn.classList.toggle('active', state.showIDs);
         renderIDs();
