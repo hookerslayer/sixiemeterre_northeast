@@ -37,3 +37,43 @@ export async function loadSupabaseData() {
         });
     }
 }
+
+export async function signUpUser(email, password, nickname) {
+    const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password,
+        options: {
+            data: { nickname }
+        }
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function signInUser(email, password) {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function signOutUser() {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+}
+
+export async function fetchUserProfile(userId) {
+    const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+
+    if (error) {
+        console.error('Ошибка загрузки профиля:', error);
+        return null;
+    }
+    return data;
+}
