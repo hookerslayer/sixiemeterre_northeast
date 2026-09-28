@@ -110,7 +110,22 @@ export function initEventListeners() {
         elements.controlsToggleBtn.textContent = isCollapsed ? '+' : '−';
     });
 
+    elements.openLoginBtn?.addEventListener('click', () => {
+        elements.loginModal?.classList.add('active');
+    });
+
+    elements.loginModalClose?.addEventListener('click', () => {
+        elements.loginModal?.classList.remove('active');
+    });
+
+    elements.loginModal?.addEventListener('click', (e) => {
+        if (e.target === elements.loginModal) {
+            elements.loginModal.classList.remove('active');
+        }
+    });
+
     elements.openRegisterBtn?.addEventListener('click', () => {
+        elements.loginModal?.classList.remove('active');
         elements.registerModal?.classList.add('active');
     });
 
@@ -180,7 +195,7 @@ export function initEventListeners() {
     }, { passive: false });
 
     elements.viewport?.addEventListener('mousedown', (e) => {
-        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#auth-panel') || e.target.closest('#register-modal')) return;
+        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#open-login-btn')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -235,7 +250,7 @@ export function initEventListeners() {
 
     elements.viewport?.addEventListener('click', (e) => {
         if (state.dragDistance > 5) return;
-        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#auth-panel') || e.target.closest('#register-modal')) return;
+        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#open-login-btn')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
