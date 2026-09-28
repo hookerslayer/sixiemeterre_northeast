@@ -110,6 +110,20 @@ export function initEventListeners() {
         elements.controlsToggleBtn.textContent = isCollapsed ? '+' : '−';
     });
 
+    elements.openRegisterBtn?.addEventListener('click', () => {
+        elements.registerModal?.classList.add('active');
+    });
+
+    elements.registerModalClose?.addEventListener('click', () => {
+        elements.registerModal?.classList.remove('active');
+    });
+
+    elements.registerModal?.addEventListener('click', (e) => {
+        if (e.target === elements.registerModal) {
+            elements.registerModal.classList.remove('active');
+        }
+    });
+
     elements.layerButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             elements.layerButtons.forEach(b => b.classList.remove('active'));
@@ -166,7 +180,7 @@ export function initEventListeners() {
     }, { passive: false });
 
     elements.viewport?.addEventListener('mousedown', (e) => {
-        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel')) return;
+        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#auth-panel') || e.target.closest('#register-modal')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -221,7 +235,7 @@ export function initEventListeners() {
 
     elements.viewport?.addEventListener('click', (e) => {
         if (state.dragDistance > 5) return;
-        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel')) return;
+        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#auth-panel') || e.target.closest('#register-modal')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
