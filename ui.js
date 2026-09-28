@@ -3,6 +3,8 @@ import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from '
 
 export function updateTransform() {
     elements.mapWrapper.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
+    elements.mapWrapper.classList.toggle('pixelated', state.scale >= 1.5);
+
     updatePopupPosition();
 }
 
