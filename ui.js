@@ -1,5 +1,6 @@
 import { state, elements, markerImages } from './config.js';
 import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from './render.js';
+import { signUpUser, signInUser, signOutUser, fetchUserProfile } from './api.js';
 
 export function updateTransform() {
     elements.mapWrapper.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
@@ -92,6 +93,15 @@ export function goToProvince(provinceId) {
     showProvincePopup(Math.floor(centerX), Math.floor(centerY), info);
 }
 
+export function updateAuthUI() {
+    if (state.currentUser) {
+        const nickname = state.userProfile?.nickname || state.currentUser.email;
+        elements.openLoginBtn.textContent = `${nickname} (Выход)`;
+    } else {
+        elements.openLoginBtn.textContent = 'Вход';
+    }
+}
+
 export function initEventListeners() {
     if (window.innerWidth <= 768) {
         elements.legendPanel?.classList.add('collapsed');
@@ -110,8 +120,14 @@ export function initEventListeners() {
         elements.controlsToggleBtn.textContent = isCollapsed ? '+' : '−';
     });
 
-    elements.openLoginBtn?.addEventListener('click', () => {
-        elements.loginModal?.classList.add('active');
+    elements.openLoginBtn?.addEventListener('click', async () => {
+        if (state.currentUser) {
+            if (confirm('Вы действительно хотите выйти из аккаунта?')) {
+                await signOutUser();
+            }
+        } else {
+            elements.loginModal?.classList.add('active');
+        }
     });
 
     elements.loginModalClose?.addEventListener('click', () => {
@@ -121,6 +137,28 @@ export function initEventListeners() {
     elements.loginModal?.addEventListener('click', (e) => {
         if (e.target === elements.loginModal) {
             elements.loginModal.classList.remove('active');
+        }
+    });
+
+    elements.authLoginBtn?.addEventListener('click', async () => {
+        const email = elements.authEmailInput.value.trim();
+        const password = elements.authPasswordInput.value;
+
+        if (!email || !password) {
+            alert('Заполните все поля');
+            return;
+        }
+
+        try {
+            elements.authLoginBtn.textContent = 'Вход...';
+            await signInUser(email, password);
+            elements.loginModal?.classList.remove('active');
+            elements.authEmailInput.value = '';
+            elements.authPasswordInput.value = '';
+        } catch (err) {
+            alert('Ошибка входа: ' + err.message);
+        } finally {
+            elements.authLoginBtn.textContent = 'Вход';
         }
     });
 
@@ -136,6 +174,38 @@ export function initEventListeners() {
     elements.registerModal?.addEventListener('click', (e) => {
         if (e.target === elements.registerModal) {
             elements.registerModal.classList.remove('active');
+        }
+    });
+
+    elements.regSubmitBtn?.addEventListener('click', async () => {
+        const nickname = elements.regNicknameInput.value.trim();
+        const email = elements.regEmailInput.value.trim();
+        const password = elements.regPasswordInput.value;
+        const confirmPass = elements.regPasswordConfirmInput.value;
+
+        if (!nickname || !email || !password) {
+            alert('Заполните все обязательные поля');
+            return;
+        }
+
+        if (password !== confirmPass) {
+            alert('Пароли не совпадают');
+            return;
+        }
+
+        try {
+            elements.regSubmitBtn.textContent = 'Регистрация...';
+            await signUpUser(email, password, nickname);
+            alert('Регистрация успешна! Проверьте почту для подтверждения аккаунта.');
+            elements.registerModal?.classList.remove('active');
+            elements.regNicknameInput.value = '';
+            elements.regEmailInput.value = '';
+            elements.regPasswordInput.value = '';
+            elements.regPasswordConfirmInput.value = '';
+        } catch (err) {
+            alert('Ошибка регистрации: ' + err.message);
+        } finally {
+            elements.regSubmitBtn.textContent = 'Зарегистрироваться';
         }
     });
 
