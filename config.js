@@ -70,6 +70,10 @@ export const elements = {
     layerButtons: document.querySelectorAll('.layer-btn'),
     markerTypeCheckboxes: document.querySelectorAll('.marker-type-checkbox'),
     hiddenCanvas: document.createElement('canvas'),
-    colorMapImage: new Image()
+    colorMapImage: new Image(),
+    legendPanel: document.getElementById('legend-panel'),
+    controlsPanel: document.getElementById('controls-panel'),
+    legendToggleBtn: document.getElementById('legend-toggle-btn'),
+    controlsToggleBtn: document.getElementById('controls-toggle-btn')
 };
 elements.hiddenCtx = elements.hiddenCanvas.getContext('2d', { willReadFrequently: true });
