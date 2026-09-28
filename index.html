@@ -8,46 +8,47 @@
 </head>
 <body>
 
-<div id="legend-panel">
-    <div class="panel-header">
-        <span class="legend-title">Легенда карты</span>
-        <button id="legend-toggle-btn" class="toggle-btn" title="Свернуть/Развернуть">−</button>
+<div id="viewport">
+    <div id="legend-panel">
+        <div class="panel-header">
+            <span class="legend-title">Легенда карты</span>
+            <button id="legend-toggle-btn" class="toggle-btn" title="Свернуть/Развернуть">−</button>
+        </div>
+        <div id="legend-content">Загрузка...</div>
     </div>
-    <div id="legend-content">Загрузка...</div>
-</div>
 
-<div id="controls-panel">
-    <div class="panel-header">
-        <span class="panel-title">Управление</span>
-        <button id="controls-toggle-btn" class="toggle-btn" title="Свернуть/Развернуть">−</button>
-    </div>
-    <div id="controls-content">
-        <div class="search-box">
-            <input type="number" id="search-input" placeholder="Поиск ID..." min="1">
-            <button id="search-btn">ОК</button>
+    <div id="controls-panel">
+        <div class="panel-header">
+            <span class="panel-title">Управление</span>
+            <button id="controls-toggle-btn" class="toggle-btn" title="Свернуть/Развернуть">−</button>
         </div>
-        <button id="toggle-ids-btn">Показать ID</button>
-        <button id="tracker-btn">Отслеживать координаты</button>
-        
-        <div class="layer-group">
-            <span class="layer-title">Слои карты</span>
-            <button class="layer-btn active" data-layer="political">Государства</button>
-            <button class="layer-btn" data-layer="region">Регионы</button>
-            <button class="layer-btn" data-layer="culture">Культуры</button>
-            <button class="layer-btn" data-layer="religion">Религии</button>
-        </div>
+        <div id="controls-content">
+            <div class="search-box">
+                <input type="number" id="search-input" placeholder="Поиск ID..." min="1">
+                <button id="search-btn">ОК</button>
+            </div>
+            <button id="toggle-ids-btn">Показать ID</button>
+            <button id="tracker-btn">Отслеживать координаты</button>
+            
+            <div class="layer-group">
+                <span class="layer-title">Слои карты</span>
+                <button class="layer-btn active" data-layer="political">Государства</button>
+                <button class="layer-btn" data-layer="region">Регионы</button>
+                <button class="layer-btn" data-layer="culture">Культуры</button>
+                <button class="layer-btn" data-layer="religion">Религии</button>
+            </div>
 
-        <div class="layer-group">
-            <span class="layer-title">Маркеры</span>
-            <button id="toggle-marker-names-btn" class="active">Названия маркеров</button>
-            <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="large_city" checked> Крупные города</label>
-            <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="city" checked> Города</label>
-            <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="monastery" checked> Монастыри</label>
-            <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="fortress" checked> Крепости</label>
-            <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="ruins" checked> Руины</label>
+            <div class="layer-group">
+                <span class="layer-title">Маркеры</span>
+                <button id="toggle-marker-names-btn" class="active">Названия маркеров</button>
+                <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="large_city" checked> Крупные города</label>
+                <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="city" checked> Города</label>
+                <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="monastery" checked> Монастыри</label>
+                <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="fortress" checked> Крепости</label>
+                <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="ruins" checked> Руины</label>
+            </div>
         </div>
     </div>
-</div>
 
     <div id="map-wrapper">
         <img id="visual-map" src="map.png" alt="Карта провинций">
