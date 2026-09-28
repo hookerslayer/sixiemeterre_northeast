@@ -8,13 +8,20 @@
 </head>
 <body>
 
-<div id="viewport">
-    <div id="legend-panel">
-        <div class="legend-title">Легенда карты</div>
-        <div id="legend-content">Загрузка...</div>
+<div id="legend-panel">
+    <div class="panel-header">
+        <span class="legend-title">Легенда карты</span>
+        <button id="legend-toggle-btn" class="toggle-btn" title="Свернуть/Развернуть">−</button>
     </div>
+    <div id="legend-content">Загрузка...</div>
+</div>
 
-    <div id="controls-panel">
+<div id="controls-panel">
+    <div class="panel-header">
+        <span class="panel-title">Управление</span>
+        <button id="controls-toggle-btn" class="toggle-btn" title="Свернуть/Развернуть">−</button>
+    </div>
+    <div id="controls-content">
         <div class="search-box">
             <input type="number" id="search-input" placeholder="Поиск ID..." min="1">
             <button id="search-btn">ОК</button>
@@ -40,6 +47,7 @@
             <label class="checkbox-label"><input type="checkbox" class="marker-type-checkbox" value="ruins" checked> Руины</label>
         </div>
     </div>
+</div>
 
     <div id="map-wrapper">
         <img id="visual-map" src="map.png" alt="Карта провинций">
