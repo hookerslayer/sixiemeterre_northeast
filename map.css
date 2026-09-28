@@ -82,11 +82,24 @@ body, html {
     image-rendering: crisp-edges;
 }
 
-#controls-panel {
+#right-sidebar {
     position: fixed;
     top: 20px;
     right: 20px;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(100vh - 40px);
+    pointer-events: none;
+}
+
+#controls-panel,
+#auth-panel {
+    pointer-events: auto;
+}
+
+#controls-panel {
     display: flex;
     flex-direction: column;
     background: rgba(0, 0, 0, 0.85);
@@ -94,8 +107,9 @@ body, html {
     border-radius: 8px;
     border: 1px solid #444;
     color: #fff;
-    max-height: 90vh;
     overflow-y: auto;
+    min-height: 0;
+    flex-shrink: 1;
 }
 
 #controls-content {
@@ -257,10 +271,6 @@ body, html {
 }
 
 #auth-panel {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 1000;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -270,6 +280,8 @@ body, html {
     border: 1px solid #444;
     color: #fff;
     width: 180px;
+    flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 #auth-panel input {
