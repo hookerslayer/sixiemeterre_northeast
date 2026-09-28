@@ -1,7 +1,7 @@
-import { state, elements, COLOR_MAP_SRC, META_JSON_SRC } from './config.js';
-import { loadSupabaseData } from './api.js';
+import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, supabaseClient } from './config.js';
+import { loadSupabaseData, fetchUserProfile } from './api.js';
 import { renderActiveLayer, renderMarkers } from './render.js';
-import { updateTransform, initEventListeners } from './ui.js';
+import { updateTransform, initEventListeners, updateAuthUI } from './ui.js';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -45,6 +45,17 @@ Promise.all([
     renderActiveLayer();
     renderMarkers();
     initEventListeners();
+
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (session?.user) {
+            state.currentUser = session.user;
+            state.userProfile = await fetchUserProfile(session.user.id);
+        } else {
+            state.currentUser = null;
+            state.userProfile = null;
+        }
+        updateAuthUI();
+    });
 }).catch(err => {
     console.error('Ошибка инициализации данных:', err);
     elements.legendContent.innerHTML = 'Ошибка загрузки данных';
