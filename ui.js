@@ -94,6 +94,23 @@ export function goToProvince(provinceId) {
 }
 
 export function initEventListeners() {
+    if (window.innerWidth <= 768) {
+        elements.legendPanel.classList.add('collapsed');
+        elements.controlsPanel.classList.add('collapsed');
+        elements.legendToggleBtn.textContent = '+';
+        elements.controlsToggleBtn.textContent = '+';
+    }
+
+    elements.legendToggleBtn.addEventListener('click', () => {
+        const isCollapsed = elements.legendPanel.classList.toggle('collapsed');
+        elements.legendToggleBtn.textContent = isCollapsed ? '+' : '−';
+    });
+
+    elements.controlsToggleBtn.addEventListener('click', () => {
+        const isCollapsed = elements.controlsPanel.classList.toggle('collapsed');
+        elements.controlsToggleBtn.textContent = isCollapsed ? '+' : '−';
+    });
+    
     elements.layerButtons.forEach(btn => {
         btn.addEventListener('click', (e) => {
             elements.layerButtons.forEach(b => b.classList.remove('active'));
