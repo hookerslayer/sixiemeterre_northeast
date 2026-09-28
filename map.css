@@ -228,3 +228,54 @@ body, html {
 .popup-close:hover {
     color: #fff;
 }
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.panel-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.toggle-btn {
+    background: none !important;
+    border: none !important;
+    color: #aaa !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    cursor: pointer;
+    padding: 0 4px !important;
+    line-height: 1;
+    width: auto !important;
+}
+
+.toggle-btn:hover {
+    color: #fff !important;
+}
+
+#legend-panel.collapsed #legend-content,
+#controls-panel.collapsed #controls-content {
+    display: none;
+}
+
+#legend-panel.collapsed,
+#controls-panel.collapsed {
+    min-width: auto;
+    padding: 8px 12px;
+}
+
+#legend-panel .legend-title {
+    margin-bottom: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+#legend-panel:not(.collapsed) .legend-title {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #555;
+    padding-bottom: 4px;
+}
