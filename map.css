@@ -1,335 +1,372 @@
+/* Базовые настройки страницы */
 body, html {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-color: #121212;
-    font-family: sans-serif;
+    margin: 0; /* Сброс внешних отступов страницы */
+    padding: 0; /* Сброс внутренних отступов страницы */
+    width: 100%; /* Полная ширина окна браузера */
+    height: 100%; /* Полная высота окна браузера */
+    overflow: hidden; /* Отключение стандартной полосы прокрутки браузера */
+    background-color: #121212; /* Темно-серый цвет фона за картой */
+    font-family: sans-serif; /* Шрифт без засечек по умолчанию */
 }
 
+/* Главная область просмотра карты */
 #viewport {
-    width: 100vw;
-    height: 100vh;
-    position: relative;
-    cursor: grab;
-    user-select: none;
+    width: 100vw; /* Ширина контейнера во весь экран */
+    height: 100vh; /* Высота контейнера во весь экран */
+    position: relative; /* Базовая точка отсчета для встроенных панелей */
+    cursor: auto; /* Вид курсора */
+    user-select: none; /* Запрет выделения текста при кликах по карте */
 }
 
+/* Курсор при активном зажатии и перетаскивании карты */
 #viewport:active {
-    cursor: grabbing;
+    cursor: grabbing; /* Вид курсора: сжатая ладонь */
 }
 
+/* Контейнер для слоев и картинок карты */
 #map-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform-origin: 0 0;
+    position: absolute; /* Позиционирование для динамического сдвига через JS */
+    top: 0; /* Привязка к верхнему краю */
+    left: 0; /* Привязка к левому краю */
+    transform-origin: 0 0; /* Точка масштабирования — верхний левый угол */
 }
 
+/* Основное базовое изображение карты */
 #visual-map {
-    display: block;
-    pointer-events: none;
-    position: relative;
-    z-index: 1;
+    display: block; /* Отображение как блочный элемент */
+    pointer-events: none; /* Пропуск кликов сквозь картинку к нижним слоям */
+    position: relative; /* Относительное позиционирование для слоя */
+    z-index: 1; /* Порядок слоя: самый нижний базовый уровень */
 }
 
+/* Холст с заливкой слоев (политика, регионы, культура, религия) */
 #layer-canvas {
-    position: absolute;
+    position: absolute; /* Точное наложение поверх картинки карты */
     top: 0;
     left: 0;
-    pointer-events: none;
-    z-index: 2;
+    pointer-events: none; /* Пропуск кликов сквозь холст */
+    z-index: 2; /* Порядок слоя: поверх картинки */
 }
 
+/* Картинка с руслами рек */
 #rivers-map {
-    position: absolute;
+    position: absolute; /* Позиционирование поверх цветных слоев */
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 3;
+    width: 100%; /* Растягивание по ширине карты */
+    height: 100%; /* Растягивание по высоте карты */
+    pointer-events: none; /* Пропуск кликов */
+    z-index: 3; /* Порядок слоя: поверх цветных провинций */
 }
 
+/* Холст подсветки выделенной провинции */
 #highlight-canvas {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 4;
+    z-index: 4; /* Порядок слоя: поверх рек */
 }
 
+/* Холст отрисовки иконок и названий маркеров */
 #markers-canvas {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 5;
+    z-index: 5; /* Порядок слоя: поверх подсветки */
 }
 
+/* Холст отрисовки номеров (ID) провинций */
 #labels-canvas {
     position: absolute;
     top: 0;
     left: 0;
     pointer-events: none;
-    z-index: 6;
+    z-index: 6; /* Порядок слоя: самый верхний уровень карты */
 }
 
+/* Четкая пиксельная отрисовка при сильном приближении */
 #map-wrapper.pixelated img,
 #map-wrapper.pixelated canvas {
-    image-rendering: pixelated;
-    image-rendering: crisp-edges;
+    image-rendering: pixelated; /* Отключение сглаживания (для Chrome/Safari) */
+    image-rendering: crisp-edges; /* Отключение сглаживания (для Firefox) */
 }
 
+/* Левая боковая панель (кнопка входа и легенда) */
 #left-sidebar {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: calc(100vh - 40px);
-    pointer-events: none;
+    position: fixed; /* Фиксированное положение поверх холста карты */
+    top: 10px; /* Отступ от верхнего края */
+    left: 10px; /* Отступ от левого края */
+    z-index: 1000; /* Приоритет отображения поверх всех слоев карты */
+    display: flex; /* Флекс-контейнер для вертикальной структуры */
+    flex-direction: column; /* Элементы располагаются вертикально */
+    gap: 10px; /* Расстояние между кнопкой входа и легендой */
+    max-height: calc(100vh - 40px); /* Ограничение максимальной высоты под экран */
+    pointer-events: none; /* Пропуск кликов мимо самих блоков панели */
 }
 
+/* Кнопка «Вход» слева сверху */
 #open-login-btn {
-    pointer-events: auto;
-    padding: 8px 16px;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    border: 1px solid #444;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: bold;
-    align-self: flex-start;
+    pointer-events: auto; /* Включение кликабельности кнопки */
+    padding: 4px 8px; /* Внутренние отступы (вертикаль, горизонталь) */
+    background: rgba(0, 0, 0, 0.85); /* Полупрозрачный черный фон */
+    color: #fff; /* Белый цвет текста */
+    border: 1px solid #444; /* Серый контур кнопки */
+    border-radius: 8px; /* Закругление углов кнопки */
+    cursor: pointer; /* Курсор при наведении: указка */
+    font-size: 13px; /* Размер шрифта */
+    font-weight: bold; /* Жирный шрифт */
+    align-self: flex-start; /* Выравнивание кнопки по левому краю контейнера */
 }
 
+/* Эффект наведения на кнопку входа */
 #open-login-btn:hover {
-    background: #333;
-    border-color: #555;
+    background: #333; /* Осветление фона */
+    border-color: #555; /* Осветление рамки */
 }
 
+/* Панель легенды карты */
 #legend-panel {
-    pointer-events: auto;
-    background: rgba(0, 0, 0, 0.85);
-    color: #fff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    border: 1px solid #444;
-    max-height: 70vh;
-    overflow-y: auto;
-    min-width: 200px;
+    pointer-events: auto; /* Включение кликабельности внутри блока */
+    background: rgba(0, 0, 0, 0.85); /* Полупрозрачный черный фон */
+    color: #fff; /* Цвет текста */
+    padding: 12px 16px; /* Внутренние отступы блока */
+    border-radius: 8px; /* Закругление углов панели */
+    border: 1px solid #444; /* Серый контур */
+    max-height: 70vh; /* Ограничение высоты в 70% от высоты экрана */
+    overflow-y: auto; /* Внутренняя прокрутка при большом количестве элементов */
+    min-width: 200px; /* Минимальная ширина панели */
 }
 
+/* Правая панель управления */
 #controls-panel {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
+    position: fixed; /* Фиксированное положение поверх карты */
+    top: 10px; /* Отступ сверху */
+    right: 10px; /* Отступ справа */
+    z-index: 1000; /* Приоритет отображения поверх карты */
     display: flex;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(0, 0, 0, 0.85); /* Полупрозрачный темно-серый фон */
     padding: 12px;
     border-radius: 8px;
     border: 1px solid #444;
     color: #fff;
-    max-height: 90vh;
-    overflow-y: auto;
+    max-height: 90vh; /* Максимальная высота панели */
+    overflow-y: auto; /* Внутренняя прокрутка при разворачивании списков */
 }
 
+/* Внутреннее содержимое панели управления */
 #controls-content {
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    margin-top: 8px;
+    gap: 8px; /* Вертикальный зазор между кнопками и блоками */
+    margin-top: 8px; /* Отступ от заглавной шапки панели */
 }
 
+/* Заголовки панелей (шапка с кнопкой свёртки) */
 .panel-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    justify-content: space-between; /* Заголовок слева, кнопка свернуть справа */
+    align-items: center; /* Выравнивание по центру по вертикали */
     gap: 12px;
 }
 
+/* Текст заголовков панелей */
 .panel-title {
     font-size: 14px;
     font-weight: bold;
 }
 
+/* Кнопка сворачивания панелей (+ / −) */
 .toggle-btn {
-    background: none !important;
-    border: none !important;
-    color: #aaa !important;
+    background: none !important; /* Убирает базовый фон кнопки */
+    border: none !important; /* Убирает базовую рамку */
+    color: #aaa !important; /* Серый цвет символа */
     font-size: 16px !important;
     font-weight: bold !important;
     cursor: pointer;
     padding: 0 4px !important;
-    line-height: 1;
+    line-height: 1; /* Выравнивание знака по высоте строки */
     width: auto !important;
 }
 
+/* Эффект наведения на кнопку сворачивания */
 .toggle-btn:hover {
-    color: #fff !important;
+    color: #fff !important; /* Белый цвет знака при наведении */
 }
 
+/* Блок поиска по ID (инпут + кнопка) */
 .search-box {
     display: flex;
-    gap: 6px;
+    gap: 6px; /* Зазор между полем ввода и кнопкой «ОК» */
 }
 
+/* Поле ввода номера ID провинции */
 #search-input {
-    width: 140px;
-    padding: 6px 8px;
-    background: #222;
-    color: #fff;
-    border: 1px solid #555;
-    border-radius: 4px;
-    outline: none;
+    width: 140px; /* Ширина поля ввода */
+    padding: 6px 8px; /* Отступы внутри поля */
+    background: #222; /* Темный фон поля */
+    color: #fff; /* Цвет текста ввода */
+    border: 1px solid #555; /* Серый контур */
+    border-radius: 4px; /* Закругление углов */
+    outline: none; /* Убирает подсветку браузера при фокусе */
 }
 
+/* Все кнопки внутри панели управления */
 #controls-panel button {
     padding: 6px 12px;
-    background: #333;
+    background: #333; /* Темно-серый фон кнопки */
     color: #fff;
     border: 1px solid #555;
     border-radius: 4px;
     cursor: pointer;
     font-size: 13px;
-    text-align: left;
+    text-align: left; /* Выравнивание текста кнопки по левому краю */
 }
 
+/* Эффект наведения на кнопки управления */
 #controls-panel button:hover {
-    background: #444;
+    background: #444; /* Осветление фона */
 }
 
+/* Активные кнопки слоев */
 #controls-panel button.active {
-    background: #2e6885;
-    border-color: #4a90b5;
+    background: #2e6885; /* Синий фон активной кнопки */
+    border-color: #4a90b5; /* Голубая рамка активной кнопки */
 }
 
+/* Группы переключателей (Слои карты / Маркеры) */
 .layer-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
     margin-top: 6px;
-    border-top: 1px solid #444;
-    padding-top: 8px;
+    border-top: 1px solid #444; /* Верхняя разделительная линия */
+    padding-top: 8px; /* Отступ от разделительной линии */
 }
 
+/* Маленькие надписи подгрупп (СЛОИ КАРТЫ, МАРКЕРЫ) */
 .layer-title {
     font-size: 11px;
-    color: #aaa;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: #aaa; /* Серый цвет текста */
+    text-transform: uppercase; /* Все буквы заглавные */
+    letter-spacing: 0.5px; /* Межбуквенный интервал */
 }
 
+/* Лейблы чекбоксов маркеров */
 .checkbox-label {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    align-items: center; /* Выравнивание галочки и текста по вертикали */
+    gap: 6px; /* Расстояние от галочки до текста */
     font-size: 13px;
     cursor: pointer;
     color: #ddd;
 }
 
+/* Курсор для квадратиков-чекбоксов */
 .checkbox-label input {
     cursor: pointer;
 }
 
+/* Заголовок легенды */
 .legend-title {
     font-size: 14px;
     font-weight: bold;
 }
 
-#legend-panel .legend-title {
-    margin-bottom: 0;
-    border-bottom: none;
-    padding-bottom: 0;
-}
-
+/* Разделительная черта под заголовком легенды в развернутом виде */
 #legend-panel:not(.collapsed) .legend-title {
     margin-bottom: 10px;
     border-bottom: 1px solid #555;
     padding-bottom: 4px;
 }
 
+/* Строка элемента легенды (цветовой маркер + название) */
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 10px; /* Зазор между квадратиком цвета и текстом */
     margin-bottom: 6px;
     font-size: 13px;
 }
 
+/* Цветовой квадрат в легенде */
 .legend-color {
-    width: 16px;
-    height: 16px;
-    border-radius: 3px;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    flex-shrink: 0;
+    width: 16px; /* Ширина плашки цвета */
+    height: 16px; /* Высота плашки цвета */
+    border-radius: 3px; /* Закругление углов */
+    border: 1px solid rgba(255, 255, 255, 0.4); /* Полупрозрачная белая рамка */
+    flex-shrink: 0; /* Запрет сжатия плашки при длинных названиях */
 }
 
+/* Скрытие содержимого панелей при свернутом состоянии */
 #legend-panel.collapsed #legend-content,
 #controls-panel.collapsed #controls-content {
-    display: none;
+    display: none; /* Полное скрытие элементов из интерфейса */
 }
 
+/* Уменьшение отступов панелей в свернутом состоянии */
 #legend-panel.collapsed,
 #controls-panel.collapsed {
     min-width: auto;
     padding: 8px 12px;
 }
 
+/* Контейнер ссылки на регистрацию */
 .auth-register-link {
-    text-align: center;
+    text-align: center; /* Выравнивание ссылки по центру */
     margin-top: 4px;
 }
 
+/* Текстовая ссылка переключения на окно регистрации */
 #open-register-btn {
     font-size: 12px;
     color: #aaa;
-    text-decoration: underline;
+    text-decoration: underline; /* Подчеркивание текста */
     cursor: pointer;
 }
 
+/* Эффект наведения на ссылку регистрации */
 #open-register-btn:hover {
     color: #fff;
 }
 
+/* Темное затенение экрана под модальными окнами */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+    background: rgba(0, 0, 0, 0.6); /* Полупрозрачный черный фон затенения */
+    display: none; /* По умолчанию окно скрыто */
+    justify-content: center; /* Центрирование модального окна по горизонтали */
+    align-items: center; /* Центрирование модального окна по вертикали */
+    z-index: 2000; /* Отображение поверх всех остальных элементов приложения */
 }
 
+/* Включение отображения модального окна при добавлении класса active */
 .modal-overlay.active {
     display: flex;
 }
 
+/* Всплывающий блок формы (авторизация / регистрация) */
 .modal-content {
     position: relative;
-    background: rgba(18, 18, 18, 0.95);
+    background: rgba(18, 18, 18, 0.95); /* Почти непрозрачный темный фон */
     border: 1px solid #555;
     border-radius: 8px;
     padding: 24px;
     color: #fff;
-    width: 280px;
+    width: 280px; /* Ширина модального окна */
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+    gap: 10px; /* Вертикальный зазор между полями ввода */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8); /* Тень вокруг окна */
 }
 
+/* Заголовок модального окна */
 .modal-title {
     font-size: 16px;
     font-weight: bold;
@@ -337,20 +374,22 @@ body, html {
     text-align: center;
 }
 
+/* Поля ввода (input) внутри модальных окон */
 .modal-content input {
     padding: 8px 10px;
-    background: #222;
-    color: #fff;
+    background: #222; /* Фон поля ввода */
+    color: #fff; /* Цвет текста */
     border: 1px solid #555;
     border-radius: 4px;
     outline: none;
     font-size: 13px;
 }
 
+/* Главные кнопки действий в модальных окнах */
 .modal-content button {
     margin-top: 6px;
     padding: 8px 12px;
-    background: #2e6885;
+    background: #2e6885; /* Синий фон кнопки */
     color: #fff;
     border: 1px solid #4a90b5;
     border-radius: 4px;
@@ -359,26 +398,30 @@ body, html {
     font-weight: bold;
 }
 
+/* Эффект наведения на кнопку в модальном окне */
 .modal-content button:hover {
     background: #3b7b9e;
 }
 
+/* Кнопка-крестик закрытия модального окна */
 .modal-close {
     position: absolute;
-    top: 10px;
-    right: 14px;
+    top: 10px; /* Отступ от верха внутри окна */
+    right: 14px; /* Отступ от правого края внутри окна */
     cursor: pointer;
     color: #aaa;
     font-size: 18px;
     font-weight: bold;
 }
 
+/* Эффект наведения на крестик закрытия */
 .modal-close:hover {
     color: #fff;
 }
 
+/* Карточка всплывающей информации (инфо о провинции/маркере) */
 .popup {
-    position: absolute;
+    position: absolute; /* Динамическое позиционирование у объекта на карте */
     display: none;
     background: rgba(0, 0, 0, 0.85);
     color: #ffffff;
@@ -391,6 +434,7 @@ body, html {
     min-width: 180px;
 }
 
+/* Крестик закрытия карточки информации */
 .popup-close {
     position: absolute;
     top: 4px;
@@ -400,6 +444,7 @@ body, html {
     font-size: 14px;
 }
 
+/* Эффект наведения на крестик карточки информации */
 .popup-close:hover {
     color: #fff;
 }
