@@ -50,6 +50,28 @@
         </div>
     </div>
 
+    <div id="auth-panel">
+        <div class="panel-title">Авторизация</div>
+        <input type="email" id="auth-email" placeholder="Email / Логин">
+        <input type="password" id="auth-password" placeholder="Пароль">
+        <button id="auth-login-btn">Вход</button>
+        <div class="auth-register-link">
+            <span id="open-register-btn">Регистрация</span>
+        </div>
+    </div>
+
+    <div id="register-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span id="register-modal-close" class="modal-close">&times;</span>
+            <div class="modal-title">Регистрация</div>
+            <input type="text" id="reg-nickname" placeholder="Имя пользователя / Никнейм">
+            <input type="email" id="reg-email" placeholder="Email">
+            <input type="password" id="reg-password" placeholder="Пароль">
+            <input type="password" id="reg-password-confirm" placeholder="Повторите пароль">
+            <button id="reg-submit-btn">Зарегистрироваться</button>
+        </div>
+    </div>
+
     <div id="map-wrapper">
         <img id="visual-map" src="map.png" alt="Карта провинций">
         <canvas id="layer-canvas"></canvas>
