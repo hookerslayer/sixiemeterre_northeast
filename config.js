@@ -66,14 +66,17 @@ export const elements = {
     toggleIdsBtn: document.getElementById('toggle-ids-btn'),
     trackerBtn: document.getElementById('tracker-btn'),
     toggleMarkerNamesBtn: document.getElementById('toggle-marker-names-btn'),
-    legendContent: document.getElementById('legend-content'),
-    layerButtons: document.querySelectorAll('.layer-btn'),
-    markerTypeCheckboxes: document.querySelectorAll('.marker-type-checkbox'),
-    hiddenCanvas: document.createElement('canvas'),
-    colorMapImage: new Image(),
     legendPanel: document.getElementById('legend-panel'),
     controlsPanel: document.getElementById('controls-panel'),
     legendToggleBtn: document.getElementById('legend-toggle-btn'),
-    controlsToggleBtn: document.getElementById('controls-toggle-btn')
+    controlsToggleBtn: document.getElementById('controls-toggle-btn'),
+    legendContent: document.getElementById('legend-content'),
+    layerButtons: document.querySelectorAll('.layer-btn'),
+    markerTypeCheckboxes: document.querySelectorAll('.marker-type-checkbox'),
+    openRegisterBtn: document.getElementById('open-register-btn'),
+    registerModal: document.getElementById('register-modal'),
+    registerModalClose: document.getElementById('register-modal-close'),
+    hiddenCanvas: document.createElement('canvas'),
+    colorMapImage: new Image()
 };
 elements.hiddenCtx = elements.hiddenCanvas.getContext('2d', { willReadFrequently: true });
