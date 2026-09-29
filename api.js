@@ -78,3 +78,44 @@ export async function fetchUserProfile(userId) {
     }
     return data;
 }
+
+export async function updateProvinceData(id, fields) {
+    const { data, error } = await supabaseClient
+        .from('Provinces')
+        .update(fields)
+        .eq('id', id)
+        .select();
+
+    if (error) throw error;
+    return data;
+}
+
+export async function createMarkerData(markerData) {
+    const { data, error } = await supabaseClient
+        .from('markers')
+        .insert([markerData])
+        .select();
+
+    if (error) throw error;
+    return data;
+}
+
+export async function updateMarkerData(id, fields) {
+    const { data, error } = await supabaseClient
+        .from('markers')
+        .update(fields)
+        .eq('id', id)
+        .select();
+
+    if (error) throw error;
+    return data;
+}
+
+export async function deleteMarkerData(id) {
+    const { error } = await supabaseClient
+        .from('markers')
+        .delete()
+        .eq('id', id);
+
+    if (error) throw error;
+}
