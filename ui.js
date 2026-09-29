@@ -2,6 +2,26 @@ import { state, elements, markerImages, MARKER_TYPES } from './config.js';
 import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from './render.js';
 import { signUpUser, signInUser, signOutUser, updateProvinceData, createMarkerData, updateMarkerData, deleteMarkerData } from './api.js';
 
+let toastTimeout = null;
+
+export function showToast(message, duration = 3000) {
+    if (!elements.toastNotification) return;
+    elements.toastNotification.textContent = message;
+    elements.toastNotification.classList.add('active');
+    if (toastTimeout) clearTimeout(toastTimeout);
+    if (duration > 0) {
+        toastTimeout = setTimeout(() => {
+            elements.toastNotification.classList.remove('active');
+        }, duration);
+    }
+}
+
+export function hideToast() {
+    if (!elements.toastNotification) return;
+    elements.toastNotification.classList.remove('active');
+    if (toastTimeout) clearTimeout(toastTimeout);
+}
+
 export function updateTransform() {
     elements.mapWrapper.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
     elements.mapWrapper.classList.toggle('pixelated', state.scale >= 1.0);
@@ -79,8 +99,9 @@ export function showProvincePopup(imgX, imgY, info) {
                 state.dbProvinces[info.id] = { ...state.dbProvinces[info.id], ...updatedFields };
                 renderActiveLayer();
                 showProvincePopup(imgX, imgY, info);
+                showToast('Данные провинции сохранены');
             } catch (err) {
-                alert('Ошибка при сохранении провинции: ' + err.message);
+                showToast('Ошибка при сохранении провинции: ' + err.message);
             }
         });
     } else {
@@ -152,26 +173,27 @@ export function showMarkerPopup(marker) {
                 if (idx !== -1) state.dbMarkers[idx] = { ...state.dbMarkers[idx], ...updatedFields };
                 renderMarkers();
                 showMarkerPopup(state.dbMarkers[idx]);
+                showToast('Маркер сохранен');
             } catch (err) {
-                alert('Ошибка при изменении маркера: ' + err.message);
+                showToast('Ошибка изменения маркера: ' + err.message);
             }
         });
 
         document.getElementById('admin-marker-move-btn').addEventListener('click', () => {
             state.movingMarkerId = marker.id;
-            alert('Кликните по карте на новое место для этого маркера');
+            clearSelection();
+            showToast('Зажмите маркер мышью и перетащите в нужное место', 0);
         });
 
         document.getElementById('admin-marker-delete-btn').addEventListener('click', async () => {
-            if (confirm('Удалить маркер?')) {
-                try {
-                    await deleteMarkerData(marker.id);
-                    state.dbMarkers = state.dbMarkers.filter(m => m.id !== marker.id);
-                    clearSelection();
-                    renderMarkers();
-                } catch (err) {
-                    alert('Ошибка удаления маркера: ' + err.message);
-                }
+            try {
+                await deleteMarkerData(marker.id);
+                state.dbMarkers = state.dbMarkers.filter(m => m.id !== marker.id);
+                clearSelection();
+                renderMarkers();
+                showToast('Маркер удален');
+            } catch (err) {
+                showToast('Ошибка удаления маркера: ' + err.message);
             }
         });
     } else {
@@ -234,8 +256,9 @@ export function showNewMarkerPopup(imgX, imgY) {
             elements.addMarkerModeBtn.classList.remove('active');
             renderMarkers();
             clearSelection();
+            showToast('Маркер успешно создан');
         } catch (err) {
-            alert('Ошибка создания маркера: ' + err.message);
+            showToast('Ошибка создания маркера: ' + err.message);
         }
     });
 
@@ -254,7 +277,7 @@ export function clearSelection() {
 export function goToProvince(provinceId) {
     const hex = state.idToHexMap[provinceId];
     if (!hex) {
-        alert('Провинция с таким ID не найдена');
+        showToast('Провинция с таким ID не найдена');
         return;
     }
 
@@ -304,9 +327,8 @@ export function initEventListeners() {
 
     elements.openLoginBtn?.addEventListener('click', async () => {
         if (state.currentUser) {
-            if (confirm('Вы действительно хотите выйти из аккаунта?')) {
-                await signOutUser();
-            }
+            await signOutUser();
+            showToast('Вы вышли из системы');
         } else {
             elements.loginModal?.classList.add('active');
         }
@@ -327,7 +349,7 @@ export function initEventListeners() {
         const password = elements.authPasswordInput.value;
 
         if (!email || !password) {
-            alert('Заполните все поля');
+            showToast('Заполните все поля');
             return;
         }
 
@@ -337,8 +359,9 @@ export function initEventListeners() {
             elements.loginModal?.classList.remove('active');
             elements.authEmailInput.value = '';
             elements.authPasswordInput.value = '';
+            showToast('Вы успешно вошли');
         } catch (err) {
-            alert('Ошибка входа: ' + err.message);
+            showToast('Ошибка входа: ' + err.message);
         } finally {
             elements.authLoginBtn.textContent = 'Вход';
         }
@@ -366,26 +389,26 @@ export function initEventListeners() {
         const confirmPass = elements.regPasswordConfirmInput.value;
 
         if (!nickname || !email || !password) {
-            alert('Заполните все обязательные поля');
+            showToast('Заполните все обязательные поля');
             return;
         }
 
         if (password !== confirmPass) {
-            alert('Пароли не совпадают');
+            showToast('Пароли не совпадают');
             return;
         }
 
         try {
             elements.regSubmitBtn.textContent = 'Регистрация...';
             await signUpUser(email, password, nickname);
-            alert('Регистрация успешна! Проверьте почту для подтверждения аккаунта.');
+            showToast('Регистрация успешна!');
             elements.registerModal?.classList.remove('active');
             elements.regNicknameInput.value = '';
             elements.regEmailInput.value = '';
             elements.regPasswordInput.value = '';
             elements.regPasswordConfirmInput.value = '';
         } catch (err) {
-            alert('Ошибка регистрации: ' + err.message);
+            showToast('Ошибка регистрации: ' + err.message);
         } finally {
             elements.regSubmitBtn.textContent = 'Зарегистрироваться';
         }
@@ -395,7 +418,9 @@ export function initEventListeners() {
         state.isAddingMarkerMode = !state.isAddingMarkerMode;
         elements.addMarkerModeBtn.classList.toggle('active', state.isAddingMarkerMode);
         if (state.isAddingMarkerMode) {
-            alert('Кликните по карте в месте создания нового маркера');
+            showToast('Кликните по карте в месте создания нового маркера', 0);
+        } else {
+            hideToast();
         }
     });
 
@@ -463,6 +488,20 @@ export function initEventListeners() {
         const imgX = Math.floor((mouseX - state.tx) / state.scale);
         const imgY = Math.floor((mouseY - state.ty) / state.scale);
 
+        if (state.movingMarkerId !== null) {
+            const movingMarker = state.dbMarkers.find(m => m.id === state.movingMarkerId);
+            if (movingMarker) {
+                const img = markerImages[movingMarker.type];
+                const w = img?.naturalWidth || 24;
+                const h = img?.naturalHeight || 24;
+                if (imgX >= movingMarker.coord_1 - w / 2 && imgX <= movingMarker.coord_1 + w / 2 &&
+                    imgY >= movingMarker.coord_2 - h / 2 && imgY <= movingMarker.coord_2 + h / 2) {
+                    state.isDraggingMarker = true;
+                    return;
+                }
+            }
+        }
+
         if (state.trackerActive) {
             const dx = imgX - state.trackerPos.x;
             const dy = imgY - state.trackerPos.y;
@@ -486,6 +525,16 @@ export function initEventListeners() {
         const imgX = Math.round((mouseX - state.tx) / state.scale);
         const imgY = Math.round((mouseY - state.ty) / state.scale);
 
+        if (state.isDraggingMarker && state.movingMarkerId !== null) {
+            const idx = state.dbMarkers.findIndex(m => m.id === state.movingMarkerId);
+            if (idx !== -1) {
+                state.dbMarkers[idx].coord_1 = imgX;
+                state.dbMarkers[idx].coord_2 = imgY;
+                renderMarkers();
+            }
+            return;
+        }
+
         if (state.isDraggingTracker) {
             state.trackerPos.x = imgX;
             state.trackerPos.y = imgY;
@@ -503,7 +552,24 @@ export function initEventListeners() {
         updateTransform();
     });
 
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('mouseup', async () => {
+        if (state.isDraggingMarker && state.movingMarkerId !== null) {
+            state.isDraggingMarker = false;
+            const movingMarker = state.dbMarkers.find(m => m.id === state.movingMarkerId);
+            if (movingMarker) {
+                try {
+                    await updateMarkerData(movingMarker.id, {
+                        coord_1: movingMarker.coord_1,
+                        coord_2: movingMarker.coord_2
+                    });
+                    showToast('Новое положение маркера сохранено');
+                } catch (err) {
+                    showToast('Ошибка сохранения позиции: ' + err.message);
+                }
+            }
+            state.movingMarkerId = null;
+        }
+
         state.isDragging = false;
         state.isDraggingTracker = false;
     });
@@ -519,24 +585,8 @@ export function initEventListeners() {
         const imgX = Math.floor((mouseX - state.tx) / state.scale);
         const imgY = Math.floor((mouseY - state.ty) / state.scale);
 
-        if (state.movingMarkerId !== null) {
-            try {
-                await updateMarkerData(state.movingMarkerId, { coord_1: imgX, coord_2: imgY });
-                const idx = state.dbMarkers.findIndex(m => m.id === state.movingMarkerId);
-                if (idx !== -1) {
-                    state.dbMarkers[idx].coord_1 = imgX;
-                    state.dbMarkers[idx].coord_2 = imgY;
-                }
-                state.movingMarkerId = null;
-                renderMarkers();
-                clearSelection();
-            } catch (err) {
-                alert('Ошибка перемещения маркера: ' + err.message);
-            }
-            return;
-        }
-
         if (state.isAddingMarkerMode) {
+            hideToast();
             showNewMarkerPopup(imgX, imgY);
             return;
         }
