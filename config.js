@@ -48,7 +48,8 @@ export const state = {
     currentUser: null,
     userProfile: null,
     isAddingMarkerMode: false,
-    movingMarkerId: null
+    movingMarkerId: null,
+    isDraggingMarker: false
 };
 
 export const elements = {
@@ -65,6 +66,7 @@ export const elements = {
     popup: document.getElementById('popup'),
     popupContent: document.getElementById('popup-content'),
     popupClose: document.getElementById('popup-close'),
+    toastNotification: document.getElementById('toast-notification'),
     searchInput: document.getElementById('search-input'),
     searchBtn: document.getElementById('search-btn'),
     toggleIdsBtn: document.getElementById('toggle-ids-btn'),
