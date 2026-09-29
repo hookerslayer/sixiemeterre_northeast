@@ -46,7 +46,9 @@ export const state = {
     selectedImgY: null,
     showIDs: false,
     currentUser: null,
-    userProfile: null
+    userProfile: null,
+    isAddingMarkerMode: false,
+    movingMarkerId: null
 };
 
 export const elements = {
@@ -89,6 +91,8 @@ export const elements = {
     regPasswordInput: document.getElementById('reg-password'),
     regPasswordConfirmInput: document.getElementById('reg-password-confirm'),
     regSubmitBtn: document.getElementById('reg-submit-btn'),
+    adminControls: document.getElementById('admin-controls'),
+    addMarkerModeBtn: document.getElementById('add-marker-mode-btn'),
     hiddenCanvas: document.createElement('canvas'),
     colorMapImage: new Image()
 };
