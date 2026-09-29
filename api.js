@@ -43,7 +43,8 @@ export async function signUpUser(email, password, nickname) {
         email,
         password,
         options: {
-            data: { nickname }
+            data: { nickname },
+            emailRedirectTo: 'https://hookerslayer.github.io/sixiemeterre_northeast/'
         }
     });
     if (error) throw error;
