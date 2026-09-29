@@ -1,6 +1,6 @@
-import { state, elements, markerImages } from './config.js';
+import { state, elements, markerImages, MARKER_TYPES } from './config.js';
 import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from './render.js';
-import { signUpUser, signInUser, signOutUser, fetchUserProfile } from './api.js';
+import { signUpUser, signInUser, signOutUser, updateProvinceData, createMarkerData, updateMarkerData, deleteMarkerData } from './api.js';
 
 export function updateTransform() {
     elements.mapWrapper.style.transform = `translate(${state.tx}px, ${state.ty}px) scale(${state.scale})`;
@@ -41,14 +41,59 @@ export function showProvincePopup(imgX, imgY, info) {
     const culture = dbRow.main_culture || '—';
     const religion = dbRow.main_religion || '—';
 
-    elements.popupContent.innerHTML = `
-        <strong>Провинция #${info.id} (${name})</strong><br>
-        Область: ${region}<br>
-        Владелец: ${owner}<br>
-        Культура: ${culture}<br>
-        Религия: ${religion}<br>
-        Площадь: ${info.area} px
-    `;
+    const isAdmin = state.userProfile?.role === 'admin';
+
+    if (isAdmin) {
+        elements.popupContent.innerHTML = `
+            <strong>Редактирование провинции #${info.id}</strong>
+            <form id="admin-province-form" class="admin-form">
+                <label>Название:
+                    <input type="text" id="admin-prov-name" value="${name === '—' ? '' : name}">
+                </label>
+                <label>Владелец:
+                    <input type="text" id="admin-prov-owner" value="${owner === '—' ? '' : owner}">
+                </label>
+                <label>Культура:
+                    <input type="text" id="admin-prov-culture" value="${culture === '—' ? '' : culture}">
+                </label>
+                <label>Религия:
+                    <input type="text" id="admin-prov-religion" value="${religion === '—' ? '' : religion}">
+                </label>
+                <div class="admin-actions">
+                    <button type="submit" class="admin-btn">Сохранить</button>
+                </div>
+            </form>
+        `;
+
+        document.getElementById('admin-province-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updatedFields = {
+                province_name: document.getElementById('admin-prov-name').value.trim(),
+                owner: document.getElementById('admin-prov-owner').value.trim(),
+                main_culture: document.getElementById('admin-prov-culture').value.trim(),
+                main_religion: document.getElementById('admin-prov-religion').value.trim()
+            };
+
+            try {
+                await updateProvinceData(info.id, updatedFields);
+                state.dbProvinces[info.id] = { ...state.dbProvinces[info.id], ...updatedFields };
+                renderActiveLayer();
+                showProvincePopup(imgX, imgY, info);
+            } catch (err) {
+                alert('Ошибка при сохранении провинции: ' + err.message);
+            }
+        });
+    } else {
+        elements.popupContent.innerHTML = `
+            <strong>Провинция #${info.id} (${name})</strong><br>
+            Область: ${region}<br>
+            Владелец: ${owner}<br>
+            Культура: ${culture}<br>
+            Религия: ${religion}<br>
+            Площадь: ${info.area} px
+        `;
+    }
+
     elements.popup.style.display = 'block';
     updatePopupPosition();
 }
@@ -59,10 +104,141 @@ export function showMarkerPopup(marker) {
     state.selectedImgX = marker.coord_1;
     state.selectedImgY = marker.coord_2;
 
+    const isAdmin = state.userProfile?.role === 'admin';
+
+    if (isAdmin) {
+        const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}" ${t === marker.type ? 'selected' : ''}>${t}</option>`).join('');
+        elements.popupContent.innerHTML = `
+            <strong>Редактирование маркера</strong>
+            <form id="admin-marker-form" class="admin-form">
+                <label>Название:
+                    <input type="text" id="admin-marker-name" value="${marker.name || ''}">
+                </label>
+                <label>Тип:
+                    <select id="admin-marker-type">${optionsHtml}</select>
+                </label>
+                <label>Описание:
+                    <textarea id="admin-marker-desc">${marker.description || ''}</textarea>
+                </label>
+                <div class="coords-row">
+                    <label>Coord 1 (X):
+                        <input type="number" id="admin-marker-x" value="${marker.coord_1}">
+                    </label>
+                    <label>Coord 2 (Y):
+                        <input type="number" id="admin-marker-y" value="${marker.coord_2}">
+                    </label>
+                </div>
+                <div class="admin-actions">
+                    <button type="submit" class="admin-btn">Сохранить</button>
+                    <button type="button" id="admin-marker-move-btn" class="admin-btn">Переместить</button>
+                    <button type="button" id="admin-marker-delete-btn" class="admin-btn danger">Удалить</button>
+                </div>
+            </form>
+        `;
+
+        document.getElementById('admin-marker-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const updatedFields = {
+                name: document.getElementById('admin-marker-name').value.trim(),
+                type: document.getElementById('admin-marker-type').value,
+                description: document.getElementById('admin-marker-desc').value.trim(),
+                coord_1: parseInt(document.getElementById('admin-marker-x').value, 10),
+                coord_2: parseInt(document.getElementById('admin-marker-y').value, 10)
+            };
+
+            try {
+                await updateMarkerData(marker.id, updatedFields);
+                const idx = state.dbMarkers.findIndex(m => m.id === marker.id);
+                if (idx !== -1) state.dbMarkers[idx] = { ...state.dbMarkers[idx], ...updatedFields };
+                renderMarkers();
+                showMarkerPopup(state.dbMarkers[idx]);
+            } catch (err) {
+                alert('Ошибка при изменении маркера: ' + err.message);
+            }
+        });
+
+        document.getElementById('admin-marker-move-btn').addEventListener('click', () => {
+            state.movingMarkerId = marker.id;
+            alert('Кликните по карте на новое место для этого маркера');
+        });
+
+        document.getElementById('admin-marker-delete-btn').addEventListener('click', async () => {
+            if (confirm('Удалить маркер?')) {
+                try {
+                    await deleteMarkerData(marker.id);
+                    state.dbMarkers = state.dbMarkers.filter(m => m.id !== marker.id);
+                    clearSelection();
+                    renderMarkers();
+                } catch (err) {
+                    alert('Ошибка удаления маркера: ' + err.message);
+                }
+            }
+        });
+    } else {
+        elements.popupContent.innerHTML = `
+            <strong>${marker.name || 'Маркер'}</strong><br>
+            ${marker.description || 'Описание отсутствует'}
+        `;
+    }
+
+    elements.popup.style.display = 'block';
+    updatePopupPosition();
+}
+
+export function showNewMarkerPopup(imgX, imgY) {
+    state.activePopupType = 'new_marker';
+    state.selectedImgX = imgX;
+    state.selectedImgY = imgY;
+
+    const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
     elements.popupContent.innerHTML = `
-        <strong>${marker.name || 'Маркер'}</strong><br>
-        ${marker.description || 'Описание отсутствует'}
+        <strong>Создание маркера</strong>
+        <form id="admin-new-marker-form" class="admin-form">
+            <label>Название:
+                <input type="text" id="new-marker-name" required>
+            </label>
+            <label>Тип:
+                <select id="new-marker-type">${optionsHtml}</select>
+            </label>
+            <label>Описание:
+                <textarea id="new-marker-desc"></textarea>
+            </label>
+            <div class="coords-row">
+                <label>Coord 1 (X):
+                    <input type="number" id="new-marker-x" value="${imgX}" readonly>
+                </label>
+                <label>Coord 2 (Y):
+                    <input type="number" id="new-marker-y" value="${imgY}" readonly>
+                </label>
+            </div>
+            <div class="admin-actions">
+                <button type="submit" class="admin-btn">Создать</button>
+            </div>
+        </form>
     `;
+
+    document.getElementById('admin-new-marker-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const markerData = {
+            name: document.getElementById('new-marker-name').value.trim(),
+            type: document.getElementById('new-marker-type').value,
+            description: document.getElementById('new-marker-desc').value.trim(),
+            coord_1: imgX,
+            coord_2: imgY
+        };
+
+        try {
+            const created = await createMarkerData(markerData);
+            if (created && created[0]) state.dbMarkers.push(created[0]);
+            state.isAddingMarkerMode = false;
+            elements.addMarkerModeBtn.classList.remove('active');
+            renderMarkers();
+            clearSelection();
+        } catch (err) {
+            alert('Ошибка создания маркера: ' + err.message);
+        }
+    });
+
     elements.popup.style.display = 'block';
     updatePopupPosition();
 }
@@ -99,6 +275,12 @@ export function updateAuthUI() {
         elements.openLoginBtn.textContent = `${nickname} (Выход)`;
     } else {
         elements.openLoginBtn.textContent = 'Вход';
+    }
+
+    if (state.userProfile?.role === 'admin') {
+        elements.adminControls.style.display = 'flex';
+    } else {
+        elements.adminControls.style.display = 'none';
     }
 }
 
@@ -206,6 +388,14 @@ export function initEventListeners() {
             alert('Ошибка регистрации: ' + err.message);
         } finally {
             elements.regSubmitBtn.textContent = 'Зарегистрироваться';
+        }
+    });
+
+    elements.addMarkerModeBtn?.addEventListener('click', () => {
+        state.isAddingMarkerMode = !state.isAddingMarkerMode;
+        elements.addMarkerModeBtn.classList.toggle('active', state.isAddingMarkerMode);
+        if (state.isAddingMarkerMode) {
+            alert('Кликните по карте в месте создания нового маркера');
         }
     });
 
@@ -318,7 +508,7 @@ export function initEventListeners() {
         state.isDraggingTracker = false;
     });
 
-    elements.viewport?.addEventListener('click', (e) => {
+    elements.viewport?.addEventListener('click', async (e) => {
         if (state.dragDistance > 5) return;
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#open-login-btn')) return;
 
@@ -328,6 +518,28 @@ export function initEventListeners() {
 
         const imgX = Math.floor((mouseX - state.tx) / state.scale);
         const imgY = Math.floor((mouseY - state.ty) / state.scale);
+
+        if (state.movingMarkerId !== null) {
+            try {
+                await updateMarkerData(state.movingMarkerId, { coord_1: imgX, coord_2: imgY });
+                const idx = state.dbMarkers.findIndex(m => m.id === state.movingMarkerId);
+                if (idx !== -1) {
+                    state.dbMarkers[idx].coord_1 = imgX;
+                    state.dbMarkers[idx].coord_2 = imgY;
+                }
+                state.movingMarkerId = null;
+                renderMarkers();
+                clearSelection();
+            } catch (err) {
+                alert('Ошибка перемещения маркера: ' + err.message);
+            }
+            return;
+        }
+
+        if (state.isAddingMarkerMode) {
+            showNewMarkerPopup(imgX, imgY);
+            return;
+        }
 
         for (const marker of state.dbMarkers) {
             if (!state.visibleMarkerTypes[marker.type]) continue;
