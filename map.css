@@ -84,6 +84,29 @@ body, html {
     image-rendering: crisp-edges;
 }
 
+/* Всплывающие уведомления верхней части экрана */
+.toast-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(46, 104, 133, 0.95);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    border: 1px solid #4a90b5;
+    font-size: 13px;
+    font-weight: bold;
+    z-index: 3000;
+    display: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+}
+
+.toast-notification.active {
+    display: block;
+}
+
 #left-sidebar {
     position: fixed;
     top: 20px;
@@ -385,8 +408,9 @@ body, html {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     pointer-events: auto;
     z-index: 1000;
-    min-width: 220px;
-    max-width: 300px;
+    min-width: 240px;
+    max-width: 320px;
+    box-sizing: border-box;
 }
 
 .admin-form {
@@ -394,6 +418,8 @@ body, html {
     flex-direction: column;
     gap: 6px;
     margin-top: 8px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .admin-form label {
@@ -402,6 +428,8 @@ body, html {
     display: flex;
     flex-direction: column;
     gap: 2px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .admin-form input,
@@ -415,6 +443,8 @@ body, html {
     font-size: 12px;
     font-family: inherit;
     outline: none;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .admin-form textarea {
@@ -426,6 +456,8 @@ body, html {
     display: flex;
     gap: 6px;
     margin-top: 8px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .admin-btn {
@@ -438,6 +470,8 @@ body, html {
     font-size: 12px;
     font-weight: bold;
     flex: 1;
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .admin-btn:hover {
@@ -455,11 +489,14 @@ body, html {
 
 .coords-row {
     display: flex;
-    gap: 6px;
+    gap: 8px;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .coords-row label {
     flex: 1;
+    min-width: 0;
 }
 
 .popup-close {
