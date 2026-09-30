@@ -20,6 +20,7 @@ export const state = {
     dbOwnerColors: {},
     dbCultureColors: {},
     dbReligionColors: {},
+    dbResourceColors: {},
     dbMarkers: [],
     activeLayer: 'political',
     showMarkerNames: true,
