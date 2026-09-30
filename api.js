@@ -1,13 +1,14 @@
 import { supabaseClient, state } from './config.js';
 
 export async function loadSupabaseData() {
-    const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions] = await Promise.all([
+    const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources] = await Promise.all([
         supabaseClient.from('Provinces').select('*'),
         supabaseClient.from('region_color').select('*'),
         supabaseClient.from('owner_color').select('*'),
         supabaseClient.from('markers').select('*'),
         supabaseClient.from('culture_color').select('*'),
-        supabaseClient.from('religion_color').select('*')
+        supabaseClient.from('religion_color').select('*'),
+        supabaseClient.from('resource_color').select('*')
     ]);
 
     if (resProvinces.data) {
@@ -34,6 +35,11 @@ export async function loadSupabaseData() {
     if (resReligions.data) {
         resReligions.data.forEach(row => {
             if (row.religion && row.religion_color) state.dbReligionColors[row.religion] = row.religion_color;
+        });
+    }
+    if (resResources.data) {
+        resResources.data.forEach(row => {
+            if (row.resource_name && row.resource_color) state.dbResourceColors[row.resource_name] = row.resource_color;
         });
     }
 }
