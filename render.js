@@ -1,11 +1,11 @@
 import { state, elements, markerImages } from './config.js';
 
 export const DENSITY_TIERS = [
-    { min: 0, max: 3, label: '< 3 чел. / тыс. px', color: '#fef0d9' },
-    { min: 3, max: 6, label: '3 - 6 чел. / тыс. px', color: '#fdcc8a' },
-    { min: 6, max: 10, label: '6 - 10 чел. / тыс. px', color: '#fc8d59' },
-    { min: 10, max: 15, label: '10 - 15 чел. / тыс. px', color: '#e34a33' },
-    { min: 15, max: Infinity, label: '> 15 чел. / тыс. px', color: '#b30000' }
+    { min: 0, max: 1, label: '< 1 чел. / км²', color: '#fef0d9' },
+    { min: 1, max: 3, label: '1 - 3 чел. / км²', color: '#fdcc8a' },
+    { min: 3, max: 6, label: '3 - 6 чел. / км²', color: '#fc8d59' },
+    { min: 6, max: 12, label: '6 - 12 чел. / км²', color: '#e34a33' },
+    { min: 12, max: Infinity, label: '> 12 чел. / км²', color: '#b30000' }
 ];
 
 export function getDensityColor(density) {
@@ -40,13 +40,13 @@ export function renderActiveLayer() {
             } else if (state.activeLayer === 'resource' && dbRow.resource) {
                 targetHex = state.dbResourceColors[dbRow.resource];
             } else if (state.activeLayer === 'density') {
-                const provYards = dbRow.yards || 0;
+                const provYards = Number(dbRow.yards) || 0;
                 const settlementYards = state.dbMarkers
                     .filter(m => Number(m.province_id) === Number(info.id))
-                    .reduce((acc, m) => acc + (m.yards || 0), 0);
+                    .reduce((acc, m) => acc + (Number(m.yards) || 0), 0);
                 const totalPop = (provYards + settlementYards) * 4;
-                const area = info.area || 1;
-                const density = (totalPop / area) * 1000;
+                const areaKm2 = (info.area || 1) * 0.1;
+                const density = totalPop / areaKm2;
                 targetHex = getDensityColor(density);
             }
         }
