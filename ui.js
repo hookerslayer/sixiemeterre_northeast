@@ -49,6 +49,16 @@ export function showTrackerPopup() {
     updatePopupPosition();
 }
 
+function calculateEstatesBreakdown(yards, ratio) {
+    if (!ratio || !yards) return { aristocracy: 0, clergy: 0, burghers: 0, peasants: 0 };
+    return {
+        aristocracy: Math.round(yards * (ratio.aristocracy || 0)),
+        clergy: Math.round(yards * (ratio.clergy || 0)),
+        burghers: Math.round(yards * (ratio.burghers || 0)),
+        peasants: Math.round(yards * (ratio.peasants || 0))
+    };
+}
+
 export function showProvincePopup(imgX, imgY, info) {
     state.activePopupType = 'province';
     state.selectedImgX = imgX;
@@ -61,6 +71,15 @@ export function showProvincePopup(imgX, imgY, info) {
     const culture = dbRow.main_culture || '—';
     const religion = dbRow.main_religion || '—';
     const resource = dbRow.resource || '—';
+    const provYards = Number(dbRow.yards) || 0;
+
+    const settlements = state.dbMarkers.filter(m => Number(m.province_id) === Number(info.id));
+    const settlementsYards = settlements.reduce((acc, m) => acc + (Number(m.yards) || 0), 0);
+    const totalYards = provYards + settlementsYards;
+    const totalPop = totalYards * 4;
+
+    const provRatio = state.dbEstateRatios['province'];
+    const estates = calculateEstatesBreakdown(provYards, provRatio);
 
     const isAdmin = state.userProfile?.role === 'admin';
 
@@ -83,6 +102,9 @@ export function showProvincePopup(imgX, imgY, info) {
                 <label>Ресурс:
                     <input type="text" id="admin-prov-resource" value="${resource === '—' ? '' : resource}">
                 </label>
+                <label>Дворы провинции:
+                    <input type="number" id="admin-prov-yards" value="${provYards}">
+                </label>
                 <div class="admin-actions">
                     <button type="submit" class="admin-btn">Сохранить</button>
                 </div>
@@ -96,7 +118,8 @@ export function showProvincePopup(imgX, imgY, info) {
                 owner: document.getElementById('admin-prov-owner').value.trim(),
                 main_culture: document.getElementById('admin-prov-culture').value.trim(),
                 main_religion: document.getElementById('admin-prov-religion').value.trim(),
-                resource: document.getElementById('admin-prov-resource').value.trim()
+                resource: document.getElementById('admin-prov-resource').value.trim(),
+                yards: parseInt(document.getElementById('admin-prov-yards').value, 10) || 0
             };
 
             try {
@@ -117,7 +140,19 @@ export function showProvincePopup(imgX, imgY, info) {
             Культура: ${culture}<br>
             Религия: ${religion}<br>
             Ресурс: ${resource}<br>
-            Площадь: ${info.area} px
+            Площадь: ${info.area} px<br>
+            <hr>
+            <strong>Демография:</strong><br>
+            Дворов (села): ${provYards}<br>
+            Дворов (в поселениях): ${settlementsYards}<br>
+            Всего дворов: ${totalYards}<br>
+            Население: ${totalPop} чел.<br>
+            <br>
+            <strong>Сословия (сельские дворы):</strong><br>
+            • Аристократия: ${estates.aristocracy}<br>
+            • Духовенство: ${estates.clergy}<br>
+            • Горожане: ${estates.burghers}<br>
+            • Крестьянство: ${estates.peasants}
         `;
     }
 
@@ -131,18 +166,29 @@ export function showMarkerPopup(marker) {
     state.selectedImgX = marker.coord_1;
     state.selectedImgY = marker.coord_2;
 
+    const yards = Number(marker.yards) || 0;
+    const pop = yards * 4;
+    const ratio = state.dbEstateRatios[marker.type];
+    const estates = calculateEstatesBreakdown(yards, ratio);
+
     const isAdmin = state.userProfile?.role === 'admin';
 
     if (isAdmin) {
         const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}" ${t === marker.type ? 'selected' : ''}>${t}</option>`).join('');
         elements.popupContent.innerHTML = `
-            <strong>Редактирование маркера</strong>
+            <strong>Редактирование поселения</strong>
             <form id="admin-marker-form" class="admin-form">
                 <label>Название:
                     <input type="text" id="admin-marker-name" value="${marker.name || ''}">
                 </label>
                 <label>Тип:
                     <select id="admin-marker-type">${optionsHtml}</select>
+                </label>
+                <label>ID Провинции:
+                    <input type="number" id="admin-marker-prov-id" value="${marker.province_id || ''}">
+                </label>
+                <label>Количество дворов:
+                    <input type="number" id="admin-marker-yards" value="${yards}">
                 </label>
                 <label>Описание:
                     <textarea id="admin-marker-desc">${marker.description || ''}</textarea>
@@ -165,9 +211,12 @@ export function showMarkerPopup(marker) {
 
         document.getElementById('admin-marker-form').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const provIdVal = document.getElementById('admin-marker-prov-id').value;
             const updatedFields = {
                 name: document.getElementById('admin-marker-name').value.trim(),
                 type: document.getElementById('admin-marker-type').value,
+                province_id: provIdVal ? parseInt(provIdVal, 10) : null,
+                yards: parseInt(document.getElementById('admin-marker-yards').value, 10) || 0,
                 description: document.getElementById('admin-marker-desc').value.trim(),
                 coord_1: parseInt(document.getElementById('admin-marker-x').value, 10),
                 coord_2: parseInt(document.getElementById('admin-marker-y').value, 10)
@@ -178,10 +227,11 @@ export function showMarkerPopup(marker) {
                 const idx = state.dbMarkers.findIndex(m => m.id === marker.id);
                 if (idx !== -1) state.dbMarkers[idx] = { ...state.dbMarkers[idx], ...updatedFields };
                 renderMarkers();
+                renderActiveLayer();
                 showMarkerPopup(state.dbMarkers[idx]);
-                showToast('Маркер сохранен');
+                showToast('Поселение сохранено');
             } catch (err) {
-                showToast('Ошибка изменения маркера: ' + err.message);
+                showToast('Ошибка изменения поселения: ' + err.message);
             }
         });
 
@@ -197,15 +247,26 @@ export function showMarkerPopup(marker) {
                 state.dbMarkers = state.dbMarkers.filter(m => m.id !== marker.id);
                 clearSelection();
                 renderMarkers();
-                showToast('Маркер удален');
+                renderActiveLayer();
+                showToast('Поселение удалено');
             } catch (err) {
-                showToast('Ошибка удаления маркера: ' + err.message);
+                showToast('Ошибка удаления поселения: ' + err.message);
             }
         });
     } else {
         elements.popupContent.innerHTML = `
-            <strong>${marker.name || 'Маркер'}</strong><br>
-            ${marker.description || 'Описание отсутствует'}
+            <strong>${marker.name || 'Поселение'}</strong><br>
+            ${marker.description || 'Описание отсутствует'}<br>
+            <hr>
+            <strong>Демография поселения:</strong><br>
+            Дворов: ${yards}<br>
+            Население: ${pop} чел.<br>
+            <br>
+            <strong>Сословия:</strong><br>
+            • Аристократия: ${estates.aristocracy}<br>
+            • Духовенство: ${estates.clergy}<br>
+            • Горожане: ${estates.burghers}<br>
+            • Крестьянство: ${estates.peasants}
         `;
     }
 
@@ -220,13 +281,19 @@ export function showNewMarkerPopup(imgX, imgY) {
 
     const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
     elements.popupContent.innerHTML = `
-        <strong>Создание маркера</strong>
+        <strong>Создание поселения</strong>
         <form id="admin-new-marker-form" class="admin-form">
             <label>Название:
                 <input type="text" id="new-marker-name" required>
             </label>
             <label>Тип:
                 <select id="new-marker-type">${optionsHtml}</select>
+            </label>
+            <label>ID Провинции:
+                <input type="number" id="new-marker-prov-id">
+            </label>
+            <label>Количество дворов:
+                <input type="number" id="new-marker-yards" value="0">
             </label>
             <label>Описание:
                 <textarea id="new-marker-desc"></textarea>
@@ -247,9 +314,12 @@ export function showNewMarkerPopup(imgX, imgY) {
 
     document.getElementById('admin-new-marker-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        const provIdVal = document.getElementById('new-marker-prov-id').value;
         const markerData = {
             name: document.getElementById('new-marker-name').value.trim(),
             type: document.getElementById('new-marker-type').value,
+            province_id: provIdVal ? parseInt(provIdVal, 10) : null,
+            yards: parseInt(document.getElementById('new-marker-yards').value, 10) || 0,
             description: document.getElementById('new-marker-desc').value.trim(),
             coord_1: imgX,
             coord_2: imgY
@@ -261,10 +331,11 @@ export function showNewMarkerPopup(imgX, imgY) {
             state.isAddingMarkerMode = false;
             elements.addMarkerModeBtn.classList.remove('active');
             renderMarkers();
+            renderActiveLayer();
             clearSelection();
-            showToast('Маркер успешно создан');
+            showToast('Поселение успешно создано');
         } catch (err) {
-            showToast('Ошибка создания маркера: ' + err.message);
+            showToast('Ошибка создания поселения: ' + err.message);
         }
     });
 
@@ -568,7 +639,7 @@ export function initEventListeners() {
                         coord_1: movingMarker.coord_1,
                         coord_2: movingMarker.coord_2
                     });
-                    showToast('Новое положение маркера сохранено');
+                    showToast('Новое положение поселения сохранено');
                 } catch (err) {
                     showToast('Ошибка сохранения позиции: ' + err.message);
                 }
