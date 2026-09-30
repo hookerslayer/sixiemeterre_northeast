@@ -57,6 +57,8 @@ export const state = {
 export const elements = {
     viewport: document.getElementById('viewport'),
     mapWrapper: document.getElementById('map-wrapper'),
+    burgerMenuBtn: document.getElementById('burger-menu-btn'),
+    navDropdownMenu: document.getElementById('nav-dropdown-menu'),
     layerCanvas: document.getElementById('layer-canvas'),
     layerCtx: document.getElementById('layer-canvas').getContext('2d'),
     highlightCanvas: document.getElementById('highlight-canvas'),
