@@ -1,4 +1,4 @@
-import { state, elements } from './config.js';
+import { state, elements, markerImages } from './config.js';
 
 export function drawProvinceColor(hex, color) {
     const info = state.provincesMeta[hex];
