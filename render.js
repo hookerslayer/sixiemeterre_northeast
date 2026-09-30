@@ -1,5 +1,22 @@
 import { state, elements, markerImages } from './config.js';
 
+export const DENSITY_TIERS = [
+    { min: 0, max: 3, label: '< 3 чел. / тыс. px', color: '#fef0d9' },
+    { min: 3, max: 6, label: '3 - 6 чел. / тыс. px', color: '#fdcc8a' },
+    { min: 6, max: 10, label: '6 - 10 чел. / тыс. px', color: '#fc8d59' },
+    { min: 10, max: 15, label: '10 - 15 чел. / тыс. px', color: '#e34a33' },
+    { min: 15, max: Infinity, label: '> 15 чел. / тыс. px', color: '#b30000' }
+];
+
+export function getDensityColor(density) {
+    for (const tier of DENSITY_TIERS) {
+        if (density >= tier.min && density < tier.max) {
+            return tier.color;
+        }
+    }
+    return DENSITY_TIERS[DENSITY_TIERS.length - 1].color;
+}
+
 export function renderActiveLayer() {
     const width = elements.hiddenCanvas.width;
     const height = elements.hiddenCanvas.height;
@@ -22,6 +39,15 @@ export function renderActiveLayer() {
                 targetHex = state.dbReligionColors[dbRow.main_religion];
             } else if (state.activeLayer === 'resource' && dbRow.resource) {
                 targetHex = state.dbResourceColors[dbRow.resource];
+            } else if (state.activeLayer === 'density') {
+                const provYards = dbRow.yards || 0;
+                const settlementYards = state.dbMarkers
+                    .filter(m => Number(m.province_id) === Number(info.id))
+                    .reduce((acc, m) => acc + (m.yards || 0), 0);
+                const totalPop = (provYards + settlementYards) * 4;
+                const area = info.area || 1;
+                const density = (totalPop / area) * 1000;
+                targetHex = getDensityColor(density);
             }
         }
 
@@ -148,19 +174,32 @@ export function renderIDs() {
 
 export function updateLegend() {
     elements.legendContent.innerHTML = '';
-    let items = {};
 
-    if (state.activeLayer === 'political') {
-        items = state.dbOwnerColors;
-    } else if (state.activeLayer === 'region') {
-        items = state.dbRegionColors;
-    } else if (state.activeLayer === 'culture') {
-        items = state.dbCultureColors;
-    } else if (state.activeLayer === 'religion') {
-        items = state.dbReligionColors;
-    } else if (state.activeLayer === 'resource') {
-        items = state.dbResourceColors;
+    if (state.activeLayer === 'density') {
+        DENSITY_TIERS.forEach(tier => {
+            const row = document.createElement('div');
+            row.className = 'legend-item';
+
+            const colorBox = document.createElement('div');
+            colorBox.className = 'legend-color';
+            colorBox.style.backgroundColor = tier.color;
+
+            const label = document.createElement('span');
+            label.textContent = tier.label;
+
+            row.appendChild(colorBox);
+            row.appendChild(label);
+            elements.legendContent.appendChild(row);
+        });
+        return;
     }
+
+    let items = {};
+    if (state.activeLayer === 'political') items = state.dbOwnerColors;
+    else if (state.activeLayer === 'region') items = state.dbRegionColors;
+    else if (state.activeLayer === 'culture') items = state.dbCultureColors;
+    else if (state.activeLayer === 'religion') items = state.dbReligionColors;
+    else if (state.activeLayer === 'resource') items = state.dbResourceColors;
 
     if (Object.keys(items).length === 0) {
         elements.legendContent.innerHTML = '<em>Нет данных</em>';
