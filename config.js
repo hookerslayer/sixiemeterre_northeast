@@ -21,6 +21,7 @@ export const state = {
     dbCultureColors: {},
     dbReligionColors: {},
     dbResourceColors: {},
+    dbEstateRatios: {},
     dbMarkers: [],
     activeLayer: 'political',
     showMarkerNames: true,
