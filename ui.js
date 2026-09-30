@@ -623,7 +623,7 @@ export function initEventListeners() {
     }, { passive: false });
 
     elements.viewport?.addEventListener('mousedown', (e) => {
-        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#open-login-btn')) return;
+        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#left-sidebar') || e.target.closest('#login-modal') || e.target.closest('#register-modal')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -719,7 +719,7 @@ export function initEventListeners() {
 
     elements.viewport?.addEventListener('click', async (e) => {
         if (state.dragDistance > 5) return;
-        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#legend-panel') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#open-login-btn')) return;
+        if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#left-sidebar') || e.target.closest('#login-modal') || e.target.closest('#register-modal')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
@@ -791,16 +791,14 @@ export function initEventListeners() {
     });
 
     elements.burgerMenuBtn?.addEventListener('click', (e) => {
-    e.stopPropagation();
-    renderNavMenu();
-    elements.navDropdownMenu?.classList.toggle('active');
-});
+        e.stopPropagation();
+        renderNavMenu();
+        elements.navDropdownMenu?.classList.toggle('active');
+    });
 
     document.addEventListener('click', (e) => {
-    if (elements.navDropdownMenu && !elements.navDropdownMenu.contains(e.target) && e.target !== elements.burgerMenuBtn && !elements.burgerMenuBtn.contains(e.target)) {
-        elements.navDropdownMenu.classList.remove('active');
-    }
-});
-    
-    
+        if (elements.navDropdownMenu && !elements.navDropdownMenu.contains(e.target) && e.target !== elements.burgerMenuBtn && !elements.burgerMenuBtn.contains(e.target)) {
+            elements.navDropdownMenu.classList.remove('active');
+        }
+    });
 }
