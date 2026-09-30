@@ -60,6 +60,7 @@ export function showProvincePopup(imgX, imgY, info) {
     const owner = dbRow.owner || '—';
     const culture = dbRow.main_culture || '—';
     const religion = dbRow.main_religion || '—';
+    const resource = dbRow.resource || '—';
 
     const isAdmin = state.userProfile?.role === 'admin';
 
@@ -79,6 +80,9 @@ export function showProvincePopup(imgX, imgY, info) {
                 <label>Религия:
                     <input type="text" id="admin-prov-religion" value="${religion === '—' ? '' : religion}">
                 </label>
+                <label>Ресурс:
+                    <input type="text" id="admin-prov-resource" value="${resource === '—' ? '' : resource}">
+                </label>
                 <div class="admin-actions">
                     <button type="submit" class="admin-btn">Сохранить</button>
                 </div>
@@ -91,7 +95,8 @@ export function showProvincePopup(imgX, imgY, info) {
                 province_name: document.getElementById('admin-prov-name').value.trim(),
                 owner: document.getElementById('admin-prov-owner').value.trim(),
                 main_culture: document.getElementById('admin-prov-culture').value.trim(),
-                main_religion: document.getElementById('admin-prov-religion').value.trim()
+                main_religion: document.getElementById('admin-prov-religion').value.trim(),
+                resource: document.getElementById('admin-prov-resource').value.trim()
             };
 
             try {
@@ -111,6 +116,7 @@ export function showProvincePopup(imgX, imgY, info) {
             Владелец: ${owner}<br>
             Культура: ${culture}<br>
             Религия: ${religion}<br>
+            Ресурс: ${resource}<br>
             Площадь: ${info.area} px
         `;
     }
