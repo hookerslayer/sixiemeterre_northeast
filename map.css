@@ -525,25 +525,22 @@ body, html {
     background: rgba(20, 20, 20, 0.85);
     border: 1px solid #444;
     border-radius: 4px;
-    cursor: pointer;
+    color: #ffffff;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer !important;
     display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    padding: 8px;
-    box-sizing: border-box;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    pointer-events: auto;
+    z-index: 1001;
+    transition: background 0.2s, border-color 0.2s;
 }
 
 .burger-btn:hover {
     background: rgba(40, 40, 40, 0.95);
     border-color: #666;
-}
-
-.burger-btn span {
-    display: block;
-    width: 100%;
-    height: 2px;
-    background-color: #ffffff;
-    border-radius: 1px;
 }
 
 .nav-dropdown {
@@ -555,6 +552,8 @@ body, html {
     padding: 6px 0;
     margin-bottom: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 1002;
+    pointer-events: auto;
 }
 
 .nav-dropdown.active {
@@ -566,7 +565,7 @@ body, html {
     color: #dddddd;
     text-decoration: none;
     font-size: 13px;
-    cursor: pointer;
+    cursor: pointer !important;
     border: none;
     background: transparent;
     text-align: left;
