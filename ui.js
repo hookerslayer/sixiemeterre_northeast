@@ -181,6 +181,9 @@ export function showMarkerPopup(marker) {
                 <label>Название:
                     <input type="text" id="admin-marker-name" value="${marker.name || ''}">
                 </label>
+                <label>Владелец:
+                    <input type="text" id="admin-marker-owner" value="${marker.owner || ''}">
+                </label>
                 <label>Тип:
                     <select id="admin-marker-type">${optionsHtml}</select>
                 </label>
@@ -214,6 +217,7 @@ export function showMarkerPopup(marker) {
             const provIdVal = document.getElementById('admin-marker-prov-id').value;
             const updatedFields = {
                 name: document.getElementById('admin-marker-name').value.trim(),
+                owner: document.getElementById('admin-marker-owner').value.trim(),
                 type: document.getElementById('admin-marker-type').value,
                 province_id: provIdVal ? parseInt(provIdVal, 10) : null,
                 yards: parseInt(document.getElementById('admin-marker-yards').value, 10) || 0,
@@ -256,6 +260,7 @@ export function showMarkerPopup(marker) {
     } else {
         elements.popupContent.innerHTML = `
             <strong>${marker.name || 'Поселение'}</strong><br>
+            Владелец: ${marker.owner || '—'}<br>
             ${marker.description || 'Описание отсутствует'}<br>
             <hr>
             <strong>Демография поселения:</strong><br>
@@ -369,6 +374,65 @@ export function goToProvince(provinceId) {
     showProvincePopup(Math.floor(centerX), Math.floor(centerY), info);
 }
 
+export function renderNavMenu() {
+    if (!elements.navDropdownMenu) return;
+
+    const isAdmin = state.userProfile?.role === 'admin';
+    const isAuth = !!state.currentUser;
+    const hasOwner = !!state.userProfile?.owner;
+
+    let items = [];
+
+    if (isAdmin) {
+        items = [
+            { id: 'nav-map', label: 'Карта' },
+            { id: 'nav-stats', label: 'Статистика' },
+            { id: 'nav-rules', label: 'Правила и механики' }
+        ];
+    } else if (!isAuth) {
+        items = [
+            { id: 'nav-rules', label: 'Правила и механики' },
+            { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }
+        ];
+    } else if (isAuth && !hasOwner) {
+        items = [
+            { id: 'nav-register-state', label: 'Регистрация' },
+            { id: 'nav-rules', label: 'Правила и механики' },
+            { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }
+        ];
+    } else if (isAuth && hasOwner) {
+        items = [
+            { id: 'nav-map', label: 'Карта' },
+            { id: 'nav-stats', label: 'Статистика' },
+            { id: 'nav-cities', label: 'Города' },
+            { id: 'nav-provinces', label: 'Провинции' },
+            { id: 'nav-military', label: 'Военное дело' },
+            { id: 'nav-modifiers', label: 'Модификаторы' },
+            { id: 'nav-rules', label: 'Правила и механики' },
+            { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }
+        ];
+    }
+
+    elements.navDropdownMenu.innerHTML = items.map(item => `
+        <button class="nav-menu-item" data-id="${item.id}" ${item.externalUrl ? `data-url="${item.externalUrl}"` : ''}>
+            ${item.label}
+        </button>
+    `).join('');
+
+    elements.navDropdownMenu.querySelectorAll('.nav-menu-item').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const url = e.currentTarget.dataset.url;
+            const id = e.currentTarget.dataset.id;
+            if (url) {
+                window.open(url, '_blank');
+            } else if (id === 'nav-register-state') {
+                elements.registerModal?.classList.add('active');
+            }
+            elements.navDropdownMenu.classList.remove('active');
+        });
+    });
+}
+
 export function updateAuthUI() {
     if (state.currentUser) {
         const nickname = state.userProfile?.nickname || state.currentUser.email;
@@ -382,6 +446,8 @@ export function updateAuthUI() {
     } else {
         elements.adminControls.style.display = 'none';
     }
+
+    renderNavMenu();
 }
 
 export function initEventListeners() {
@@ -723,4 +789,18 @@ export function initEventListeners() {
         elements.toggleIdsBtn.classList.toggle('active', state.showIDs);
         renderIDs();
     });
+
+    elements.burgerMenuBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    renderNavMenu();
+    elements.navDropdownMenu?.classList.toggle('active');
+});
+
+    document.addEventListener('click', (e) => {
+    if (elements.navDropdownMenu && !elements.navDropdownMenu.contains(e.target) && e.target !== elements.burgerMenuBtn && !elements.burgerMenuBtn.contains(e.target)) {
+        elements.navDropdownMenu.classList.remove('active');
+    }
+});
+    
+    
 }
