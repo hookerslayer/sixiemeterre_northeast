@@ -1,67 +1,62 @@
 import { state, elements, markerImages } from './config.js';
 
-export function drawProvinceColor(hex, color) {
-    const info = state.provincesMeta[hex];
-    if (!info || !info.pixels) return;
-    elements.layerCtx.fillStyle = color;
-    for (let i = 0; i < info.pixels.length; i += 2) {
-        elements.layerCtx.fillRect(info.pixels[i], info.pixels[i + 1], 1, 1);
-    }
-}
-
 export function renderActiveLayer() {
-    elements.layerCtx.clearRect(0, 0, elements.layerCanvas.width, elements.layerCanvas.height);
+    const width = elements.hiddenCanvas.width;
+    const height = elements.hiddenCanvas.height;
+    elements.layerCtx.clearRect(0, 0, width, height);
 
-    for (const [hex, info] of Object.entries(state.provincesMeta)) {
+    const rgbLookup = {};
+
+    for (const [srcHex, info] of Object.entries(state.provincesMeta)) {
         const dbRow = state.dbProvinces[info.id];
-        if (!dbRow) continue;
+        let targetHex = null;
 
-        let color = null;
-        if (state.activeLayer === 'political') color = state.dbOwnerColors[dbRow.owner];
-        else if (state.activeLayer === 'region') color = state.dbRegionColors[dbRow.region];
-        else if (state.activeLayer === 'culture') color = state.dbCultureColors[dbRow.main_culture];
-        else if (state.activeLayer === 'religion') color = state.dbReligionColors[dbRow.main_religion];
-        else if (state.activeLayer === 'resource') color = state.dbResourceColors[dbRow.resource];
+        if (dbRow) {
+            if (state.activeLayer === 'political' && dbRow.owner) {
+                targetHex = state.dbOwnerColors[dbRow.owner];
+            } else if (state.activeLayer === 'region' && dbRow.region) {
+                targetHex = state.dbRegionColors[dbRow.region];
+            } else if (state.activeLayer === 'culture' && dbRow.main_culture) {
+                targetHex = state.dbCultureColors[dbRow.main_culture];
+            } else if (state.activeLayer === 'religion' && dbRow.main_religion) {
+                targetHex = state.dbReligionColors[dbRow.main_religion];
+            } else if (state.activeLayer === 'resource' && dbRow.resource) {
+                targetHex = state.dbResourceColors[dbRow.resource];
+            }
+        }
 
-        if (color) {
-            drawProvinceColor(hex, color);
+        if (targetHex) {
+            const srcR = parseInt(srcHex.slice(1, 3), 16);
+            const srcG = parseInt(srcHex.slice(3, 5), 16);
+            const srcB = parseInt(srcHex.slice(5, 7), 16);
+            const key = (srcR << 16) | (srcG << 8) | srcB;
+
+            const trgR = parseInt(targetHex.slice(1, 3), 16);
+            const trgG = parseInt(targetHex.slice(3, 5), 16);
+            const trgB = parseInt(targetHex.slice(5, 7), 16);
+
+            rgbLookup[key] = [trgR, trgG, trgB, 153];
         }
     }
-    renderLegend();
-}
 
-export function renderLegend() {
-    if (!elements.legendContent) return;
-    let map = {};
-    if (state.activeLayer === 'political') map = state.dbOwnerColors;
-    else if (state.activeLayer === 'region') map = state.dbRegionColors;
-    else if (state.activeLayer === 'culture') map = state.dbCultureColors;
-    else if (state.activeLayer === 'religion') map = state.dbReligionColors;
-    else if (state.activeLayer === 'resource') map = state.dbResourceColors;
+    const srcData = elements.hiddenCtx.getImageData(0, 0, width, height).data;
+    const layerImgData = elements.layerCtx.createImageData(width, height);
+    const dstData = layerImgData.data;
 
-    const entries = Object.entries(map);
-    if (entries.length === 0) {
-        elements.legendContent.innerHTML = 'Нет данных';
-        return;
+    for (let i = 0; i < srcData.length; i += 4) {
+        const key = (srcData[i] << 16) | (srcData[i + 1] << 8) | srcData[i + 2];
+        const targetRgba = rgbLookup[key];
+
+        if (targetRgba) {
+            dstData[i] = targetRgba[0];
+            dstData[i + 1] = targetRgba[1];
+            dstData[i + 2] = targetRgba[2];
+            dstData[i + 3] = targetRgba[3];
+        }
     }
 
-    elements.legendContent.innerHTML = entries.map(([name, color]) => `
-        <div class="legend-item">
-            <div class="legend-color" style="background-color: ${color}"></div>
-            <span>${name}</span>
-        </div>
-    `).join('');
-}
-
-export function highlightProvince(hex) {
-    elements.highlightCtx.clearRect(0, 0, elements.highlightCanvas.width, elements.highlightCanvas.height);
-    const info = state.provincesMeta[hex];
-    if (!info || !info.pixels) return;
-
-    elements.highlightCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    for (let i = 0; i < info.pixels.length; i += 2) {
-        elements.highlightCtx.fillRect(info.pixels[i], info.pixels[i + 1], 1, 1);
-    }
+    elements.layerCtx.putImageData(layerImgData, 0, 0);
+    updateLegend();
 }
 
 export function renderMarkers() {
@@ -70,63 +65,121 @@ export function renderMarkers() {
     state.dbMarkers.forEach(marker => {
         if (!state.visibleMarkerTypes[marker.type]) return;
 
+        const img = markerImages[marker.type];
+        if (!img) return;
+
         const x = marker.coord_1;
         const y = marker.coord_2;
+        const w = img.naturalWidth || 24;
+        const h = img.naturalHeight || 24;
 
-        const img = markerImages[marker.type];
-        if (img && img.complete) {
-            elements.markersCtx.drawImage(img, x - img.width / 2, y - img.height / 2);
-        } else {
-            elements.markersCtx.fillStyle = '#ff0000';
-            elements.markersCtx.beginPath();
-            elements.markersCtx.arc(x, y, 6, 0, Math.PI * 2);
-            elements.markersCtx.fill();
-        }
+        elements.markersCtx.drawImage(img, x - w / 2, y - h / 2, w, h);
 
         if (state.showMarkerNames && marker.name) {
-            elements.markersCtx.font = '12px sans-serif';
-            elements.markersCtx.fillStyle = '#ffffff';
-            elements.markersCtx.strokeStyle = '#000000';
-            elements.markersCtx.lineWidth = 3;
-            elements.markersCtx.textAlign = 'center';
-            elements.markersCtx.strokeText(marker.name, x, y - 12);
-            elements.markersCtx.fillText(marker.name, x, y - 12);
+            drawMarkerLabel(elements.markersCtx, marker.name, x + w / 2 + 2, y - h / 2);
         }
     });
 
     if (state.trackerActive) {
-        const x = state.trackerPos.x;
-        const y = state.trackerPos.y;
-
-        elements.markersCtx.strokeStyle = '#00ffff';
-        elements.markersCtx.lineWidth = 2;
-        elements.markersCtx.beginPath();
-        elements.markersCtx.arc(x, y, 10, 0, Math.PI * 2);
-        elements.markersCtx.stroke();
-
-        elements.markersCtx.fillStyle = '#00ffff';
-        elements.markersCtx.beginPath();
-        elements.markersCtx.arc(x, y, 3, 0, Math.PI * 2);
-        elements.markersCtx.fill();
+        const img = markerImages.ruins;
+        if (img) {
+            const w = img.naturalWidth || 24;
+            const h = img.naturalHeight || 24;
+            elements.markersCtx.drawImage(img, state.trackerPos.x - w / 2, state.trackerPos.y - h / 2, w, h);
+        }
     }
+}
+
+export function drawMarkerLabel(ctx, text, x, y) {
+    ctx.font = 'bold 14px sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 3;
+    ctx.strokeText(text, x, y);
+
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, x, y);
+}
+
+export function highlightProvince(targetHex) {
+    const width = elements.hiddenCanvas.width;
+    const height = elements.hiddenCanvas.height;
+    elements.highlightCtx.clearRect(0, 0, width, height);
+
+    const targetR = parseInt(targetHex.slice(1, 3), 16);
+    const targetG = parseInt(targetHex.slice(3, 5), 16);
+    const targetB = parseInt(targetHex.slice(5, 7), 16);
+
+    const colorData = elements.hiddenCtx.getImageData(0, 0, width, height).data;
+    const highlightImgData = elements.highlightCtx.createImageData(width, height);
+    const hData = highlightImgData.data;
+
+    for (let i = 0; i < colorData.length; i += 4) {
+        if (colorData[i] === targetR && colorData[i + 1] === targetG && colorData[i + 2] === targetB) {
+            hData[i] = 255;
+            hData[i + 1] = 240;
+            hData[i + 2] = 130;
+            hData[i + 3] = 180;
+        }
+    }
+
+    elements.highlightCtx.putImageData(highlightImgData, 0, 0);
 }
 
 export function renderIDs() {
     elements.labelsCtx.clearRect(0, 0, elements.labelsCanvas.width, elements.labelsCanvas.height);
     if (!state.showIDs) return;
 
-    elements.labelsCtx.font = 'bold 11px sans-serif';
-    elements.labelsCtx.fillStyle = '#ffffff';
-    elements.labelsCtx.strokeStyle = '#000000';
-    elements.labelsCtx.lineWidth = 2;
+    elements.labelsCtx.font = 'bold 16px sans-serif';
     elements.labelsCtx.textAlign = 'center';
     elements.labelsCtx.textBaseline = 'middle';
 
     for (const info of Object.values(state.provincesMeta)) {
-        if (info.center) {
-            const [cx, cy] = info.center;
-            elements.labelsCtx.strokeText(info.id, cx, cy);
-            elements.labelsCtx.fillText(info.id, cx, cy);
-        }
+        const [cx, cy] = info.center;
+        elements.labelsCtx.strokeStyle = '#000000';
+        elements.labelsCtx.lineWidth = 3;
+        elements.labelsCtx.strokeText(info.id, cx, cy);
+        elements.labelsCtx.fillStyle = '#ffffff';
+        elements.labelsCtx.fillText(info.id, cx, cy);
+    }
+}
+
+export function updateLegend() {
+    elements.legendContent.innerHTML = '';
+    let items = {};
+
+    if (state.activeLayer === 'political') {
+        items = state.dbOwnerColors;
+    } else if (state.activeLayer === 'region') {
+        items = state.dbRegionColors;
+    } else if (state.activeLayer === 'culture') {
+        items = state.dbCultureColors;
+    } else if (state.activeLayer === 'religion') {
+        items = state.dbReligionColors;
+    } else if (state.activeLayer === 'resource') {
+        items = state.dbResourceColors;
+    }
+
+    if (Object.keys(items).length === 0) {
+        elements.legendContent.innerHTML = '<em>Нет данных</em>';
+        return;
+    }
+
+    for (const [name, color] of Object.entries(items)) {
+        const row = document.createElement('div');
+        row.className = 'legend-item';
+
+        const colorBox = document.createElement('div');
+        colorBox.className = 'legend-color';
+        colorBox.style.backgroundColor = color;
+
+        const label = document.createElement('span');
+        label.textContent = name;
+
+        row.appendChild(colorBox);
+        row.appendChild(label);
+        elements.legendContent.appendChild(row);
     }
 }
