@@ -10,6 +10,10 @@
 
 <div id="viewport">
     <div id="toast-notification" class="toast-notification"></div>
+    <div id="game-calendar" class="game-calendar" aria-live="polite">
+        <span id="game-turn-label">Ход 1 · Осень · 1450</span>
+        <button id="advance-turn-btn" class="advance-turn-btn admin-only" style="display:none" type="button">Сменить ход</button>
+    </div>
 
 <div id="left-sidebar">
     <div class="top-nav-row">
@@ -52,7 +56,6 @@
                 <button class="layer-btn" data-layer="culture">Культуры</button>
                 <button class="layer-btn" data-layer="religion">Религии</button>
                 <button class="layer-btn" data-layer="resource">Ресурсы</button>
-                <button class="layer-btn" data-layer="density">Плотность населения</button>
             </div>
 
             <div class="layer-group">
@@ -105,6 +108,8 @@
         <span id="popup-close" class="popup-close">&times;</span>
         <div id="popup-content"></div>
     </div>
+
+    <div id="page-view" class="page-view" aria-live="polite"></div>
 </div>
 
 <script type="module" src="main.js"></script>

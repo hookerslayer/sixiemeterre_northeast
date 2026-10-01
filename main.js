@@ -1,7 +1,7 @@
 import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, supabaseClient } from './config.js';
-import { loadSupabaseData, fetchUserProfile } from './api.js';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar } from './api.js';
 import { renderActiveLayer, renderMarkers } from './render.js';
-import { updateTransform, initEventListeners, updateAuthUI } from './ui.js';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar } from './ui.js';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -45,14 +45,37 @@ Promise.all([
     renderActiveLayer();
     renderMarkers();
     initEventListeners();
+    fetchGameCalendar().then(calendar => {
+        state.gameCalendar = calendar;
+        renderGameCalendar();
+    }).catch(err => console.error('Ошибка загрузки игрового календаря:', err));
+    window.setInterval(async () => {
+        try {
+            const calendar = await fetchGameCalendar();
+            if (calendar.turn !== state.gameCalendar?.turn || calendar.season !== state.gameCalendar?.season || calendar.year !== state.gameCalendar?.year) {
+                state.gameCalendar = calendar;
+                renderGameCalendar();
+            }
+        } catch (err) {
+            console.error('Ошибка обновления игрового календаря:', err);
+        }
+    }, 60_000);
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
         if (session?.user) {
             state.currentUser = session.user;
             state.userProfile = await fetchUserProfile(session.user.id);
+            if (state.userProfile?.owner) {
+                try {
+                    state.stateMechanics[state.userProfile.owner] = await fetchStateMechanics(state.userProfile.owner) || {};
+                } catch (err) {
+                    console.error('Ошибка загрузки механик государства:', err);
+                }
+            }
         } else {
             state.currentUser = null;
             state.userProfile = null;
+            state.stateMechanics = {};
         }
         updateAuthUI();
     });

@@ -91,6 +91,41 @@ export async function fetchUserProfile(userId) {
     return data;
 }
 
+export async function fetchStateProfiles() {
+    const { data, error } = await supabaseClient
+        .from('profiles')
+        .select('nickname, role, owner')
+        .not('owner', 'is', null)
+        .order('nickname');
+
+    if (error) throw error;
+    return data || [];
+}
+
+export async function fetchStateMechanics(owner) {
+    const { data, error } = await supabaseClient.from('state_mechanics').select('settings').eq('owner', owner).maybeSingle();
+    if (error) throw error;
+    return data?.settings || null;
+}
+
+export async function saveStateMechanics(owner, settings) {
+    const { data, error } = await supabaseClient.from('state_mechanics').upsert({ owner, settings, updated_at: new Date().toISOString() }, { onConflict: 'owner' }).select('settings').single();
+    if (error) throw error;
+    return data.settings;
+}
+
+export async function fetchGameCalendar() {
+    const { data, error } = await supabaseClient.from('game_calendar').select('turn, season, year').eq('singleton', true).single();
+    if (error) throw error;
+    return data;
+}
+
+export async function advanceGameTurn() {
+    const { data, error } = await supabaseClient.rpc('advance_game_turn');
+    if (error) throw error;
+    return Array.isArray(data) ? data[0] : data;
+}
+
 export async function updateProvinceData(id, fields) {
     const { data, error } = await supabaseClient
         .from('Provinces')

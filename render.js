@@ -1,22 +1,5 @@
 import { state, elements, markerImages } from './config.js';
 
-export const DENSITY_TIERS = [
-    { min: 0, max: 1, label: '< 1 чел. / км²', color: '#fef0d9' },
-    { min: 1, max: 3, label: '1 - 3 чел. / км²', color: '#fdcc8a' },
-    { min: 3, max: 6, label: '3 - 6 чел. / км²', color: '#fc8d59' },
-    { min: 6, max: 12, label: '6 - 12 чел. / км²', color: '#e34a33' },
-    { min: 12, max: Infinity, label: '> 12 чел. / км²', color: '#b30000' }
-];
-
-export function getDensityColor(density) {
-    for (const tier of DENSITY_TIERS) {
-        if (density >= tier.min && density < tier.max) {
-            return tier.color;
-        }
-    }
-    return DENSITY_TIERS[DENSITY_TIERS.length - 1].color;
-}
-
 export function renderActiveLayer() {
     const width = elements.hiddenCanvas.width;
     const height = elements.hiddenCanvas.height;
@@ -39,15 +22,6 @@ export function renderActiveLayer() {
                 targetHex = state.dbReligionColors[dbRow.main_religion];
             } else if (state.activeLayer === 'resource' && dbRow.resource) {
                 targetHex = state.dbResourceColors[dbRow.resource];
-            } else if (state.activeLayer === 'density') {
-                const provYards = Number(dbRow.yards) || 0;
-                const settlementYards = state.dbMarkers
-                    .filter(m => Number(m.province_id) === Number(info.id))
-                    .reduce((acc, m) => acc + (Number(m.yards) || 0), 0);
-                const totalPop = (provYards + settlementYards) * 4;
-                const areaKm2 = (info.area || 1) * 0.1;
-                const density = totalPop / areaKm2;
-                targetHex = getDensityColor(density);
             }
         }
 
@@ -174,25 +148,6 @@ export function renderIDs() {
 
 export function updateLegend() {
     elements.legendContent.innerHTML = '';
-
-    if (state.activeLayer === 'density') {
-        DENSITY_TIERS.forEach(tier => {
-            const row = document.createElement('div');
-            row.className = 'legend-item';
-
-            const colorBox = document.createElement('div');
-            colorBox.className = 'legend-color';
-            colorBox.style.backgroundColor = tier.color;
-
-            const label = document.createElement('span');
-            label.textContent = tier.label;
-
-            row.appendChild(colorBox);
-            row.appendChild(label);
-            elements.legendContent.appendChild(row);
-        });
-        return;
-    }
 
     let items = {};
     if (state.activeLayer === 'political') items = state.dbOwnerColors;

@@ -1,8 +1,10 @@
 import { state, elements, markerImages, MARKER_TYPES } from './config.js';
 import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from './render.js';
-import { signUpUser, signInUser, signOutUser, updateProvinceData, createMarkerData, updateMarkerData, deleteMarkerData } from './api.js';
+import { signUpUser, signInUser, signOutUser, updateProvinceData, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, advanceGameTurn } from './api.js';
 
 let toastTimeout = null;
+let activePageOwner = '';
+const markerTypeLabels = { large_city: 'Крупный город', city: 'Город', monastery: 'Монастырь', fortress: 'Острог', ruins: 'Руины' };
 
 export function showToast(message, duration = 3000) {
     if (!elements.toastNotification) return;
@@ -59,6 +61,36 @@ function calculateEstatesBreakdown(yards, ratio) {
     };
 }
 
+export function renderGameCalendar() {
+    if (!elements.gameTurnLabel || !state.gameCalendar) return;
+    const { turn, season, year } = state.gameCalendar;
+    elements.gameTurnLabel.textContent = `Ход ${formatNumber(turn)} · ${season} · ${year}`;
+}
+
+function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, (character) => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    })[character]);
+}
+
+function assimilationTurns(record, kind, name, settings) {
+    if (!name || name === '—' || name === settings?.[`titular_${kind}`]) return null;
+    const stored = Number(record?.[`${kind}_assimilation_turns`]);
+    if (state.userProfile?.role === 'admin' && stored > 0) return stored;
+    return statusDefaultTurns[getStatus(settings, kind, name)] || 30;
+}
+
+function assimilationLine(record, kind, name, settings) {
+    const turns = assimilationTurns(record, kind, name, settings);
+    if (turns === null) return '';
+    const status = statusLabels[getStatus(settings, kind, name)] || statusLabels.noninterference;
+    return `<br>Ассимиляция ${kind === 'culture' ? 'культуры' : 'религии'} (${status}): ${formatNumber(turns)} ходов`;
+}
+
 export function showProvincePopup(imgX, imgY, info) {
     state.activePopupType = 'province';
     state.selectedImgX = imgX;
@@ -82,6 +114,10 @@ export function showProvincePopup(imgX, imgY, info) {
     const estates = calculateEstatesBreakdown(provYards, provRatio);
 
     const isAdmin = state.userProfile?.role === 'admin';
+    const mechanics = state.stateMechanics[dbRow.owner] || {};
+    const cultureTurns = assimilationTurns(dbRow, 'culture', culture, mechanics);
+    const religionTurns = assimilationTurns(dbRow, 'religion', religion, mechanics);
+    const assimilationInputs = `${cultureTurns === null ? '' : `<label>Ассимиляция культуры, ходов:<input type="number" min="1" id="admin-prov-culture-turns" value="${cultureTurns}"></label>`}${religionTurns === null ? '' : `<label>Ассимиляция религии, ходов:<input type="number" min="1" id="admin-prov-religion-turns" value="${religionTurns}"></label>`}`;
 
     if (isAdmin) {
         elements.popupContent.innerHTML = `
@@ -105,6 +141,7 @@ export function showProvincePopup(imgX, imgY, info) {
                 <label>Дворы провинции:
                     <input type="number" id="admin-prov-yards" value="${provYards}">
                 </label>
+                ${assimilationInputs}
                 <div class="admin-actions">
                     <button type="submit" class="admin-btn">Сохранить</button>
                 </div>
@@ -121,6 +158,10 @@ export function showProvincePopup(imgX, imgY, info) {
                 resource: document.getElementById('admin-prov-resource').value.trim(),
                 yards: parseInt(document.getElementById('admin-prov-yards').value, 10) || 0
             };
+            const cultureTurnsInput = document.getElementById('admin-prov-culture-turns');
+            const religionTurnsInput = document.getElementById('admin-prov-religion-turns');
+            if (cultureTurnsInput) updatedFields.culture_assimilation_turns = Math.max(1, parseInt(cultureTurnsInput.value, 10) || cultureTurns);
+            if (religionTurnsInput) updatedFields.religion_assimilation_turns = Math.max(1, parseInt(religionTurnsInput.value, 10) || religionTurns);
 
             try {
                 await updateProvinceData(info.id, updatedFields);
@@ -140,7 +181,6 @@ export function showProvincePopup(imgX, imgY, info) {
             Культура: ${culture}<br>
             Религия: ${religion}<br>
             Ресурс: ${resource}<br>
-            Площадь: ${info.area} px<br>
             <hr>
             <strong>Демография:</strong><br>
             Дворов (села): ${provYards}<br>
@@ -172,9 +212,9 @@ export function showMarkerPopup(marker) {
     const estates = calculateEstatesBreakdown(yards, ratio);
 
     const isAdmin = state.userProfile?.role === 'admin';
-
+    const owningProvince = state.dbProvinces[Number(marker.province_id)] || {};
     if (isAdmin) {
-        const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}" ${t === marker.type ? 'selected' : ''}>${t}</option>`).join('');
+        const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}" ${t === marker.type ? 'selected' : ''}>${markerTypeLabels[t]}</option>`).join('');
         elements.popupContent.innerHTML = `
             <strong>Редактирование поселения</strong>
             <form id="admin-marker-form" class="admin-form">
@@ -252,7 +292,6 @@ export function showMarkerPopup(marker) {
                 coord_1: parseInt(document.getElementById('admin-marker-x').value, 10),
                 coord_2: parseInt(document.getElementById('admin-marker-y').value, 10)
             };
-
             try {
                 await updateMarkerData(marker.id, updatedFields);
                 const idx = state.dbMarkers.findIndex(m => m.id === marker.id);
@@ -287,6 +326,7 @@ export function showMarkerPopup(marker) {
     } else {
         elements.popupContent.innerHTML = `
             <strong>${marker.name || 'Поселение'}</strong><br>
+            Тип: ${markerTypeLabels[marker.type] || marker.type}<br>
             Владелец: ${marker.owner || '—'}<br>
             Культура: ${marker.culture || '—'}<br>
             Религия: ${marker.religion || '—'}<br>
@@ -313,7 +353,7 @@ export function showNewMarkerPopup(imgX, imgY) {
     state.selectedImgX = imgX;
     state.selectedImgY = imgY;
 
-    const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
+    const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}">${markerTypeLabels[t]}</option>`).join('');
     elements.popupContent.innerHTML = `
         <strong>Создание поселения</strong>
         <form id="admin-new-marker-form" class="admin-form">
@@ -434,44 +474,432 @@ export function goToProvince(provinceId) {
     showProvincePopup(Math.floor(centerX), Math.floor(centerY), info);
 }
 
-export function renderNavMenu() {
-    if (!elements.navDropdownMenu) return;
+function showPageView(title, content, options = {}) {
+    if (!elements.pageView) return;
 
+    state.isDragging = false;
+    state.isDraggingMarker = false;
+    state.isDraggingTracker = false;
+    elements.popup.style.display = 'none';
+    const navItems = getNavigationItems();
+    elements.pageView.innerHTML = `
+        <nav class="page-nav" aria-label="Разделы государства">
+            <div class="page-nav-brand">SIXIÈME TERRE</div>
+            ${navItems.map(item => `<button class="page-nav-item ${item.id === options.navId ? 'active' : ''}" data-page-nav="${item.id}" ${item.externalUrl ? `data-url="${item.externalUrl}"` : ''}>${escapeHtml(item.label)}</button>`).join('')}
+        </nav>
+        <div class="page-shell">
+            <header class="page-header">
+                <div>
+                    <div class="page-eyebrow">SIXIÈME TERRE <span>/</span> ${escapeHtml(options.section || title)}</div>
+                    <h1>${escapeHtml(title)}</h1>
+                    ${options.subtitle ? `<p class="page-subtitle">${escapeHtml(options.subtitle)}</p>` : ''}
+                </div>
+                <div class="page-header-actions">
+                    ${options.onBack ? `<button id="page-back-btn" class="page-back-btn">${escapeHtml(options.backLabel || 'Назад')}</button>` : ''}
+                    <button id="page-map-btn" class="page-map-btn">← На карту</button>
+                </div>
+            </header>
+            <main class="page-content">${content}</main>
+        </div>
+    `;
+    elements.pageView.classList.add('active');
+    elements.pageView.scrollTop = 0;
+    document.getElementById('page-map-btn')?.addEventListener('click', closePageView);
+    document.getElementById('page-back-btn')?.addEventListener('click', options.onBack);
+    elements.pageView.querySelectorAll('[data-page-nav]').forEach(button => button.addEventListener('click', () => activateNavigationItem(button.dataset.pageNav, button.dataset.url)));
+}
+
+function closePageView() {
+    elements.pageView?.classList.remove('active');
+    if (elements.pageView) elements.pageView.innerHTML = '';
+}
+
+function getOwnerStatistics(owner) {
+    const provinces = Object.values(state.dbProvinces).filter(province => province.owner === owner);
+    const provinceIds = new Set(provinces.map(province => Number(province.id)));
+    const settlements = state.dbMarkers.filter(marker => provinceIds.has(Number(marker.province_id)));
+    const sum = (rows, key) => rows.reduce((total, row) => total + (Number(row[key]) || 0), 0);
+    const provinceYards = sum(provinces, 'yards');
+    const settlementYards = sum(settlements, 'yards');
+    const estateYards = { aristocracy: 0, clergy: 0, burghers: 0, peasants: 0 };
+
+    const addEstates = (yards, type) => {
+        const result = calculateEstatesBreakdown(yards, state.dbEstateRatios[type]);
+        for (const estate of Object.keys(estateYards)) estateYards[estate] += result[estate];
+    };
+    provinces.forEach(province => addEstates(Number(province.yards) || 0, 'province'));
+    settlements.forEach(marker => addEstates(Number(marker.yards) || 0, marker.type));
+
+    const cultureGroups = new Map();
+    const religionGroups = new Map();
+    const addPopulation = (map, label, yards) => {
+        const key = String(label || '').trim();
+        if (key) {
+            const group = map.get(key) || { yards: 0, population: 0 };
+            group.yards += yards;
+            group.population += yards * 4;
+            map.set(key, group);
+        }
+    };
+    provinces.forEach(province => {
+        const yards = Number(province.yards) || 0;
+        addPopulation(cultureGroups, province.main_culture, yards);
+        addPopulation(religionGroups, province.main_religion, yards);
+    });
+    settlements.forEach(marker => {
+        const yards = Number(marker.yards) || 0;
+        addPopulation(cultureGroups, marker.culture, yards);
+        addPopulation(religionGroups, marker.religion, yards);
+    });
+    const totalYards = provinceYards + settlementYards;
+    return {
+        provinces,
+        settlements,
+        provinceYards,
+        settlementYards,
+        totalYards,
+        population: totalYards * 4,
+        estateYards,
+        cultureGroups,
+        religionGroups
+    };
+}
+
+function formatNumber(value, digits = 0) {
+    return new Intl.NumberFormat('ru-RU', { maximumFractionDigits: digits }).format(value);
+}
+
+function renderPieChart(title, entries) {
+    const values = [...entries].filter(([, value]) => value > 0).sort((a, b) => b[1] - a[1]);
+    const total = values.reduce((sum, [, value]) => sum + value, 0);
+    if (!total) return `<section class="page-panel distribution-panel"><h2>${escapeHtml(title)}</h2><p class="page-empty">Нет данных для распределения.</p></section>`;
+    const palette = ['#c9a96e','#7e9a78','#8799b8','#b77d65','#9c83ad','#d4c18a','#5eaaa0','#c87891','#8c9870','#a78561'];
+    let cursor = 0;
+    const slices = values.map(([, value], index) => {
+        const start = cursor;
+        cursor += value / total * 100;
+        return `${palette[index % palette.length]} ${start}% ${cursor}%`;
+    });
+    const legend = values.map(([label, value], index) => `<li><i style="--slice-color:${palette[index % palette.length]}"></i><span>${escapeHtml(label)}</span><strong>${formatNumber(value)} чел.</strong><small>${formatNumber(value / total * 100, 1)}%</small></li>`).join('');
+    return `<section class="page-panel distribution-panel"><div class="page-panel-heading"><div><h2>${escapeHtml(title)}</h2><p>Расчёт по численности населения в доступных данных.</p></div></div><div class="pie-layout"><div class="pie-chart" role="img" aria-label="${escapeHtml(title)}" style="--pie:${slices.join(',')}"><span>${formatNumber(total)}<small>чел.</small></span></div><ul class="pie-legend">${legend}</ul></div></section>`;
+}
+
+const statusLabels = { recognition: 'Признание', noninterference: 'Невмешательство', expulsion: 'Изгнание' };
+const statusOptions = Object.entries(statusLabels);
+const statusDefaultTurns = { recognition: 60, noninterference: 30, expulsion: 10 };
+const estateNames = [['aristocracy','Аристократия'],['clergy','Духовенство'],['burghers','Горожане'],['peasants','Крестьянство']];
+
+function defaultCultureReligionStatus(kind, name, settings = {}) {
+    return kind === 'religion' && name.toLocaleLowerCase('ru') === 'язычество' && settings.titular_religion === 'Ислам' ? 'expulsion' : 'noninterference';
+}
+
+function getStatus(settings, kind, name) {
+    return settings?.[`${kind}_status`]?.[name]?.status || defaultCultureReligionStatus(kind, name, settings);
+}
+
+function demographicRows(groups, kind, settings, titularName) {
+    return [...groups.entries()].sort((a, b) => b[1].population - a[1].population).map(([name, values]) => {
+        const isTitular = name === titularName;
+        const forcedExpulsion = kind === 'religion' && name.toLocaleLowerCase('ru') === 'язычество' && settings.titular_religion === 'Ислам';
+        const status = isTitular ? 'Титульная' : (statusLabels[getStatus(settings, kind, name)] || statusLabels.noninterference);
+        const loyalty = Number(settings?.[`${kind}_loyalty`]?.[name] ?? 100);
+        const isAdmin = state.userProfile?.role === 'admin';
+        const control = isTitular || forcedExpulsion || !isAdmin ? status : `<select data-status-kind="${kind}" data-status-name="${escapeHtml(name)}">${statusOptions.map(([value, label]) => `<option value="${value}" ${value === getStatus(settings, kind, name) ? 'selected' : ''}>${label}</option>`).join('')}</select>`;
+        const loyaltyInput = isAdmin ? `<input class="stat-loyalty-input" type="number" min="0" max="100" step="1" data-loyalty-kind="${kind}" data-loyalty-name="${escapeHtml(name)}" value="${loyalty}"> %` : `${loyalty}%`;
+        return `<tr><td>${kind === 'culture' ? 'Культура' : 'Религия'}: ${escapeHtml(name)}</td><td>${control}</td><td>${formatNumber(values.yards)} дв.</td><td>${formatNumber(values.population)} чел.</td><td>${loyaltyInput}</td></tr>`;
+    }).join('');
+}
+
+async function renderStateStatistics(owner, playerName = '', options = {}) {
+    activePageOwner = owner;
+    const stats = getOwnerStatistics(owner);
+    showPageView('Статистика', '<div class="page-loading">Загружаю статистику государства…</div>', {
+        section: 'Статистика государства', navId: 'nav-stats', subtitle: `${owner}${playerName ? ` · игрок ${playerName}` : ''}`
+    });
+    try {
+        const settings = state.stateMechanics[owner] ?? await fetchStateMechanics(owner) ?? {};
+        state.stateMechanics[owner] = settings;
+        const titularCulture = settings.titular_culture || '';
+        const titularReligion = settings.titular_religion || '';
+        const isAdmin = state.userProfile?.role === 'admin';
+        const estateRows = estateNames.map(([key, label]) => {
+            const yards = stats.estateYards[key];
+            const loyalty = Number(settings.estate_loyalty?.[key] ?? 100);
+            const rate = Number(settings.tax_rates?.[key] ?? { aristocracy: 10, clergy: 1, burghers: 2, peasants: 1 }[key]);
+            const loyaltyCell = isAdmin ? `<input class="stat-loyalty-input" type="number" min="0" max="100" step="1" data-loyalty-kind="estate" data-loyalty-name="${key}" value="${loyalty}"> %` : `${loyalty}%`;
+            return `<tr><td>${label}</td><td><input class="stat-tax-input" name="tax_${key}" type="number" min="0" step="0.1" value="${rate}"> z/двор</td><td>${formatNumber(yards)} дв.</td><td>${formatNumber(yards * 4)} чел.</td><td>${loyaltyCell}</td></tr>`;
+        }).join('');
+        const culturePie = new Map([...stats.cultureGroups].map(([name, group]) => [name, group.population]));
+        const religionPie = new Map([...stats.religionGroups].map(([name, group]) => [name, group.population]));
+        const titleOptions = (groups, selected) => `<option value="">— не выбрана —</option>${[...groups.keys()].sort((a,b) => a.localeCompare(b, 'ru')).map(name => `<option value="${escapeHtml(name)}" ${name === selected ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}`;
+        const adminTitles = isAdmin ? `<div class="stat-titular-settings"><label>Титульная культура<select name="titular_culture">${titleOptions(stats.cultureGroups, titularCulture)}</select></label><label>Титульная религия<select name="titular_religion">${titleOptions(stats.religionGroups, titularReligion)}</select></label></div>` : '';
+        const ruler = settings.ruler || {};
+        const rulerFields = `<section class="page-panel ruler-panel"><div class="page-panel-heading"><div><h2>Правитель</h2><p>Возраст увеличивается при переходе к новому игровому году.</p></div></div><div class="ruler-fields"><label>Имя<input name="ruler_name" maxlength="80" value="${escapeHtml(ruler.name || '')}" ${isAdmin ? 'readonly' : ''}></label><label>Титул<input name="ruler_title" maxlength="80" value="${escapeHtml(ruler.title || '')}" ${isAdmin ? 'readonly' : ''}></label><label>Возраст<input name="ruler_age" type="number" min="0" max="150" value="${Number(ruler.age) || 0}" ${isAdmin ? 'readonly' : ''}></label></div></section>`;
+        const crime = Number(settings.crime_rate ?? 20);
+        const corruption = Number(settings.corruption_rate ?? 20);
+        const socialSection = (title, rows, key) => `<div class="statistic-pair"><section class="page-panel"><div class="page-panel-heading"><div><h2>${title}</h2></div></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>${key === 'estate' ? 'Сословие' : key === 'culture' ? 'Культура' : 'Религия'}</th>${key === 'estate' ? '<th>Налоговая ставка</th>' : '<th>Статус</th>'}<th>Дворы</th><th>Население</th><th>Лояльность</th></tr></thead><tbody>${rows || `<tr><td colspan="5">Нет данных.</td></tr>`}</tbody></table></div></section>${renderPieChart(`Население по ${key === 'estate' ? 'сословиям' : key === 'culture' ? 'культурам' : 'религиям'}`, key === 'estate' ? Object.entries(stats.estateYards).map(([estate, yards]) => [estateNames.find(([id]) => id === estate)[1], yards * 4]) : key === 'culture' ? culturePie : religionPie)}</div>`;
+        const content = `${stats.provinces.length === 0 ? '<div class="page-empty">В базе пока нет провинций, закреплённых за этим государством.</div>' : ''}
+            <section class="stat-overview" aria-label="Краткая статистика">
+                <div><span>Население</span><strong>${formatNumber(stats.population)}</strong><small>${formatNumber(stats.totalYards)} дворов</small></div>
+                <div><span>Провинции</span><strong>${formatNumber(stats.provinces.length)}</strong><small>под контролем</small></div>
+                <div><span>Поселения</span><strong>${formatNumber(stats.settlements.length)}</strong><small>${formatNumber(stats.settlementYards)} дворов</small></div>
+                <div><span>Преступность</span><strong>${formatNumber(crime)}%</strong><small>текущий показатель</small></div>
+                <div><span>Коррупция</span><strong>${formatNumber(corruption)}%</strong><small>текущий показатель</small></div>
+            </section>
+            ${!isAdmin ? `<div class="stat-titular-summary"><span>Титульная культура: <strong>${escapeHtml(titularCulture || 'не указана')}</strong></span><span>Титульная религия: <strong>${escapeHtml(titularReligion || 'не указана')}</strong></span></div>` : ''}
+            <form id="state-statistics-form">
+                ${adminTitles}
+                ${rulerFields}
+                ${socialSection('Сословия', estateRows, 'estate')}
+                ${socialSection('Культуры', demographicRows(stats.cultureGroups, 'culture', settings, titularCulture), 'culture')}
+                ${socialSection('Религии', demographicRows(stats.religionGroups, 'religion', settings, titularReligion), 'religion')}
+                <div class="mechanics-save-row"><button class="page-map-btn" type="submit">Сохранить данные статистики</button><span id="statistics-save-status" aria-live="polite"></span></div>
+            </form>
+            `;
+        showPageView('Статистика', content, {
+            section: 'Статистика государства', navId: 'nav-stats',
+            subtitle: `${owner}${playerName ? ` · игрок ${playerName}` : ''}`,
+            onBack: options.onBack, backLabel: options.backLabel
+        });
+        elements.pageView.querySelector('#state-statistics-form').addEventListener('submit', async event => {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const status = form.querySelector('#statistics-save-status');
+            const next = { ...settings, tax_rates: { ...(settings.tax_rates || {}) }, estate_loyalty: { ...(settings.estate_loyalty || {}) }, culture_status: { ...(settings.culture_status || {}) }, religion_status: { ...(settings.religion_status || {}) }, culture_loyalty: { ...(settings.culture_loyalty || {}) }, religion_loyalty: { ...(settings.religion_loyalty || {}) } };
+            const defaultTaxRates = { aristocracy: 10, clergy: 1, burghers: 2, peasants: 1 };
+            const proposedTaxRates = Object.fromEntries(estateNames.map(([key]) => [key, Math.max(0, Number(form.elements[`tax_${key}`]?.value ?? settings.tax_rates?.[key] ?? defaultTaxRates[key]) || 0)]));
+            const taxChanged = estateNames.some(([key]) => proposedTaxRates[key] !== Number(settings.tax_rates?.[key] ?? defaultTaxRates[key]));
+            if (taxChanged && !isAdmin && Number(settings.tax_rates_last_changed_year) === Number(state.gameCalendar?.year)) {
+                status.textContent = 'Налоговые ставки можно менять один раз за игровой год.';
+                return;
+            }
+            Object.assign(next.tax_rates, proposedTaxRates);
+            if (taxChanged && !isAdmin) next.tax_rates_last_changed_year = Number(state.gameCalendar?.year);
+            form.querySelectorAll('[data-status-kind]').forEach(select => {
+                const key = select.dataset.statusName;
+                next[`${select.dataset.statusKind}_status`][key] = { ...(next[`${select.dataset.statusKind}_status`][key] || {}), status: select.value };
+            });
+            if (isAdmin) form.querySelectorAll('[data-loyalty-kind]').forEach(input => {
+                const kind = input.dataset.loyaltyKind;
+                const name = input.dataset.loyaltyName;
+                next[`${kind}_loyalty`][name] = Math.max(0, Math.min(100, Number(input.value) || 0));
+            });
+            if (isAdmin) {
+                next.titular_culture = form.elements.titular_culture.value;
+                next.titular_religion = form.elements.titular_religion.value;
+            } else {
+                next.ruler = { ...(settings.ruler || {}), name: form.elements.ruler_name.value.trim(), title: form.elements.ruler_title.value.trim(), age: Math.max(0, Math.min(150, Number(form.elements.ruler_age.value) || 0)), last_age_year: Number(state.gameCalendar?.year) || 1450 };
+            }
+            try {
+                state.stateMechanics[owner] = await saveStateMechanics(owner, next);
+                await renderStateStatistics(owner, playerName, options);
+            } catch (error) {
+                status.textContent = `Ошибка сохранения: ${error.message}`;
+            }
+        });
+    } catch (error) {
+        showPageView('Статистика', `<div class="page-error">Не удалось загрузить настройки государства: ${escapeHtml(error.message)}</div>`, { navId: 'nav-stats', subtitle: owner });
+    }
+}
+
+async function renderAdminStateList() {
+    activePageOwner = '';
+    showPageView('Статистика игроков', '<div class="page-loading">Загружаю список игроков…</div>', { navId: 'nav-stats' });
+    try {
+        const profiles = (await fetchStateProfiles()).filter(profile => String(profile.owner || '').trim());
+        if (!profiles.length) {
+            showPageView('Статистика игроков', '<div class="page-empty">Пока нет игроков с назначенными государствами.</div>', { navId: 'nav-stats' });
+            return;
+        }
+
+        const cards = profiles.map((profile, index) => {
+            const stats = getOwnerStatistics(profile.owner);
+            return `<button class="player-state-card" data-player-index="${index}">
+                <span class="player-state-name">${escapeHtml(profile.nickname || 'Игрок')}</span>
+                <strong>${escapeHtml(profile.owner)}</strong>
+                <span class="player-state-summary">${formatNumber(stats.provinces.length)} пров. · ${formatNumber(stats.population)} чел.</span>
+                <span class="player-state-open">Открыть статистику →</span>
+            </button>`;
+        }).join('');
+        showPageView('Статистика игроков', `<p class="page-intro">Выберите государство, чтобы открыть его показатели отдельно.</p><div class="player-state-grid">${cards}</div>`, { navId: 'nav-stats' });
+        elements.pageView.querySelectorAll('[data-player-index]').forEach(button => {
+            button.addEventListener('click', () => {
+                const profile = profiles[Number(button.dataset.playerIndex)];
+                renderStateStatistics(profile.owner, profile.nickname || 'Игрок', {
+                    onBack: renderAdminStateList,
+                    backLabel: '← К игрокам'
+                });
+            });
+        });
+    } catch (error) {
+        showPageView('Статистика игроков', `<div class="page-error">Не удалось загрузить список игроков: ${escapeHtml(error.message)}</div>`, { navId: 'nav-stats' });
+    }
+}
+
+function renderOwnerProvinces(owner) {
+    const provinces = Object.values(state.dbProvinces)
+        .filter(province => province.owner === owner)
+        .sort((a, b) => Number(a.id) - Number(b.id));
+    const rows = provinces.map(province => `
+        <tr><td><button class="table-link" data-province-id="${Number(province.id)}">#${formatNumber(Number(province.id))}</button></td>
+        <td>${escapeHtml(province.province_name || '—')}</td><td>${escapeHtml(province.region || '—')}</td>
+        <td>${formatNumber(Number(province.yards) || 0)}</td><td>${escapeHtml(province.main_culture || '—')}</td>
+        <td>${escapeHtml(province.main_religion || '—')}</td><td>${formatTurns(assimilationTurns(province, 'culture', province.main_culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(province, 'religion', province.main_religion, state.stateMechanics[owner] || {}))}</td><td>${escapeHtml(province.resource || '—')}</td></tr>
+    `).join('');
+    const content = provinces.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Дворы</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th></tr></thead><tbody>${rows}</tbody></table></div></section>` : '<div class="page-empty">За государством пока не закреплены провинции.</div>';
+    activePageOwner = owner;
+    showPageView('Провинции', content, { subtitle: owner, navId: 'nav-provinces' });
+    elements.pageView.querySelectorAll('[data-province-id]').forEach(button => button.addEventListener('click', () => {
+        closePageView();
+        goToProvince(Number(button.dataset.provinceId));
+    }));
+}
+
+function renderOwnerSettlements(owner) {
+    const provinces = Object.values(state.dbProvinces).filter(province => province.owner === owner);
+    const provinceIds = new Set(provinces.map(province => Number(province.id)));
+    const settlements = state.dbMarkers.filter(marker => provinceIds.has(Number(marker.province_id)));
+    const rows = settlements.map(marker => `
+        <tr><td><button class="table-link" data-marker-id="${Number(marker.id)}">${escapeHtml(marker.name || 'Поселение')}</button></td>
+        <td>${escapeHtml(markerTypeLabels[marker.type] || marker.type || '—')}</td><td>#${formatNumber(Number(marker.province_id) || 0)}</td>
+        <td>${formatNumber(Number(marker.yards) || 0)}</td><td>${escapeHtml(marker.culture || '—')}</td>
+        <td>${escapeHtml(marker.religion || '—')}</td><td>${formatTurns(assimilationTurns(marker, 'culture', marker.culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(marker, 'religion', marker.religion, state.stateMechanics[owner] || {}))}</td></tr>
+    `).join('');
+    const content = settlements.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Дворы</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
+    activePageOwner = owner;
+    showPageView('Города и поселения', content, { subtitle: owner, navId: 'nav-cities' });
+    elements.pageView.querySelectorAll('[data-marker-id]').forEach(button => button.addEventListener('click', () => {
+        const marker = settlements.find(item => Number(item.id) === Number(button.dataset.markerId));
+        if (!marker) return;
+        closePageView();
+        state.tx = window.innerWidth / 2 - Number(marker.coord_1) * state.scale;
+        state.ty = window.innerHeight / 2 - Number(marker.coord_2) * state.scale;
+        updateTransform();
+        showMarkerPopup(marker);
+    }));
+}
+
+function formatTurns(turns) { return turns === null ? '—' : `${formatNumber(turns)} ходов`; }
+
+async function renderEconomy(owner, playerName = '') {
+    activePageOwner = owner;
+    showPageView('Экономика', '<div class="page-loading">Загружаю экономику государства…</div>', { navId: 'nav-economy' });
+    try {
+        const settings = state.stateMechanics[owner] ?? await fetchStateMechanics(owner) ?? {};
+        state.stateMechanics[owner] = settings;
+        const economy = settings.economy || {};
+        const income = { taxes: 0, trade: 0, other_recurring: 0, other_one_off: 0, ...(economy.income || {}) };
+        const expenses = { army: 0, trade: 0, other_recurring: 0, other_one_off: 0, ...(economy.expenses || {}) };
+        const treasury = Number(economy.treasury) || 0;
+        const prestige = Number(economy.prestige) || 0;
+        const treasuryIncome = Number(income.taxes || 0) + Number(income.trade || 0) + Number(income.other_recurring || 0) + Number(income.other_one_off || 0);
+        const treasuryFixedExpenses = Number(expenses.army || 0) + Number(expenses.trade || 0) + Number(expenses.other_recurring || 0);
+        const storedTreasuryItems = Array.isArray(economy.one_off_expenses_treasury) ? economy.one_off_expenses_treasury : [];
+        const storedPrestigeItems = Array.isArray(economy.one_off_expenses_prestige) ? economy.one_off_expenses_prestige : [];
+        const treasuryItems = storedTreasuryItems.length || !Number(expenses.other_one_off) ? storedTreasuryItems : [{ reason: 'Прочие разовые расходы', amount: Number(expenses.other_one_off) }];
+        const prestigeItems = storedPrestigeItems.length || !Number(economy.prestige_one_off_expenses) ? storedPrestigeItems : [{ reason: 'Ранее внесённые разовые расходы', amount: Number(economy.prestige_one_off_expenses) }];
+        const oneOffTreasuryTotal = treasuryItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const oneOffPrestigeTotal = prestigeItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const treasuryNext = treasury + treasuryIncome - treasuryFixedExpenses - oneOffTreasuryTotal;
+        const prestigeFixed = Number(economy.prestige_recurring_expenses) || 0;
+        const prestigeIncome = Number(economy.prestige_recurring_income) || 0;
+        const prestigeNext = prestige + prestigeIncome - prestigeFixed - oneOffPrestigeTotal;
+        const edit = state.userProfile?.role === 'admin' || state.userProfile?.owner === owner;
+        const field = (label, key, value, unit = '') => `<label>${label}<span><input type="number" step="0.1" name="${key}" value="${Number(value) || 0}" ${edit ? '' : 'readonly'}>${unit}</span></label>`;
+        const oneOffRows = (kind, items, unit) => items.map((item, index) => `<div class="one-off-row" data-one-off-row data-kind="${kind}"><input aria-label="Причина расхода" type="text" maxlength="120" name="${kind}_reason" placeholder="Источник или причина" value="${escapeHtml(item.reason || '')}" ${edit ? '' : 'readonly'}><label><input aria-label="Сумма расхода" type="number" min="0" step="0.1" name="${kind}_amount" value="${Number(item.amount) || 0}" ${edit ? '' : 'readonly'}>${unit}</label>${edit ? `<button type="button" class="one-off-remove" aria-label="Удалить расход" data-remove-one-off>×</button>` : ''}</div>`).join('');
+        const addButton = (kind, label) => edit ? `<button type="button" class="compact-add-btn" data-add-one-off="${kind}" aria-label="Добавить ${label}">+</button>` : '';
+        const content = `<form id="economy-form"><div class="economy-layout"><div class="economy-left">
+          <section class="economy-balances"><div class="economy-balance"><span>Казна</span>${field('', 'treasury', treasury, 'z')}<small>На след. ход: <b data-next-treasury>${formatNumber(treasuryNext, 1)} z</b></small></div><div class="economy-balance"><span>Престиж</span>${field('', 'prestige', prestige, 'ОП')}<small>На след. ход: <b data-next-prestige>${formatNumber(prestigeNext, 1)} ОП</b></small></div></section>
+          <div class="economy-fixed-grid">
+            <section class="economy-list page-panel"><h2>Доходы казны</h2>${field('Налоги', 'income_taxes', income.taxes, 'z')}${field('Торговля', 'income_trade', income.trade, 'z')}${field('Прочие постоянные', 'income_other_recurring', income.other_recurring, 'z')}${field('Прочие разовые', 'income_other_one_off', income.other_one_off, 'z')}</section>
+            <section class="economy-list page-panel"><h2>Постоянные расходы казны</h2>${field('Армия', 'expense_army', expenses.army, 'z')}${field('Торговля', 'expense_trade', expenses.trade, 'z')}${field('Прочие расходы', 'expense_other_recurring', expenses.other_recurring, 'z')}</section>
+            <section class="economy-list page-panel"><h2>Постоянные доходы престижа</h2>${field('Прочие доходы', 'prestige_income_fixed', prestigeIncome, 'ОП')}</section>
+            <section class="economy-list page-panel"><h2>Постоянные расходы престижа</h2>${field('Прочие расходы', 'prestige_fixed', prestigeFixed, 'ОП')}</section>
+          </div>
+          <div class="economy-one-off-grid">
+            <section class="economy-list one-off-panel page-panel"><header><h2>Разовые расходы казны</h2>${addButton('treasury', 'расход')}</header><div data-one-off-list="treasury">${oneOffRows('treasury', treasuryItems, 'z')}</div></section>
+            <section class="economy-list one-off-panel page-panel"><header><h2>Разовые расходы престижа</h2>${addButton('prestige', 'расход престижа')}</header><div data-one-off-list="prestige">${oneOffRows('prestige', prestigeItems, 'ОП')}</div></section>
+          </div>
+          <div class="mechanics-save-row"><button class="page-map-btn" type="submit" ${edit ? '' : 'disabled'}>Сохранить экономику</button><span id="economy-save-status" aria-live="polite"></span></div>
+        </div><aside class="economy-charts">
+          ${renderPieChart('Доходы казны', new Map([['Налоги', Number(income.taxes)], ['Торговля', Number(income.trade)], ['Прочие постоянные', Number(income.other_recurring)], ['Прочие разовые доходы', Number(income.other_one_off)]]))}
+          ${renderPieChart('Постоянные расходы казны', new Map([['Армия', Number(expenses.army)], ['Торговля', Number(expenses.trade)], ['Прочие', Number(expenses.other_recurring)]]))}
+          ${renderPieChart('Постоянные доходы престижа', new Map([['Прочие доходы', prestigeIncome]]))}
+          ${renderPieChart('Разовые расходы казны', new Map(treasuryItems.map((item, index) => [item.reason || `Расход ${index + 1}`, Number(item.amount) || 0])))}
+          ${renderPieChart('Расходы престижа', new Map([['Постоянные', prestigeFixed], ...prestigeItems.map((item, index) => [item.reason || `Разовый расход ${index + 1}`, Number(item.amount) || 0])]))}
+        </aside></div><p class="page-note">Текущие балансы и суммы пока вводятся вручную. Доходы и расходы следующего хода пересчитываются из указанных значений.</p></form>`;
+        showPageView('Экономика', content, { navId: 'nav-economy', subtitle: `${owner}${playerName ? ` · игрок ${playerName}` : ''}` });
+        const form = elements.pageView.querySelector('#economy-form');
+        form.querySelectorAll('[data-add-one-off]').forEach(button => button.addEventListener('click', () => {
+            const kind = button.dataset.addOneOff;
+            const unit = kind === 'treasury' ? 'z' : 'ОП';
+            const row = document.createElement('div');
+            row.className = 'one-off-row';
+            row.dataset.oneOffRow = '';
+            row.dataset.kind = kind;
+            row.innerHTML = `<input aria-label="Причина расхода" type="text" maxlength="120" name="${kind}_reason" placeholder="Источник или причина"><label><input aria-label="Сумма расхода" type="number" min="0" step="0.1" name="${kind}_amount" value="0">${unit}</label><button type="button" class="one-off-remove" aria-label="Удалить расход" data-remove-one-off>×</button>`;
+            form.querySelector(`[data-one-off-list="${kind}"]`).append(row);
+            row.querySelector('[data-remove-one-off]').addEventListener('click', () => row.remove());
+        }));
+        form.querySelectorAll('[data-remove-one-off]').forEach(button => button.addEventListener('click', () => button.closest('[data-one-off-row]').remove()));
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            const num = key => Math.max(0, Number(form.elements[key].value) || 0);
+            const status = form.querySelector('#economy-save-status');
+            const invalidOneOff = [...form.querySelectorAll('[data-one-off-row]')].some(row => Number(row.querySelector('input[type="number"]').value) > 0 && !row.querySelector('input[type="text"]').value.trim());
+            if (invalidOneOff) { status.textContent = 'Укажите источник или причину каждого расхода.'; return; }
+            const collectOneOff = kind => [...form.querySelectorAll(`[data-one-off-row][data-kind="${kind}"]`)].map(row => ({ reason: row.querySelector(`[name="${kind}_reason"]`).value.trim(), amount: Math.max(0, Number(row.querySelector(`[name="${kind}_amount"]`).value) || 0) })).filter(item => item.reason || item.amount > 0);
+            const next = { ...settings, economy: { ...economy, treasury: num('treasury'), prestige: num('prestige'), prestige_recurring_income: num('prestige_income_fixed'), prestige_recurring_expenses: num('prestige_fixed'), income: { ...income, taxes: num('income_taxes'), trade: num('income_trade'), other_recurring: num('income_other_recurring'), other_one_off: num('income_other_one_off') }, expenses: { ...expenses, army: num('expense_army'), trade: num('expense_trade'), other_recurring: num('expense_other_recurring'), other_one_off: 0 }, one_off_expenses_treasury: collectOneOff('treasury'), one_off_expenses_prestige: collectOneOff('prestige') } };
+            try { state.stateMechanics[owner] = await saveStateMechanics(owner, next); await renderEconomy(owner, playerName); }
+            catch (error) { status.textContent = `Ошибка сохранения: ${error.message}`; }
+        });
+    } catch (error) { showPageView('Экономика', `<div class="page-error">Не удалось загрузить экономику: ${escapeHtml(error.message)}</div>`, { navId: 'nav-economy', subtitle: owner }); }
+}
+
+async function ageRulersForNewYear(previousYear, newYear) {
+    if (!Number.isFinite(previousYear) || !Number.isFinite(newYear) || newYear <= previousYear) return;
+    const profiles = await fetchStateProfiles();
+    const owners = [...new Set(profiles.map(profile => String(profile.owner || '').trim()).filter(Boolean))];
+    for (const owner of owners) {
+        const settings = state.stateMechanics[owner] ?? await fetchStateMechanics(owner) ?? {};
+        if (!settings.ruler || !Number.isFinite(Number(settings.ruler.age))) continue;
+        const lastAgeYear = Number(settings.ruler.last_age_year ?? previousYear);
+        const yearsElapsed = Math.max(0, newYear - Math.max(previousYear, lastAgeYear));
+        if (!yearsElapsed) continue;
+        const updated = { ...settings, ruler: { ...settings.ruler, age: Math.min(150, Number(settings.ruler.age) + yearsElapsed), last_age_year: newYear } };
+        state.stateMechanics[owner] = await saveStateMechanics(owner, updated);
+    }
+}
+
+function renderUnavailableSection(title, description, navId) {
+    showPageView(title, `<section class="page-empty-state"><div class="page-empty-icon">✦</div><h2>${escapeHtml(title)}</h2><p>${escapeHtml(description)}</p></section>`, { navId });
+}
+
+function getNavigationItems() {
     const isAdmin = state.userProfile?.role === 'admin';
     const isAuth = !!state.currentUser;
     const hasOwner = !!state.userProfile?.owner;
+    if (isAdmin) return [{ id: 'nav-map', label: 'Карта' }, { id: 'nav-stats', label: 'Статистика' }, ...(activePageOwner ? [{ id: 'nav-economy', label: 'Экономика' }] : []), { id: 'nav-rules', label: 'Правила и механики' }];
+    if (!isAuth || !hasOwner) return [{ id: 'nav-rules', label: 'Правила и механики' }, { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }];
+    return [{ id: 'nav-map', label: 'Карта' }, { id: 'nav-stats', label: 'Статистика' }, { id: 'nav-economy', label: 'Экономика' }, { id: 'nav-cities', label: 'Города' }, { id: 'nav-provinces', label: 'Провинции' }, { id: 'nav-military', label: 'Военное дело' }, { id: 'nav-modifiers', label: 'Модификаторы' }, { id: 'nav-rules', label: 'Правила и механики' }, { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }];
+}
 
-    let items = [];
+function activateNavigationItem(id, url) {
+    if (url) { window.open(url, '_blank', 'noopener,noreferrer'); return; }
+    if (id === 'nav-map') closePageView();
+    else if (id === 'nav-stats') state.userProfile?.role === 'admin' ? renderAdminStateList() : state.userProfile?.owner && renderStateStatistics(state.userProfile.owner, state.userProfile.nickname || '');
+    else if (id === 'nav-economy') activePageOwner && renderEconomy(activePageOwner, state.userProfile?.nickname || '');
+    else if (id === 'nav-provinces') state.userProfile?.owner && renderOwnerProvinces(state.userProfile.owner);
+    else if (id === 'nav-cities') state.userProfile?.owner && renderOwnerSettlements(state.userProfile.owner);
+    else if (id === 'nav-military') renderUnavailableSection('Военное дело', 'Здесь появятся состав и численность армии, воеводы, приказы и состояние военных кампаний.', id);
+    else if (id === 'nav-modifiers') renderUnavailableSection('Модификаторы', 'Здесь появятся активные эффекты, срок их действия и влияние на показатели государства.', id);
+    else if (id === 'nav-rules') renderUnavailableSection('Правила и механики', 'Раздел откроется здесь после публикации отдельной вики-страницы проекта.', id);
+}
 
-    if (isAdmin) {
-        items = [
-            { id: 'nav-map', label: 'Карта' },
-            { id: 'nav-stats', label: 'Статистика' },
-            { id: 'nav-rules', label: 'Правила и механики' }
-        ];
-    } else if (!isAuth) {
-        items = [
-            { id: 'nav-rules', label: 'Правила и механики' },
-            { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }
-        ];
-    } else if (isAuth && !hasOwner) {
-        items = [
-            { id: 'nav-register-state', label: 'Регистрация' },
-            { id: 'nav-rules', label: 'Правила и механики' },
-            { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }
-        ];
-    } else if (isAuth && hasOwner) {
-        items = [
-            { id: 'nav-map', label: 'Карта' },
-            { id: 'nav-stats', label: 'Статистика' },
-            { id: 'nav-cities', label: 'Города' },
-            { id: 'nav-provinces', label: 'Провинции' },
-            { id: 'nav-military', label: 'Военное дело' },
-            { id: 'nav-modifiers', label: 'Модификаторы' },
-            { id: 'nav-rules', label: 'Правила и механики' },
-            { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }
-        ];
-    }
+export function renderNavMenu() {
+    if (!elements.navDropdownMenu) return;
+
+    const items = getNavigationItems();
 
     elements.navDropdownMenu.innerHTML = items.map(item => `
         <button class="nav-menu-item" data-id="${item.id}" ${item.externalUrl ? `data-url="${item.externalUrl}"` : ''}>
@@ -481,13 +909,7 @@ export function renderNavMenu() {
 
     elements.navDropdownMenu.querySelectorAll('.nav-menu-item').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            const url = e.currentTarget.dataset.url;
-            const id = e.currentTarget.dataset.id;
-            if (url) {
-                window.open(url, '_blank');
-            } else if (id === 'nav-register-state') {
-                elements.registerModal?.classList.add('active');
-            }
+            activateNavigationItem(e.currentTarget.dataset.id, e.currentTarget.dataset.url);
             elements.navDropdownMenu.classList.remove('active');
         });
     });
@@ -503,8 +925,10 @@ export function updateAuthUI() {
 
     if (state.userProfile?.role === 'admin') {
         elements.adminControls.style.display = 'flex';
+        if (elements.advanceTurnBtn) elements.advanceTurnBtn.style.display = 'inline-flex';
     } else {
         elements.adminControls.style.display = 'none';
+        if (elements.advanceTurnBtn) elements.advanceTurnBtn.style.display = 'none';
     }
 
     renderNavMenu();
@@ -521,6 +945,23 @@ export function initEventListeners() {
     elements.legendToggleBtn?.addEventListener('click', () => {
         const isCollapsed = elements.legendPanel.classList.toggle('collapsed');
         elements.legendToggleBtn.textContent = isCollapsed ? '+' : '−';
+    });
+
+    elements.advanceTurnBtn?.addEventListener('click', async () => {
+        if (state.userProfile?.role !== 'admin') return;
+        const button = elements.advanceTurnBtn;
+        button.disabled = true;
+        try {
+            const previousYear = Number(state.gameCalendar?.year);
+            state.gameCalendar = await advanceGameTurn();
+            if (Number(state.gameCalendar?.year) > previousYear) await ageRulersForNewYear(previousYear, Number(state.gameCalendar.year));
+            renderGameCalendar();
+            showToast('Наступил новый ход');
+        } catch (error) {
+            showToast(`Не удалось сменить ход: ${error.message}`);
+        } finally {
+            button.disabled = false;
+        }
     });
 
     elements.controlsToggleBtn?.addEventListener('click', () => {
@@ -664,6 +1105,7 @@ export function initEventListeners() {
     });
 
     elements.viewport?.addEventListener('wheel', (e) => {
+        if (elements.pageView?.classList.contains('active')) return;
         e.preventDefault();
         const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
         const newScale = Math.min(Math.max(state.minScale, state.scale * zoomFactor), 2.5);
@@ -683,6 +1125,7 @@ export function initEventListeners() {
     }, { passive: false });
 
     elements.viewport?.addEventListener('mousedown', (e) => {
+        if (elements.pageView?.classList.contains('active')) return;
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#left-sidebar') || e.target.closest('#login-modal') || e.target.closest('#register-modal')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
@@ -721,7 +1164,7 @@ export function initEventListeners() {
     });
 
     window.addEventListener('mousemove', (e) => {
-        if (!elements.viewport) return;
+        if (!elements.viewport || elements.pageView?.classList.contains('active')) return;
         const rect = elements.viewport.getBoundingClientRect();
         const mouseX = e.clientX - rect.left;
         const mouseY = e.clientY - rect.top;
@@ -778,6 +1221,7 @@ export function initEventListeners() {
     });
 
     elements.viewport?.addEventListener('click', async (e) => {
+        if (elements.pageView?.classList.contains('active')) return;
         if (state.dragDistance > 5) return;
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#left-sidebar') || e.target.closest('#login-modal') || e.target.closest('#register-modal')) return;
 

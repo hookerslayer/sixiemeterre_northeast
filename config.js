@@ -49,6 +49,8 @@ export const state = {
     showIDs: false,
     currentUser: null,
     userProfile: null,
+    gameCalendar: null,
+    stateMechanics: {},
     isAddingMarkerMode: false,
     movingMarkerId: null,
     isDraggingMarker: false
@@ -70,6 +72,9 @@ export const elements = {
     popup: document.getElementById('popup'),
     popupContent: document.getElementById('popup-content'),
     popupClose: document.getElementById('popup-close'),
+    pageView: document.getElementById('page-view'),
+    gameTurnLabel: document.getElementById('game-turn-label'),
+    advanceTurnBtn: document.getElementById('advance-turn-btn'),
     toastNotification: document.getElementById('toast-notification'),
     searchInput: document.getElementById('search-input'),
     searchBtn: document.getElementById('search-btn'),
