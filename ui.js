@@ -190,6 +190,12 @@ export function showMarkerPopup(marker) {
                 <label>ID Провинции:
                     <input type="number" id="admin-marker-prov-id" value="${marker.province_id || ''}">
                 </label>
+                <label>Культура поселения:
+                    <input type="text" id="admin-marker-culture" value="${marker.culture || ''}" ${marker.type === 'ruins' ? 'disabled' : ''}>
+                </label>
+                <label>Религия поселения:
+                    <input type="text" id="admin-marker-religion" value="${marker.religion || ''}" ${marker.type === 'ruins' ? 'disabled' : ''}>
+                </label>
                 <label>Количество дворов:
                     <input type="number" id="admin-marker-yards" value="${yards}">
                 </label>
@@ -212,14 +218,35 @@ export function showMarkerPopup(marker) {
             </form>
         `;
 
+        const markerTypeInput = document.getElementById('admin-marker-type');
+        const markerProvinceInput = document.getElementById('admin-marker-prov-id');
+        const markerCultureInput = document.getElementById('admin-marker-culture');
+        const markerReligionInput = document.getElementById('admin-marker-religion');
+        markerTypeInput.addEventListener('change', () => {
+            const isRuins = markerTypeInput.value === 'ruins';
+            markerCultureInput.disabled = isRuins;
+            markerReligionInput.disabled = isRuins;
+            if (isRuins) {
+                markerCultureInput.value = '';
+                markerReligionInput.value = '';
+            } else {
+                const province = state.dbProvinces[Number(markerProvinceInput.value)];
+                if (!markerCultureInput.value.trim()) markerCultureInput.value = province?.main_culture || '';
+                if (!markerReligionInput.value.trim()) markerReligionInput.value = province?.main_religion || '';
+            }
+        });
+
         document.getElementById('admin-marker-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const provIdVal = document.getElementById('admin-marker-prov-id').value;
+            const markerType = markerTypeInput.value;
             const updatedFields = {
                 name: document.getElementById('admin-marker-name').value.trim(),
                 owner: document.getElementById('admin-marker-owner').value.trim(),
-                type: document.getElementById('admin-marker-type').value,
+                type: markerType,
                 province_id: provIdVal ? parseInt(provIdVal, 10) : null,
+                culture: markerType === 'ruins' ? null : markerCultureInput.value.trim() || null,
+                religion: markerType === 'ruins' ? null : markerReligionInput.value.trim() || null,
                 yards: parseInt(document.getElementById('admin-marker-yards').value, 10) || 0,
                 description: document.getElementById('admin-marker-desc').value.trim(),
                 coord_1: parseInt(document.getElementById('admin-marker-x').value, 10),
@@ -261,6 +288,8 @@ export function showMarkerPopup(marker) {
         elements.popupContent.innerHTML = `
             <strong>${marker.name || 'Поселение'}</strong><br>
             Владелец: ${marker.owner || '—'}<br>
+            Культура: ${marker.culture || '—'}<br>
+            Религия: ${marker.religion || '—'}<br>
             ${marker.description || 'Описание отсутствует'}<br>
             <hr>
             <strong>Демография поселения:</strong><br>
@@ -297,6 +326,12 @@ export function showNewMarkerPopup(imgX, imgY) {
             <label>ID Провинции:
                 <input type="number" id="new-marker-prov-id">
             </label>
+            <label>Культура поселения:
+                <input type="text" id="new-marker-culture">
+            </label>
+            <label>Религия поселения:
+                <input type="text" id="new-marker-religion">
+            </label>
             <label>Количество дворов:
                 <input type="number" id="new-marker-yards" value="0">
             </label>
@@ -317,13 +352,38 @@ export function showNewMarkerPopup(imgX, imgY) {
         </form>
     `;
 
+    const newMarkerTypeInput = document.getElementById('new-marker-type');
+    const newMarkerProvinceInput = document.getElementById('new-marker-prov-id');
+    const newMarkerCultureInput = document.getElementById('new-marker-culture');
+    const newMarkerReligionInput = document.getElementById('new-marker-religion');
+    const syncNewMarkerCultureReligion = () => {
+        const isRuins = newMarkerTypeInput.value === 'ruins';
+        newMarkerCultureInput.disabled = isRuins;
+        newMarkerReligionInput.disabled = isRuins;
+        if (isRuins) {
+            newMarkerCultureInput.value = '';
+            newMarkerReligionInput.value = '';
+            return;
+        }
+
+        const province = state.dbProvinces[Number(newMarkerProvinceInput.value)];
+        newMarkerCultureInput.value = province?.main_culture || '';
+        newMarkerReligionInput.value = province?.main_religion || '';
+    };
+    newMarkerTypeInput.addEventListener('change', syncNewMarkerCultureReligion);
+    newMarkerProvinceInput.addEventListener('input', syncNewMarkerCultureReligion);
+    syncNewMarkerCultureReligion();
+
     document.getElementById('admin-new-marker-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const provIdVal = document.getElementById('new-marker-prov-id').value;
+        const markerType = newMarkerTypeInput.value;
         const markerData = {
             name: document.getElementById('new-marker-name').value.trim(),
-            type: document.getElementById('new-marker-type').value,
+            type: markerType,
             province_id: provIdVal ? parseInt(provIdVal, 10) : null,
+            culture: markerType === 'ruins' ? null : newMarkerCultureInput.value.trim() || null,
+            religion: markerType === 'ruins' ? null : newMarkerReligionInput.value.trim() || null,
             yards: parseInt(document.getElementById('new-marker-yards').value, 10) || 0,
             description: document.getElementById('new-marker-desc').value.trim(),
             coord_1: imgX,
