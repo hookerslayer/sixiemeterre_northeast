@@ -126,6 +126,24 @@ export async function advanceGameTurn() {
     return Array.isArray(data) ? data[0] : data;
 }
 
+export async function uploadStateSymbol(owner, file) {
+    const ownerKey = Array.from(new TextEncoder().encode(owner), byte => byte.toString(16).padStart(2, '0')).join('');
+    const path = `${ownerKey}/symbol`;
+    const { error } = await supabaseClient.storage.from('state-symbols').upload(path, file, {
+        upsert: true,
+        contentType: file.type,
+        cacheControl: '3600'
+    });
+    if (error) throw error;
+    const { data } = supabaseClient.storage.from('state-symbols').getPublicUrl(path);
+    return { path, url: `${data.publicUrl}?v=${Date.now()}` };
+}
+
+export async function deleteStateSymbol(path) {
+    const { error } = await supabaseClient.storage.from('state-symbols').remove([path]);
+    if (error) throw error;
+}
+
 export async function updateProvinceData(id, fields) {
     const { data, error } = await supabaseClient
         .from('Provinces')

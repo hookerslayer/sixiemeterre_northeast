@@ -733,22 +733,21 @@ body, html {
 .economy-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .economy-fields label > span { display: flex; align-items: center; gap: 7px; }
 .economy-layout { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr); align-items: start; gap: 16px; }
-.economy-left, .economy-charts { min-width: 0; }
+.economy-left, .economy-charts, .economy-ledgers, .economy-ledger { min-width: 0; }
+.economy-ledgers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 10px; }
+.economy-ledger { display: grid; gap: 9px; }
+.economy-ledger-heading { margin-bottom: 1px; }
 .economy-charts { display: grid; gap: 14px; }
 .economy-charts > .distribution-panel { margin: 0; }
-.economy-balances { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
 .economy-balance { display: grid; gap: 5px; min-width: 0; padding: 11px 13px; border: 1px solid rgba(222, 210, 183, .15); border-radius: 7px; background: rgba(255, 255, 255, .025); }
 .economy-balance > span { color: #aeb2a7; font-size: 11px; }
-.economy-balance > label { display: flex; align-items: center; gap: 6px; color: #f0e4c7; font: 500 20px Georgia, serif; }
-.economy-balance input { width: 110px; padding: 3px 5px; border: 0; color: #f0e4c7; background: transparent; font: inherit; }
+.economy-balance > strong { color: #f0e4c7; font: 500 20px Georgia, serif; }
 .economy-balance small { color: #aeb2a7; font-size: 11px; }
 .economy-balance small b { color: #e8deca; font-weight: 600; }
-.economy-fixed-grid, .economy-one-off-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
 .economy-list { min-width: 0; margin: 0; padding: 12px; }
 .economy-list h2 { margin: 0 0 10px; color: #eee5d4; font: 500 16px Georgia, serif; }
-.economy-list > label { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 6px 0; color: #b6b8ae; font-size: 11px; }
-.economy-list > label > span { display: flex; align-items: center; gap: 5px; color: #c8c6ae; white-space: nowrap; }
-.economy-list > label input { width: 80px; padding: 5px 6px; border: 1px solid rgba(222, 210, 183, .16); border-radius: 4px; color: #eee8da; background: #171b19; font: inherit; }
+.economy-value { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 7px 0; color: #b6b8ae; font-size: 11px; }
+.economy-value strong { color: #e8deca; font-weight: 600; white-space: nowrap; }
 .one-off-panel header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .compact-add-btn, .one-off-remove { border: 1px solid rgba(212, 178, 112, .28); border-radius: 5px; color: #eee2c5; background: rgba(212, 178, 112, .1); font: inherit; cursor: pointer; }
 .compact-add-btn { width: 27px; height: 27px; line-height: 1; font-size: 18px; }
@@ -757,6 +756,26 @@ body, html {
 .one-off-row label { display: flex; align-items: center; gap: 4px; color: #b6b8ae; font-size: 10px; }
 .one-off-row label input { width: 62px; }
 .one-off-remove { width: 25px; height: 25px; padding: 0; }
+.government-form-field { display: grid; gap: 6px; margin: 0 0 16px; color: #b6b8ae; font-size: 12px; }
+.government-form-field select { width: min(100%, 380px); padding: 8px 10px; border: 1px solid rgba(222, 210, 183, .2); border-radius: 5px; color: #eee8da; background: #171b19; font: inherit; }
+.government-form-readonly { display: flex; gap: 10px; margin: 0 0 16px; color: #aeb2a7; font-size: 12px; }
+.government-form-readonly strong { color: #e8deca; font-weight: 600; }
+.state-identity-panel { display: grid; grid-template-columns: minmax(250px, .85fr) minmax(0, 1.4fr); align-items: center; gap: 14px; padding: 0 16px 0 0; }
+.state-identity-symbol { min-width: 0; }
+.state-identity-symbol .page-panel-heading { padding-bottom: 8px; }
+.symbol-content { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 0 20px 20px; }
+.state-symbol-preview { max-width: min(100%, 280px); max-height: 180px; object-fit: contain; border: 1px solid rgba(222, 210, 183, .17); border-radius: 6px; }
+.state-symbol-empty { display: grid; width: 220px; height: 120px; place-items: center; border: 1px dashed rgba(222, 210, 183, .2); border-radius: 6px; color: #92988d; font-size: 12px; }
+.symbol-content > div:last-child { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; }
+.symbol-upload-label { padding: 9px 12px; border: 1px solid rgba(212, 178, 112, .35); border-radius: 5px; color: #eee2c5; background: rgba(212, 178, 112, .1); font-size: 12px; cursor: pointer; }
+.symbol-upload-label input { display: block; max-width: 250px; margin-top: 7px; font-size: 11px; }
+.state-identity-details { min-width: 0; padding: 20px 12px; }
+.state-identity-details > h2 { margin: 0 0 14px; color: #eee5d4; font: 500 clamp(24px, 3vw, 34px) Georgia, serif; overflow-wrap: anywhere; }
+.state-identity-titles { display: flex; flex-wrap: wrap; gap: 10px 24px; margin-bottom: 16px; }
+.state-identity-titles > span { display: grid; gap: 4px; color: #aeb2a7; font-size: 11px; }
+.state-identity-titles strong { color: #e8deca; font-size: 14px; font-weight: 600; }
+.state-identity-details .government-form-field, .state-identity-details .government-form-readonly { margin: 0; }
+#state-symbol-status { color: #b9c6a6; font-size: 12px; }
 .dense-table .page-table th, .dense-table .page-table td { padding: 8px 9px; font-size: 11px; }
 .dense-table .page-table th { white-space: normal; }
 
@@ -988,6 +1007,8 @@ body, html {
 }
 
 @media (max-width: 760px) {
+    .state-identity-panel { grid-template-columns: 1fr; padding: 0; }
+    .state-identity-details { padding: 4px 20px 20px; }
     .page-shell {
         padding: 24px 18px 36px;
     }
@@ -1011,6 +1032,6 @@ body, html {
     .pie-layout { grid-template-columns: minmax(100px, 130px) minmax(0, 1fr); gap: 12px; padding: 0 14px 16px; }
     .pie-chart { width: 130px; }
     .stat-titular-settings { grid-template-columns: 1fr; }
-    .economy-fixed-grid, .economy-one-off-grid { grid-template-columns: 1fr; }
+    .economy-ledgers { grid-template-columns: 1fr; }
     .ruler-fields { grid-template-columns: 1fr; }
 }

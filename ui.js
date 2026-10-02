@@ -1,10 +1,12 @@
 import { state, elements, markerImages, MARKER_TYPES } from './config.js';
 import { renderActiveLayer, renderMarkers, highlightProvince, renderIDs } from './render.js';
-import { signUpUser, signInUser, signOutUser, updateProvinceData, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, advanceGameTurn } from './api.js';
+import { signUpUser, signInUser, signOutUser, updateProvinceData, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, advanceGameTurn, uploadStateSymbol, deleteStateSymbol } from './api.js';
 
 let toastTimeout = null;
 let activePageOwner = '';
 const markerTypeLabels = { large_city: 'Крупный город', city: 'Город', monastery: 'Монастырь', fortress: 'Острог', ruins: 'Руины' };
+const markerTypeDevelopment = { large_city: 200, city: 50, monastery: 20, fortress: 10, ruins: 0 };
+const governmentForms = ['Феодальная монархия', 'Вечевая республика', 'Теократия', 'Вождество'];
 
 export function showToast(message, duration = 3000) {
     if (!elements.toastNotification) return;
@@ -104,6 +106,7 @@ export function showProvincePopup(imgX, imgY, info) {
     const religion = dbRow.main_religion || '—';
     const resource = dbRow.resource || '—';
     const provYards = Number(dbRow.yards) || 0;
+    const development = Number(dbRow.development ?? 20);
 
     const settlements = state.dbMarkers.filter(m => Number(m.province_id) === Number(info.id));
     const settlementsYards = settlements.reduce((acc, m) => acc + (Number(m.yards) || 0), 0);
@@ -141,6 +144,9 @@ export function showProvincePopup(imgX, imgY, info) {
                 <label>Дворы провинции:
                     <input type="number" id="admin-prov-yards" value="${provYards}">
                 </label>
+                <label>Развитие:
+                    <input type="number" min="0" id="admin-prov-development" value="${development}">
+                </label>
                 ${assimilationInputs}
                 <div class="admin-actions">
                     <button type="submit" class="admin-btn">Сохранить</button>
@@ -156,7 +162,8 @@ export function showProvincePopup(imgX, imgY, info) {
                 main_culture: document.getElementById('admin-prov-culture').value.trim(),
                 main_religion: document.getElementById('admin-prov-religion').value.trim(),
                 resource: document.getElementById('admin-prov-resource').value.trim(),
-                yards: parseInt(document.getElementById('admin-prov-yards').value, 10) || 0
+                yards: parseInt(document.getElementById('admin-prov-yards').value, 10) || 0,
+                development: Math.max(0, parseInt(document.getElementById('admin-prov-development').value, 10) || 0)
             };
             const cultureTurnsInput = document.getElementById('admin-prov-culture-turns');
             const religionTurnsInput = document.getElementById('admin-prov-religion-turns');
@@ -180,6 +187,7 @@ export function showProvincePopup(imgX, imgY, info) {
             Владелец: ${owner}<br>
             Культура: ${culture}<br>
             Религия: ${religion}<br>
+            Развитие: ${development}<br>
             Ресурс: ${resource}<br>
             <hr>
             <strong>Демография:</strong><br>
@@ -207,6 +215,7 @@ export function showMarkerPopup(marker) {
     state.selectedImgY = marker.coord_2;
 
     const yards = Number(marker.yards) || 0;
+    const development = Number(marker.development ?? markerTypeDevelopment[marker.type] ?? 0);
     const pop = yards * 4;
     const ratio = state.dbEstateRatios[marker.type];
     const estates = calculateEstatesBreakdown(yards, ratio);
@@ -239,6 +248,9 @@ export function showMarkerPopup(marker) {
                 <label>Количество дворов:
                     <input type="number" id="admin-marker-yards" value="${yards}">
                 </label>
+                <label>Развитие:
+                    <input type="number" min="0" id="admin-marker-development" value="${development}">
+                </label>
                 <label>Описание:
                     <textarea id="admin-marker-desc">${marker.description || ''}</textarea>
                 </label>
@@ -260,9 +272,11 @@ export function showMarkerPopup(marker) {
 
         const markerTypeInput = document.getElementById('admin-marker-type');
         const markerProvinceInput = document.getElementById('admin-marker-prov-id');
+        const markerDevelopmentInput = document.getElementById('admin-marker-development');
         const markerCultureInput = document.getElementById('admin-marker-culture');
         const markerReligionInput = document.getElementById('admin-marker-religion');
         markerTypeInput.addEventListener('change', () => {
+            markerDevelopmentInput.value = markerTypeDevelopment[markerTypeInput.value] ?? 0;
             const isRuins = markerTypeInput.value === 'ruins';
             markerCultureInput.disabled = isRuins;
             markerReligionInput.disabled = isRuins;
@@ -288,6 +302,7 @@ export function showMarkerPopup(marker) {
                 culture: markerType === 'ruins' ? null : markerCultureInput.value.trim() || null,
                 religion: markerType === 'ruins' ? null : markerReligionInput.value.trim() || null,
                 yards: parseInt(document.getElementById('admin-marker-yards').value, 10) || 0,
+                development: Math.max(0, parseInt(markerDevelopmentInput.value, 10) || 0),
                 description: document.getElementById('admin-marker-desc').value.trim(),
                 coord_1: parseInt(document.getElementById('admin-marker-x').value, 10),
                 coord_2: parseInt(document.getElementById('admin-marker-y').value, 10)
@@ -328,6 +343,7 @@ export function showMarkerPopup(marker) {
             <strong>${marker.name || 'Поселение'}</strong><br>
             Тип: ${markerTypeLabels[marker.type] || marker.type}<br>
             Владелец: ${marker.owner || '—'}<br>
+            Развитие: ${development}<br>
             Культура: ${marker.culture || '—'}<br>
             Религия: ${marker.religion || '—'}<br>
             ${marker.description || 'Описание отсутствует'}<br>
@@ -375,6 +391,9 @@ export function showNewMarkerPopup(imgX, imgY) {
             <label>Количество дворов:
                 <input type="number" id="new-marker-yards" value="0">
             </label>
+            <label>Развитие:
+                <input type="number" min="0" id="new-marker-development" value="200">
+            </label>
             <label>Описание:
                 <textarea id="new-marker-desc"></textarea>
             </label>
@@ -396,6 +415,7 @@ export function showNewMarkerPopup(imgX, imgY) {
     const newMarkerProvinceInput = document.getElementById('new-marker-prov-id');
     const newMarkerCultureInput = document.getElementById('new-marker-culture');
     const newMarkerReligionInput = document.getElementById('new-marker-religion');
+    const newMarkerDevelopmentInput = document.getElementById('new-marker-development');
     const syncNewMarkerCultureReligion = () => {
         const isRuins = newMarkerTypeInput.value === 'ruins';
         newMarkerCultureInput.disabled = isRuins;
@@ -411,6 +431,7 @@ export function showNewMarkerPopup(imgX, imgY) {
         newMarkerReligionInput.value = province?.main_religion || '';
     };
     newMarkerTypeInput.addEventListener('change', syncNewMarkerCultureReligion);
+    newMarkerTypeInput.addEventListener('change', () => { newMarkerDevelopmentInput.value = markerTypeDevelopment[newMarkerTypeInput.value] ?? 0; });
     newMarkerProvinceInput.addEventListener('input', syncNewMarkerCultureReligion);
     syncNewMarkerCultureReligion();
 
@@ -425,6 +446,7 @@ export function showNewMarkerPopup(imgX, imgY) {
             culture: markerType === 'ruins' ? null : newMarkerCultureInput.value.trim() || null,
             religion: markerType === 'ruins' ? null : newMarkerReligionInput.value.trim() || null,
             yards: parseInt(document.getElementById('new-marker-yards').value, 10) || 0,
+            development: Math.max(0, parseInt(newMarkerDevelopmentInput.value, 10) || 0),
             description: document.getElementById('new-marker-desc').value.trim(),
             coord_1: imgX,
             coord_2: imgY
@@ -606,7 +628,7 @@ function demographicRows(groups, kind, settings, titularName) {
         const isAdmin = state.userProfile?.role === 'admin';
         const control = isTitular || forcedExpulsion || !isAdmin ? status : `<select data-status-kind="${kind}" data-status-name="${escapeHtml(name)}">${statusOptions.map(([value, label]) => `<option value="${value}" ${value === getStatus(settings, kind, name) ? 'selected' : ''}>${label}</option>`).join('')}</select>`;
         const loyaltyInput = isAdmin ? `<input class="stat-loyalty-input" type="number" min="0" max="100" step="1" data-loyalty-kind="${kind}" data-loyalty-name="${escapeHtml(name)}" value="${loyalty}"> %` : `${loyalty}%`;
-        return `<tr><td>${kind === 'culture' ? 'Культура' : 'Религия'}: ${escapeHtml(name)}</td><td>${control}</td><td>${formatNumber(values.yards)} дв.</td><td>${formatNumber(values.population)} чел.</td><td>${loyaltyInput}</td></tr>`;
+        return `<tr><td>${escapeHtml(name)}</td><td>${control}</td><td>${formatNumber(values.yards)} дв.</td><td>${formatNumber(values.population)} чел.</td><td>${loyaltyInput}</td></tr>`;
     }).join('');
 }
 
@@ -633,12 +655,17 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
         const religionPie = new Map([...stats.religionGroups].map(([name, group]) => [name, group.population]));
         const titleOptions = (groups, selected) => `<option value="">— не выбрана —</option>${[...groups.keys()].sort((a,b) => a.localeCompare(b, 'ru')).map(name => `<option value="${escapeHtml(name)}" ${name === selected ? 'selected' : ''}>${escapeHtml(name)}</option>`).join('')}`;
         const adminTitles = isAdmin ? `<div class="stat-titular-settings"><label>Титульная культура<select name="titular_culture">${titleOptions(stats.cultureGroups, titularCulture)}</select></label><label>Титульная религия<select name="titular_religion">${titleOptions(stats.religionGroups, titularReligion)}</select></label></div>` : '';
+        const governmentForm = settings.government_form || '';
+        const governmentField = isAdmin ? `<label class="government-form-field">Форма правления<select name="government_form"><option value="">— не выбрана —</option>${governmentForms.map(form => `<option value="${escapeHtml(form)}" ${form === governmentForm ? 'selected' : ''}>${escapeHtml(form)}</option>`).join('')}</select></label>` : `<div class="government-form-readonly"><span>Форма правления</span><strong>${escapeHtml(governmentForm || 'не указана')}</strong></div>`;
+        const stateIdentity = `<section class="page-panel state-identity-panel"><div class="state-identity-symbol"><div class="page-panel-heading"><div><h2>Символика</h2><p>Флаг или герб · PNG, JPEG или WebP · до 2 МБ</p></div></div><div class="symbol-content">${settings.state_symbol_url ? `<img class="state-symbol-preview" src="${escapeHtml(settings.state_symbol_url)}" alt="Символика государства">` : '<div class="state-symbol-empty">Изображение не загружено</div>'}<div><label class="symbol-upload-label">Загрузить изображение<input id="state-symbol-file" type="file" accept="image/png,image/jpeg,image/webp"></label>${settings.state_symbol_path ? '<button id="state-symbol-remove" class="page-back-btn" type="button">Удалить символику</button>' : ''}<span id="state-symbol-status" aria-live="polite"></span></div></div></div><div class="state-identity-details"><h2>${escapeHtml(owner)}</h2><div class="state-identity-titles"><span>Титульная культура<strong>${escapeHtml(titularCulture || 'не указана')}</strong></span><span>Титульная религия<strong>${escapeHtml(titularReligion || 'не указана')}</strong></span></div>${governmentField}</div></section>`;
         const ruler = settings.ruler || {};
         const rulerFields = `<section class="page-panel ruler-panel"><div class="page-panel-heading"><div><h2>Правитель</h2><p>Возраст увеличивается при переходе к новому игровому году.</p></div></div><div class="ruler-fields"><label>Имя<input name="ruler_name" maxlength="80" value="${escapeHtml(ruler.name || '')}" ${isAdmin ? 'readonly' : ''}></label><label>Титул<input name="ruler_title" maxlength="80" value="${escapeHtml(ruler.title || '')}" ${isAdmin ? 'readonly' : ''}></label><label>Возраст<input name="ruler_age" type="number" min="0" max="150" value="${Number(ruler.age) || 0}" ${isAdmin ? 'readonly' : ''}></label></div></section>`;
         const crime = Number(settings.crime_rate ?? 20);
         const corruption = Number(settings.corruption_rate ?? 20);
         const socialSection = (title, rows, key) => `<div class="statistic-pair"><section class="page-panel"><div class="page-panel-heading"><div><h2>${title}</h2></div></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>${key === 'estate' ? 'Сословие' : key === 'culture' ? 'Культура' : 'Религия'}</th>${key === 'estate' ? '<th>Налоговая ставка</th>' : '<th>Статус</th>'}<th>Дворы</th><th>Население</th><th>Лояльность</th></tr></thead><tbody>${rows || `<tr><td colspan="5">Нет данных.</td></tr>`}</tbody></table></div></section>${renderPieChart(`Население по ${key === 'estate' ? 'сословиям' : key === 'culture' ? 'культурам' : 'религиям'}`, key === 'estate' ? Object.entries(stats.estateYards).map(([estate, yards]) => [estateNames.find(([id]) => id === estate)[1], yards * 4]) : key === 'culture' ? culturePie : religionPie)}</div>`;
         const content = `${stats.provinces.length === 0 ? '<div class="page-empty">В базе пока нет провинций, закреплённых за этим государством.</div>' : ''}
+            <form id="state-statistics-form">
+            ${stateIdentity}
             <section class="stat-overview" aria-label="Краткая статистика">
                 <div><span>Население</span><strong>${formatNumber(stats.population)}</strong><small>${formatNumber(stats.totalYards)} дворов</small></div>
                 <div><span>Провинции</span><strong>${formatNumber(stats.provinces.length)}</strong><small>под контролем</small></div>
@@ -646,8 +673,6 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
                 <div><span>Преступность</span><strong>${formatNumber(crime)}%</strong><small>текущий показатель</small></div>
                 <div><span>Коррупция</span><strong>${formatNumber(corruption)}%</strong><small>текущий показатель</small></div>
             </section>
-            ${!isAdmin ? `<div class="stat-titular-summary"><span>Титульная культура: <strong>${escapeHtml(titularCulture || 'не указана')}</strong></span><span>Титульная религия: <strong>${escapeHtml(titularReligion || 'не указана')}</strong></span></div>` : ''}
-            <form id="state-statistics-form">
                 ${adminTitles}
                 ${rulerFields}
                 ${socialSection('Сословия', estateRows, 'estate')}
@@ -687,6 +712,7 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
             if (isAdmin) {
                 next.titular_culture = form.elements.titular_culture.value;
                 next.titular_religion = form.elements.titular_religion.value;
+                next.government_form = form.elements.government_form.value;
             } else {
                 next.ruler = { ...(settings.ruler || {}), name: form.elements.ruler_name.value.trim(), title: form.elements.ruler_title.value.trim(), age: Math.max(0, Math.min(150, Number(form.elements.ruler_age.value) || 0)), last_age_year: Number(state.gameCalendar?.year) || 1450 };
             }
@@ -695,6 +721,40 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
                 await renderStateStatistics(owner, playerName, options);
             } catch (error) {
                 status.textContent = `Ошибка сохранения: ${error.message}`;
+            }
+        });
+        const symbolInput = elements.pageView.querySelector('#state-symbol-file');
+        symbolInput?.addEventListener('change', async () => {
+            const file = symbolInput.files?.[0];
+            if (!file) return;
+            const symbolStatus = elements.pageView.querySelector('#state-symbol-status');
+            if (file.size > 2 * 1024 * 1024) { symbolStatus.textContent = 'Изображение больше 2 МБ.'; symbolInput.value = ''; return; }
+            if (!['image/png', 'image/jpeg', 'image/webp'].includes(file.type)) { symbolStatus.textContent = 'Выберите PNG, JPEG или WebP.'; symbolInput.value = ''; return; }
+            symbolInput.disabled = true;
+            symbolStatus.textContent = 'Загрузка…';
+            try {
+                const uploaded = await uploadStateSymbol(owner, file);
+                const next = { ...settings, state_symbol_path: uploaded.path, state_symbol_url: uploaded.url };
+                state.stateMechanics[owner] = await saveStateMechanics(owner, next);
+                await renderStateStatistics(owner, playerName, options);
+                showToast('Символика государства сохранена');
+            } catch (error) {
+                symbolStatus.textContent = `Не удалось загрузить: ${error.message}`;
+                symbolInput.disabled = false;
+            }
+        });
+        elements.pageView.querySelector('#state-symbol-remove')?.addEventListener('click', async event => {
+            const button = event.currentTarget;
+            button.disabled = true;
+            const symbolStatus = elements.pageView.querySelector('#state-symbol-status');
+            try {
+                const next = { ...settings, state_symbol_path: null, state_symbol_url: null };
+                state.stateMechanics[owner] = await saveStateMechanics(owner, next);
+                if (settings.state_symbol_path) await deleteStateSymbol(settings.state_symbol_path);
+                await renderStateStatistics(owner, playerName, options);
+            } catch (error) {
+                symbolStatus.textContent = `Не удалось удалить символику: ${error.message}`;
+                button.disabled = false;
             }
         });
     } catch (error) {
@@ -743,10 +803,10 @@ function renderOwnerProvinces(owner) {
     const rows = provinces.map(province => `
         <tr><td><button class="table-link" data-province-id="${Number(province.id)}">#${formatNumber(Number(province.id))}</button></td>
         <td>${escapeHtml(province.province_name || '—')}</td><td>${escapeHtml(province.region || '—')}</td>
-        <td>${formatNumber(Number(province.yards) || 0)}</td><td>${escapeHtml(province.main_culture || '—')}</td>
+        <td>${formatNumber(Number(province.yards) || 0)}</td><td>${formatNumber(Number(province.development ?? 20))}</td><td>${escapeHtml(province.main_culture || '—')}</td>
         <td>${escapeHtml(province.main_religion || '—')}</td><td>${formatTurns(assimilationTurns(province, 'culture', province.main_culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(province, 'religion', province.main_religion, state.stateMechanics[owner] || {}))}</td><td>${escapeHtml(province.resource || '—')}</td></tr>
     `).join('');
-    const content = provinces.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Дворы</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th></tr></thead><tbody>${rows}</tbody></table></div></section>` : '<div class="page-empty">За государством пока не закреплены провинции.</div>';
+    const content = provinces.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Дворы</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th></tr></thead><tbody>${rows}</tbody></table></div></section>` : '<div class="page-empty">За государством пока не закреплены провинции.</div>';
     activePageOwner = owner;
     showPageView('Провинции', content, { subtitle: owner, navId: 'nav-provinces' });
     elements.pageView.querySelectorAll('[data-province-id]').forEach(button => button.addEventListener('click', () => {
@@ -762,10 +822,10 @@ function renderOwnerSettlements(owner) {
     const rows = settlements.map(marker => `
         <tr><td><button class="table-link" data-marker-id="${Number(marker.id)}">${escapeHtml(marker.name || 'Поселение')}</button></td>
         <td>${escapeHtml(markerTypeLabels[marker.type] || marker.type || '—')}</td><td>#${formatNumber(Number(marker.province_id) || 0)}</td>
-        <td>${formatNumber(Number(marker.yards) || 0)}</td><td>${escapeHtml(marker.culture || '—')}</td>
+        <td>${formatNumber(Number(marker.yards) || 0)}</td><td>${formatNumber(Number(marker.development ?? markerTypeDevelopment[marker.type] ?? 0))}</td><td>${escapeHtml(marker.culture || '—')}</td>
         <td>${escapeHtml(marker.religion || '—')}</td><td>${formatTurns(assimilationTurns(marker, 'culture', marker.culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(marker, 'religion', marker.religion, state.stateMechanics[owner] || {}))}</td></tr>
     `).join('');
-    const content = settlements.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Дворы</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
+    const content = settlements.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Дворы</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
     activePageOwner = owner;
     showPageView('Города и поселения', content, { subtitle: owner, navId: 'nav-cities' });
     elements.pageView.querySelectorAll('[data-marker-id]').forEach(button => button.addEventListener('click', () => {
@@ -792,64 +852,67 @@ async function renderEconomy(owner, playerName = '') {
         const expenses = { army: 0, trade: 0, other_recurring: 0, other_one_off: 0, ...(economy.expenses || {}) };
         const treasury = Number(economy.treasury) || 0;
         const prestige = Number(economy.prestige) || 0;
-        const treasuryIncome = Number(income.taxes || 0) + Number(income.trade || 0) + Number(income.other_recurring || 0) + Number(income.other_one_off || 0);
+        const itemsFor = (stored, legacyAmount, legacyReason) => Array.isArray(stored) ? stored : (Number(legacyAmount) > 0 ? [{ reason: legacyReason, amount: Number(legacyAmount) }] : []);
+        const treasuryIncomeItems = itemsFor(economy.one_off_income_treasury, income.other_one_off, 'Прочие разовые доходы');
+        const treasuryItems = itemsFor(economy.one_off_expenses_treasury, expenses.other_one_off, 'Прочие разовые расходы');
+        const prestigeIncomeItems = itemsFor(economy.one_off_income_prestige, 0, '');
+        const prestigeItems = itemsFor(economy.one_off_expenses_prestige, economy.prestige_one_off_expenses, 'Ранее внесённые разовые расходы');
+        const totalOf = items => items.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const treasuryIncome = Number(income.taxes || 0) + Number(income.trade || 0) + Number(income.other_recurring || 0) + totalOf(treasuryIncomeItems);
         const treasuryFixedExpenses = Number(expenses.army || 0) + Number(expenses.trade || 0) + Number(expenses.other_recurring || 0);
-        const storedTreasuryItems = Array.isArray(economy.one_off_expenses_treasury) ? economy.one_off_expenses_treasury : [];
-        const storedPrestigeItems = Array.isArray(economy.one_off_expenses_prestige) ? economy.one_off_expenses_prestige : [];
-        const treasuryItems = storedTreasuryItems.length || !Number(expenses.other_one_off) ? storedTreasuryItems : [{ reason: 'Прочие разовые расходы', amount: Number(expenses.other_one_off) }];
-        const prestigeItems = storedPrestigeItems.length || !Number(economy.prestige_one_off_expenses) ? storedPrestigeItems : [{ reason: 'Ранее внесённые разовые расходы', amount: Number(economy.prestige_one_off_expenses) }];
-        const oneOffTreasuryTotal = treasuryItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
-        const oneOffPrestigeTotal = prestigeItems.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+        const oneOffTreasuryTotal = totalOf(treasuryItems);
+        const oneOffPrestigeTotal = totalOf(prestigeItems);
         const treasuryNext = treasury + treasuryIncome - treasuryFixedExpenses - oneOffTreasuryTotal;
         const prestigeFixed = Number(economy.prestige_recurring_expenses) || 0;
         const prestigeIncome = Number(economy.prestige_recurring_income) || 0;
-        const prestigeNext = prestige + prestigeIncome - prestigeFixed - oneOffPrestigeTotal;
+        const totalPrestigeIncome = prestigeIncome + totalOf(prestigeIncomeItems);
+        const prestigeNext = prestige + totalPrestigeIncome - prestigeFixed - oneOffPrestigeTotal;
         const edit = state.userProfile?.role === 'admin' || state.userProfile?.owner === owner;
-        const field = (label, key, value, unit = '') => `<label>${label}<span><input type="number" step="0.1" name="${key}" value="${Number(value) || 0}" ${edit ? '' : 'readonly'}>${unit}</span></label>`;
-        const oneOffRows = (kind, items, unit) => items.map((item, index) => `<div class="one-off-row" data-one-off-row data-kind="${kind}"><input aria-label="Причина расхода" type="text" maxlength="120" name="${kind}_reason" placeholder="Источник или причина" value="${escapeHtml(item.reason || '')}" ${edit ? '' : 'readonly'}><label><input aria-label="Сумма расхода" type="number" min="0" step="0.1" name="${kind}_amount" value="${Number(item.amount) || 0}" ${edit ? '' : 'readonly'}>${unit}</label>${edit ? `<button type="button" class="one-off-remove" aria-label="Удалить расход" data-remove-one-off>×</button>` : ''}</div>`).join('');
+        const field = (label, value, unit = '') => `<div class="economy-value"><span>${label}</span><strong>${formatNumber(Number(value) || 0, 1)} ${unit}</strong></div>`;
+        const balance = (label, current, next, unit) => `<section class="economy-balance"><span>${label}</span><strong>${formatNumber(current, 1)} ${unit}</strong><small>На след. ход: <b>${formatNumber(next, 1)} ${unit}</b></small></section>`;
+        const oneOffRows = (kind, items, unit) => items.map(item => `<div class="one-off-row" data-one-off-row data-kind="${kind}"><input aria-label="Источник или причина" type="text" maxlength="120" name="${kind}_reason" placeholder="Источник или причина" value="${escapeHtml(item.reason || '')}" ${edit ? '' : 'readonly'}><label><input aria-label="Сумма" type="number" min="0" step="0.1" name="${kind}_amount" value="${Number(item.amount) || 0}" ${edit ? '' : 'readonly'}>${unit}</label>${edit ? '<button type="button" class="one-off-remove" aria-label="Удалить запись" data-remove-one-off>×</button>' : ''}</div>`).join('');
         const addButton = (kind, label) => edit ? `<button type="button" class="compact-add-btn" data-add-one-off="${kind}" aria-label="Добавить ${label}">+</button>` : '';
-        const content = `<form id="economy-form"><div class="economy-layout"><div class="economy-left">
-          <section class="economy-balances"><div class="economy-balance"><span>Казна</span>${field('', 'treasury', treasury, 'z')}<small>На след. ход: <b data-next-treasury>${formatNumber(treasuryNext, 1)} z</b></small></div><div class="economy-balance"><span>Престиж</span>${field('', 'prestige', prestige, 'ОП')}<small>На след. ход: <b data-next-prestige>${formatNumber(prestigeNext, 1)} ОП</b></small></div></section>
-          <div class="economy-fixed-grid">
-            <section class="economy-list page-panel"><h2>Доходы казны</h2>${field('Налоги', 'income_taxes', income.taxes, 'z')}${field('Торговля', 'income_trade', income.trade, 'z')}${field('Прочие постоянные', 'income_other_recurring', income.other_recurring, 'z')}${field('Прочие разовые', 'income_other_one_off', income.other_one_off, 'z')}</section>
-            <section class="economy-list page-panel"><h2>Постоянные расходы казны</h2>${field('Армия', 'expense_army', expenses.army, 'z')}${field('Торговля', 'expense_trade', expenses.trade, 'z')}${field('Прочие расходы', 'expense_other_recurring', expenses.other_recurring, 'z')}</section>
-            <section class="economy-list page-panel"><h2>Постоянные доходы престижа</h2>${field('Прочие доходы', 'prestige_income_fixed', prestigeIncome, 'ОП')}</section>
-            <section class="economy-list page-panel"><h2>Постоянные расходы престижа</h2>${field('Прочие расходы', 'prestige_fixed', prestigeFixed, 'ОП')}</section>
-          </div>
-          <div class="economy-one-off-grid">
-            <section class="economy-list one-off-panel page-panel"><header><h2>Разовые расходы казны</h2>${addButton('treasury', 'расход')}</header><div data-one-off-list="treasury">${oneOffRows('treasury', treasuryItems, 'z')}</div></section>
-            <section class="economy-list one-off-panel page-panel"><header><h2>Разовые расходы престижа</h2>${addButton('prestige', 'расход престижа')}</header><div data-one-off-list="prestige">${oneOffRows('prestige', prestigeItems, 'ОП')}</div></section>
-          </div>
-          <div class="mechanics-save-row"><button class="page-map-btn" type="submit" ${edit ? '' : 'disabled'}>Сохранить экономику</button><span id="economy-save-status" aria-live="polite"></span></div>
+        const oneOffPanel = (kind, title, items, unit, label) => `<section class="economy-list one-off-panel page-panel"><header><h2>${title}</h2>${addButton(kind, label)}</header><div data-one-off-list="${kind}">${oneOffRows(kind, items, unit)}</div></section>`;
+        const content = `<form id="economy-form"><div class="economy-layout"><div class="economy-ledgers">
+          <section class="economy-ledger"><div class="economy-ledger-heading">${balance('Казна', treasury, treasuryNext, 'z')}</div>
+            <section class="economy-list page-panel"><h2>Доходы казны</h2>${field('Налоги', income.taxes, 'z')}${field('Торговля', income.trade, 'z')}${field('Прочие постоянные', income.other_recurring, 'z')}</section>
+            <section class="economy-list page-panel"><h2>Постоянные расходы казны</h2>${field('Армия', expenses.army, 'z')}${field('Торговля', expenses.trade, 'z')}${field('Прочие расходы', expenses.other_recurring, 'z')}</section>
+            ${oneOffPanel('treasury_income', 'Разовые доходы казны', treasuryIncomeItems, 'z', 'доход')}
+            ${oneOffPanel('treasury_expense', 'Разовые расходы казны', treasuryItems, 'z', 'расход')}
+          </section>
+          <section class="economy-ledger"><div class="economy-ledger-heading">${balance('Престиж', prestige, prestigeNext, 'ОП')}</div>
+            <section class="economy-list page-panel"><h2>Постоянные доходы престижа</h2>${field('Прочие доходы', prestigeIncome, 'ОП')}</section>
+            <section class="economy-list page-panel"><h2>Постоянные расходы престижа</h2>${field('Прочие расходы', prestigeFixed, 'ОП')}</section>
+            ${oneOffPanel('prestige_income', 'Разовые доходы престижа', prestigeIncomeItems, 'ОП', 'доход престижа')}
+            ${oneOffPanel('prestige_expense', 'Разовые расходы престижа', prestigeItems, 'ОП', 'расход престижа')}
+          </section>
         </div><aside class="economy-charts">
-          ${renderPieChart('Доходы казны', new Map([['Налоги', Number(income.taxes)], ['Торговля', Number(income.trade)], ['Прочие постоянные', Number(income.other_recurring)], ['Прочие разовые доходы', Number(income.other_one_off)]]))}
-          ${renderPieChart('Постоянные расходы казны', new Map([['Армия', Number(expenses.army)], ['Торговля', Number(expenses.trade)], ['Прочие', Number(expenses.other_recurring)]]))}
-          ${renderPieChart('Постоянные доходы престижа', new Map([['Прочие доходы', prestigeIncome]]))}
-          ${renderPieChart('Разовые расходы казны', new Map(treasuryItems.map((item, index) => [item.reason || `Расход ${index + 1}`, Number(item.amount) || 0])))}
-          ${renderPieChart('Расходы престижа', new Map([['Постоянные', prestigeFixed], ...prestigeItems.map((item, index) => [item.reason || `Разовый расход ${index + 1}`, Number(item.amount) || 0])]))}
-        </aside></div><p class="page-note">Текущие балансы и суммы пока вводятся вручную. Доходы и расходы следующего хода пересчитываются из указанных значений.</p></form>`;
+          ${renderPieChart('Доходы казны', new Map([['Налоги', Number(income.taxes)], ['Торговля', Number(income.trade)], ['Прочие постоянные', Number(income.other_recurring)], ...treasuryIncomeItems.map(item => [item.reason || 'Разовый доход', Number(item.amount) || 0])]))}
+          ${renderPieChart('Расходы казны', new Map([['Армия', Number(expenses.army)], ['Торговля', Number(expenses.trade)], ['Прочие постоянные', Number(expenses.other_recurring)], ...treasuryItems.map(item => [item.reason || 'Разовый расход', Number(item.amount) || 0])]))}
+          ${renderPieChart('Доходы престижа', new Map([['Постоянные', prestigeIncome], ...prestigeIncomeItems.map(item => [item.reason || 'Разовый доход', Number(item.amount) || 0])]))}
+          ${renderPieChart('Расходы престижа', new Map([['Постоянные', prestigeFixed], ...prestigeItems.map(item => [item.reason || 'Разовый расход', Number(item.amount) || 0])]))}
+        </aside></div><div class="mechanics-save-row"><button class="page-map-btn" type="submit" ${edit ? '' : 'disabled'}>Сохранить разовые операции</button><span id="economy-save-status" aria-live="polite"></span></div><p class="page-note">Постоянные показатели и балансы отображаются только для чтения. Суммы следующего хода учитывают доходы и расходы, введённые вручную.</p></form>`;
         showPageView('Экономика', content, { navId: 'nav-economy', subtitle: `${owner}${playerName ? ` · игрок ${playerName}` : ''}` });
         const form = elements.pageView.querySelector('#economy-form');
         form.querySelectorAll('[data-add-one-off]').forEach(button => button.addEventListener('click', () => {
             const kind = button.dataset.addOneOff;
-            const unit = kind === 'treasury' ? 'z' : 'ОП';
+            const unit = kind.startsWith('treasury') ? 'z' : 'ОП';
             const row = document.createElement('div');
             row.className = 'one-off-row';
             row.dataset.oneOffRow = '';
             row.dataset.kind = kind;
-            row.innerHTML = `<input aria-label="Причина расхода" type="text" maxlength="120" name="${kind}_reason" placeholder="Источник или причина"><label><input aria-label="Сумма расхода" type="number" min="0" step="0.1" name="${kind}_amount" value="0">${unit}</label><button type="button" class="one-off-remove" aria-label="Удалить расход" data-remove-one-off>×</button>`;
+            row.innerHTML = `<input aria-label="Источник или причина" type="text" maxlength="120" name="${kind}_reason" placeholder="Источник или причина"><label><input aria-label="Сумма" type="number" min="0" step="0.1" name="${kind}_amount" value="0">${unit}</label><button type="button" class="one-off-remove" aria-label="Удалить запись" data-remove-one-off>×</button>`;
             form.querySelector(`[data-one-off-list="${kind}"]`).append(row);
             row.querySelector('[data-remove-one-off]').addEventListener('click', () => row.remove());
         }));
         form.querySelectorAll('[data-remove-one-off]').forEach(button => button.addEventListener('click', () => button.closest('[data-one-off-row]').remove()));
         form.addEventListener('submit', async event => {
             event.preventDefault();
-            const num = key => Math.max(0, Number(form.elements[key].value) || 0);
             const status = form.querySelector('#economy-save-status');
             const invalidOneOff = [...form.querySelectorAll('[data-one-off-row]')].some(row => Number(row.querySelector('input[type="number"]').value) > 0 && !row.querySelector('input[type="text"]').value.trim());
             if (invalidOneOff) { status.textContent = 'Укажите источник или причину каждого расхода.'; return; }
             const collectOneOff = kind => [...form.querySelectorAll(`[data-one-off-row][data-kind="${kind}"]`)].map(row => ({ reason: row.querySelector(`[name="${kind}_reason"]`).value.trim(), amount: Math.max(0, Number(row.querySelector(`[name="${kind}_amount"]`).value) || 0) })).filter(item => item.reason || item.amount > 0);
-            const next = { ...settings, economy: { ...economy, treasury: num('treasury'), prestige: num('prestige'), prestige_recurring_income: num('prestige_income_fixed'), prestige_recurring_expenses: num('prestige_fixed'), income: { ...income, taxes: num('income_taxes'), trade: num('income_trade'), other_recurring: num('income_other_recurring'), other_one_off: num('income_other_one_off') }, expenses: { ...expenses, army: num('expense_army'), trade: num('expense_trade'), other_recurring: num('expense_other_recurring'), other_one_off: 0 }, one_off_expenses_treasury: collectOneOff('treasury'), one_off_expenses_prestige: collectOneOff('prestige') } };
+            const next = { ...settings, economy: { ...economy, income: { ...income, other_one_off: 0 }, expenses: { ...expenses, other_one_off: 0 }, one_off_income_treasury: collectOneOff('treasury_income'), one_off_expenses_treasury: collectOneOff('treasury_expense'), one_off_income_prestige: collectOneOff('prestige_income'), one_off_expenses_prestige: collectOneOff('prestige_expense') } };
             try { state.stateMechanics[owner] = await saveStateMechanics(owner, next); await renderEconomy(owner, playerName); }
             catch (error) { status.textContent = `Ошибка сохранения: ${error.message}`; }
         });
