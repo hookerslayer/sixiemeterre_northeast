@@ -4,6 +4,9 @@ export const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABAS
 
 export const COLOR_MAP_SRC = 'color_map.png';
 export const META_JSON_SRC = 'provinces_meta.json';
+export const RIVERS_MAP_SRC = 'rivers.png';
+export const LAKES_MAP_SRC = 'lake.png';
+export const SEAS_MAP_SRC = 'sea.png';
 
 export const MARKER_TYPES = ['large_city', 'city', 'monastery', 'fortress', 'ruins'];
 export const markerImages = {};
@@ -51,6 +54,16 @@ export const state = {
     userProfile: null,
     gameCalendar: null,
     stateMechanics: {},
+    provinceAdjacency: new Map(),
+    provinceCentroids: new Map(),
+    provinceMapImageData: null,
+    riverComponents: new Map(),
+    lakeComponents: new Map(),
+    seaComponents: new Map(),
+    economySnapshot: null,
+    showTradeRoutes: false,
+    tradeRouteOverlay: [],
+    tradeRouteDraft: null,
     isAddingMarkerMode: false,
     movingMarkerId: null,
     isDraggingMarker: false
@@ -63,6 +76,8 @@ export const elements = {
     navDropdownMenu: document.getElementById('nav-dropdown-menu'),
     layerCanvas: document.getElementById('layer-canvas'),
     layerCtx: document.getElementById('layer-canvas').getContext('2d'),
+    tradeRoutesCanvas: document.getElementById('trade-routes-canvas'),
+    tradeRoutesCtx: document.getElementById('trade-routes-canvas').getContext('2d'),
     highlightCanvas: document.getElementById('highlight-canvas'),
     highlightCtx: document.getElementById('highlight-canvas').getContext('2d'),
     markersCanvas: document.getElementById('markers-canvas'),
@@ -85,6 +100,13 @@ export const elements = {
     controlsPanel: document.getElementById('controls-panel'),
     legendToggleBtn: document.getElementById('legend-toggle-btn'),
     controlsToggleBtn: document.getElementById('controls-toggle-btn'),
+    tradeRoutesToggleBtn: document.getElementById('toggle-trade-routes-btn'),
+    tradeRouteEditor: document.getElementById('trade-route-editor'),
+    tradeRouteEditorStatus: document.getElementById('trade-route-editor-status'),
+    tradeRouteUndoBtn: document.getElementById('trade-route-undo-btn'),
+    tradeRouteClearBtn: document.getElementById('trade-route-clear-btn'),
+    tradeRouteSaveBtn: document.getElementById('trade-route-save-btn'),
+    tradeRouteCancelBtn: document.getElementById('trade-route-cancel-btn'),
     legendContent: document.getElementById('legend-content'),
     layerButtons: document.querySelectorAll('.layer-btn'),
     markerTypeCheckboxes: document.querySelectorAll('.marker-type-checkbox'),

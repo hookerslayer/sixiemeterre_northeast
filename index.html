@@ -51,6 +51,7 @@
 
             <div class="layer-group">
                 <span class="layer-title">Слои карты</span>
+                <button id="toggle-trade-routes-btn">Торговые маршруты: скрыты</button>
                 <button class="layer-btn active" data-layer="political">Государства</button>
                 <button class="layer-btn" data-layer="region">Регионы</button>
                 <button class="layer-btn" data-layer="culture">Культуры</button>
@@ -99,6 +100,7 @@
         <img id="visual-map" src="map.png" alt="Карта провинций">
         <canvas id="layer-canvas"></canvas>
         <img id="rivers-map" src="rivers.png" alt="Карта рек">
+        <canvas id="trade-routes-canvas"></canvas>
         <canvas id="highlight-canvas"></canvas>
         <canvas id="markers-canvas"></canvas>
         <canvas id="labels-canvas"></canvas>
@@ -110,6 +112,16 @@
     </div>
 
     <div id="page-view" class="page-view" aria-live="polite"></div>
+    <section id="trade-route-editor" class="trade-route-editor" hidden aria-live="polite">
+        <strong>Прокладка торгового маршрута</strong>
+        <p id="trade-route-editor-status">Выберите соседние провинции на карте.</p>
+        <div class="trade-route-editor-actions">
+            <button id="trade-route-undo-btn" type="button">Отменить шаг</button>
+            <button id="trade-route-clear-btn" type="button">Начать заново</button>
+            <button id="trade-route-save-btn" type="button" disabled>Сохранить маршрут</button>
+            <button id="trade-route-cancel-btn" type="button">Отмена</button>
+        </div>
+    </section>
 </div>
 
 <script type="module" src="main.js"></script>
