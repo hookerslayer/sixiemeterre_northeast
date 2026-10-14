@@ -1,6 +1,7 @@
 // Deterministic seasonal production, logistics, storage, conversion and consumption.
 // Flax and seafood norms are provisional balancing values based on comparable
 // seasonal resources; no additional uses for them are inferred here.
+import { buildStaticModifiers, modifierValue } from './modifierSystem.js';
 export const RESOURCES = ['Зерно', 'Древесина', 'Железная руда', 'Скот', 'Камень', 'Соль', 'Пушнина', 'Бивни', 'Ворвань', 'Самоцветы', 'Мёд и Воск', 'Лён', 'Морепродукты'];
 export const GOODS = ['Топливо', 'Сукно и Одежда', 'Инструменты', 'Оружие и Доспехи', 'Обработанный камень', 'Оловина', 'Бумага'];
 export const BASE_MARKET_PRICES = Object.freeze({
@@ -37,14 +38,15 @@ const NEED_GOODS = [
 const ESTATES=['aristocracy','clergy','burghers','peasants'];
 const spoilageRate = name => ['Скот','Ворвань','Оловина','Морепродукты'].includes(name) ? .10 : ['Зерно','Древесина','Пушнина','Мёд и Воск','Сукно и Одежда','Бумага','Лён'].includes(name) ? .03 : 0;
 const round = value => Math.round((Number(value)||0)*100)/100;
-export function annualPopulationGrowthRate(reports=[], settings={}) {
+export function annualPopulationGrowthRate(reports=[], settings={}, modifiers=[]) {
   const coverage=reports.slice(0,4).map(row=>{
     const value=Number(row?.report?.state_effects?.food_coverage ?? row?.state_effects?.food_coverage);
     return Number.isFinite(value)?Math.max(0,Math.min(1,value)):1;
   });
   const averageFoodCoverage=(coverage.reduce((sum,value)=>sum+value,0)+(4-coverage.length))/4;
-  const averageLoyalty=ESTATES.reduce((sum,estate)=>sum+Math.max(0,Math.min(100,Number(settings.estate_loyalty?.[estate]??50))),0)/ESTATES.length;
-  return Math.round(.02*averageFoodCoverage*(.75+.5*averageLoyalty/100)*1e6)/1e6;
+  const averageLoyalty=ESTATES.reduce((sum,estate)=>sum+Math.max(0,Math.min(100,(Number(settings.estate_loyalty?.[estate]??50)+modifierValue(modifiers,'estate_loyalty_pp',{estate})))),0)/ESTATES.length;
+  const populationModifier=modifierValue(modifiers,'population_growth_pct');
+  return Math.round(.02*averageFoodCoverage*(.75+.5*averageLoyalty/100)*Math.max(0,1+populationModifier/100)*1e6)/1e6;
 }
 const statusMultiplier = status => status === 'expulsion' ? 0 : status === 'recognition' ? 1 : .8;
 function getStatus(settings, kind, name) {
@@ -63,10 +65,10 @@ function takeNeed(inv,need,demand,onConsume=()=>{}){
   for(const [name,rate] of need.choices){if(remaining<=1e-8)break;const type=GOODS.includes(name)?'good':'resource',used=Math.min(readInv(inv,type,name),remaining/rate);if(used>0){inv.set(invKey(type,name),readInv(inv,type,name)-used);remaining-=used*rate;covered+=used*rate;onConsume(name,used);}}
   return covered;
 }
-function provinceDestinations(startId, markersByProvince, provincesById, adjacency, owner) {
+function provinceDestinations(startId, markersByProvince, provincesById, adjacency, owner, blockedProvinceIds=new Set()) {
   const queue=[[startId,0]], seen=new Set([startId]), candidates=[];
   while(queue.length){const [id,distance]=queue.shift(); for(const m of markersByProvince.get(id)||[])if(m.owner===owner&&m.type!=='ruins')candidates.push({marker:m,distance});
-    for(const next of adjacency.get(id)||[]){const p=provincesById.get(next);if(!seen.has(next)&&p?.owner===owner){seen.add(next);queue.push([next,distance+1]);}}
+    for(const next of adjacency.get(id)||[]){const p=provincesById.get(next);if(!seen.has(next)&&!blockedProvinceIds.has(Number(next))&&p?.owner===owner){seen.add(next);queue.push([next,distance+1]);}}
   }
   const local=candidates.filter(candidate=>candidate.distance===0), remote=candidates.filter(candidate=>candidate.distance>0);
   const nearestDistance=remote.length?Math.min(...remote.map(candidate=>candidate.distance)):Infinity;
@@ -203,17 +205,17 @@ function routeScore(route,transitTolls=[],quantity=0){
   const capacity=routeCapacity(route.mode,route.distance),capacityPenalty=quantity>capacity?((quantity-capacity)/Math.max(1,quantity))*route.distance:0;
   return route.distance+(Number(route.neutralProvinceCount)||0)*.5+transitTolls.reduce((sum,row)=>sum+(Number(row.rate)||0),0)/10+capacityPenalty;
 }
-function ownedProvinceDistance(startId,endId,provincesById,adjacency,owner){
+function ownedProvinceDistance(startId,endId,provincesById,adjacency,owner,blockedProvinceIds=new Set()){
   if(Number(startId)===Number(endId))return 0;
   const queue=[[Number(startId),0]],seen=new Set([Number(startId)]);
-  while(queue.length){const [id,distance]=queue.shift();for(const next of adjacency.get(id)||[]){const province=provincesById.get(Number(next));if(seen.has(Number(next))||province?.owner!==owner)continue;if(Number(next)===Number(endId))return distance+1;seen.add(Number(next));queue.push([Number(next),distance+1]);}}
+  while(queue.length){const [id,distance]=queue.shift();for(const next of adjacency.get(id)||[]){const province=provincesById.get(Number(next));if(seen.has(Number(next))||blockedProvinceIds.has(Number(next))||province?.owner!==owner)continue;if(Number(next)===Number(endId))return distance+1;seen.add(Number(next));queue.push([Number(next),distance+1]);}}
   return null;
 }
-function tradeProvincePath(startId,endId,provincesById,adjacency,blockedOwners=new Set()){
+function tradeProvincePath(startId,endId,provincesById,adjacency,blockedOwners=new Set(),blockedProvinceIds=new Set()){
   const start=Number(startId),end=Number(endId);
   if(start===end)return {provinceIds:[start],distance:0,neutralProvinceCount:0,transitOwners:[]};
   const queue=[start],previous=new Map([[start,null]]);
-  while(queue.length){const id=queue.shift();for(const rawNext of adjacency.get(id)||[]){const next=Number(rawNext),province=provincesById.get(next);if(previous.has(next)||!province||blockedOwners.has(province.owner))continue;previous.set(next,id);if(next===end){const path=[];for(let cursor=end;cursor!==null;cursor=previous.get(cursor))path.push(cursor);path.reverse();const intermediate=path.slice(1,-1),neutralProvinceCount=intermediate.filter(provinceId=>!provincesById.get(provinceId)?.owner).length,transitOwners=[...new Set(intermediate.map(provinceId=>provincesById.get(provinceId)?.owner).filter(owner=>owner&&owner!==provincesById.get(start)?.owner&&owner!==provincesById.get(end)?.owner))];return {provinceIds:path,distance:path.length-1,neutralProvinceCount,transitOwners};}queue.push(next);}}
+  while(queue.length){const id=queue.shift();for(const rawNext of adjacency.get(id)||[]){const next=Number(rawNext),province=provincesById.get(next);if(previous.has(next)||!province||blockedOwners.has(province.owner)||blockedProvinceIds.has(next))continue;previous.set(next,id);if(next===end){const path=[];for(let cursor=end;cursor!==null;cursor=previous.get(cursor))path.push(cursor);path.reverse();const intermediate=path.slice(1,-1),neutralProvinceCount=intermediate.filter(provinceId=>!provincesById.get(provinceId)?.owner).length,transitOwners=[...new Set(intermediate.map(provinceId=>provincesById.get(provinceId)?.owner).filter(owner=>owner&&owner!==provincesById.get(start)?.owner&&owner!==provincesById.get(end)?.owner))];return {provinceIds:path,distance:path.length-1,neutralProvinceCount,transitOwners};}queue.push(next);}}
   return null;
 }
 function manualTradeProvincePath(path,startId,endId,provincesById,adjacency,blockedOwners=new Set()){
@@ -228,40 +230,55 @@ function manualTradeProvincePath(path,startId,endId,provincesById,adjacency,bloc
   const transitOwners=[...new Set(intermediate.map(id=>provincesById.get(id)?.owner).filter(Boolean))];
   return {provinceIds,distance:provinceIds.length-1,neutralProvinceCount,transitOwners,blocked:transitOwners.some(owner=>blockedOwners.has(owner))};
 }
-export function processTurnSimulation({calendar,provinces,markers,mechanics={},inventories=[],consumptionRates=[],estateRatios={},adjacency=new Map(),provinceCentroids=new Map(),riverComponents=new Map(),lakeComponents=new Map(),seaComponents=new Map(),transportRoutes=[],tradeContracts=[],tradeTransitRules=[],militaryProvinceIds=new Set()}={}) {
+export function processTurnSimulation({calendar,provinces,markers,mechanics={},modifiers=[],inventories=[],consumptionRates=[],estateRatios={},adjacency=new Map(),provinceCentroids=new Map(),riverComponents=new Map(),lakeComponents=new Map(),seaComponents=new Map(),transportRoutes=[],tradeContracts=[],tradeTransitRules=[],militaryProvinceIds=new Set(),spySabotageEffects=[],rebellions=[]}={}) {
   const seasonIndex=SEASONS[calendar?.season]??2, season=calendar?.season||'Осень';
   const provincesById=new Map(provinces.map(p=>[Number(p.id),p])),markersByProvince=new Map(),markersById=new Map(markers.map(marker=>[Number(marker.id),marker])),settingsFor=owner=>mechanics[owner]||(mechanics[owner]={});
+  const modifierRowsByOwner=new Map();
+  const activeModifiersFor=owner=>{
+    if(!modifierRowsByOwner.has(owner)){
+      const settings=settingsFor(owner),current=Number(calendar?.turn)||1;
+      const submitted=modifiers.filter(row=>row.owner===owner&&row.status==='active'&&Number(row.starts_turn||1)<=current&&(row.ends_turn===null||row.ends_turn===undefined||Number(row.ends_turn)>=current));
+      modifierRowsByOwner.set(owner,[...buildStaticModifiers(owner,settings),...submitted]);
+    }
+    return modifierRowsByOwner.get(owner);
+  };
+  const modifierPct=(owner,effect,context={})=>modifierValue(activeModifiersFor(owner),effect,context);
+  const effectiveRate=(owner,settingKey,effectKey)=>Math.max(0,Math.min(100,Number(settingsFor(owner)[settingKey]??20)+modifierPct(owner,effectKey)));
+  const rebellionByTerritory=new Map(rebellions.map(row=>[`${row.territory_type}:${Number(row.territory_id)}`,row]));
+  const isRebellious=(type,id)=>Number(rebellionByTerritory.get(`${type}:${Number(id)}`)?.rebellion_turn)===Number(calendar?.turn);
+  const rebelliousProvinceIds=new Set(provinces.filter(row=>isRebellious('province',row.id)).map(row=>Number(row.id)));
   const initialTreasury=Object.fromEntries(Object.keys(mechanics).map(owner=>[owner,Number(mechanics[owner]?.economy?.treasury)||0]));
   for(const m of markers){const id=Number(m.province_id);if(!markersByProvince.has(id))markersByProvince.set(id,[]);markersByProvince.get(id).push(m);}
   const stock=new Map(),invByMarker=new Map(); for(const m of markers){const inv=new Map();for(const row of inventories)if(Number(row.marker_id)===Number(m.id))inv.set(invKey(row.item_type,row.item_name),Number(row.quantity)||0);invByMarker.set(Number(m.id),inv);}
   const spoilMult=season==='Лето' ? 1.5 : season==='Зима' ? .4 : 1;
-  for(const inv of invByMarker.values())for(const [key,quantity] of inv){const itemName=key.split('\u0000')[1];inv.set(key,Math.max(0,quantity-quantity*spoilageRate(itemName)*spoilMult));}
+  for(const [markerId,inv] of invByMarker){const marker=markersById.get(markerId),province=provincesById.get(Number(marker?.province_id));for(const [key,quantity] of inv){const [itemType,itemName]=key.split('\u0000'),owner=marker?.owner,scope={marker:String(markerId),province:String(marker?.province_id||''),culture:marker?.culture||province?.main_culture,religion:marker?.religion||province?.main_religion,territory_type:marker?.type,item_name:itemName,resource:itemType==='resource'?itemName:null,good:itemType==='good'?itemName:null};const lossRate=Math.min(1,spoilageRate(itemName)*spoilMult*Math.max(0,1+modifierPct(owner,'spoilage_pct',scope)/100));inv.set(key,Math.max(0,quantity-quantity*lossRate));}}
   const provinceStored=new Map(provinces.map(p=>[Number(p.id),Number(p.stored_resource_qty)||0]));
-  const production={}, consumption={}, shortages={}, markerReports={}, provinceReports={}, ownerProduction={}, ownerConsumption={}, ownerShortages={}, ownerMarkerReports={}, ownerProvinceReports={}, ownerTransportReports={}, ownerNeeds={}, ownerMarketSupply={};
+  const production={}, consumption={}, shortages={}, markerReports={}, provinceReports={}, ownerProduction={}, ownerConsumption={}, ownerShortages={}, ownerMarkerReports={}, ownerProvinceReports={}, ownerTransportReports={}, ownerNeeds={}, ownerMarketSupply={}, occupationClaims=[];
   const addBalance=(map,name,value)=>map[name]=(map[name]||0)+value;
   const addNeedCoverage=(owner,need,demand,covered)=>{ownerNeeds[owner]??={};ownerNeeds[owner][need]??={demand:0,covered:0};ownerNeeds[owner][need].demand+=demand;ownerNeeds[owner][need].covered+=covered;};
   const ownerTaxBases={},ownerTaxTerritories={};
-  const addTaxBase=(owner,yards,type,territoryType,id)=>{
+  const addTaxBase=(owner,yards,type,territoryType,id,occupiedBy=null)=>{
     if(!owner)return;
     const ratios=estateRatios[type]||{};
     ownerTaxBases[owner]??=Object.fromEntries(ESTATES.map(estate=>[estate,0]));
     const taxableYards=Object.fromEntries(ESTATES.map(estate=>[estate,Math.round((Number(yards)||0)*(Number(ratios[estate])||0))]));
     for(const estate of ESTATES)ownerTaxBases[owner][estate]+=taxableYards[estate];
     ownerTaxTerritories[owner]??=[];
-    ownerTaxTerritories[owner].push({territoryType,id,taxableYards});
+    ownerTaxTerritories[owner].push({territoryType,id,taxableYards,occupiedBy:occupiedBy&&occupiedBy!==owner?occupiedBy:null});
   };
-  for(const province of provinces)addTaxBase(province.owner,province.yards,'province','province',Number(province.id));
-  for(const marker of markers)if(marker.type!=='ruins')addTaxBase(marker.owner,marker.yards,marker.type,'marker',Number(marker.id));
+  for(const province of provinces)if(!isRebellious('province',province.id))addTaxBase(province.owner,province.yards,'province','province',Number(province.id),province.occupied_by);
+  for(const marker of markers)if(marker.type!=='ruins'&&!isRebellious('marker',marker.id)&&!isRebellious('province',marker.province_id))addTaxBase(marker.owner,marker.yards,marker.type,'marker',Number(marker.id),marker.military_controlled_by);
   const demandByMarker=new Map();
-  const calculateNeeds=(religion,estates)=>{
+  const calculateNeeds=(religion,estates,owner,culture,recordType,territoryId,territoryType=recordType)=>{
     const rows=consumptionRates.filter(r=>r.religion===religion), needs={};
-    for(const need of NEED_GOODS)needs[need.name]=rows.filter(r=>r.need_name===need.name).reduce((total,row)=>total+ESTATES.reduce((sum,estate)=>sum+(Number(estates[estate])||0)*(Number(row[estate])||0),0),0);
+    const scope={religion,culture,territory_type:territoryType,[recordType]:territoryId===undefined?undefined:String(territoryId)};
+    for(const need of NEED_GOODS){const base=rows.filter(r=>r.need_name===need.name).reduce((total,row)=>total+ESTATES.reduce((sum,estate)=>sum+(Number(estates[estate])||0)*(Number(row[estate])||0),0),0);needs[need.name]=base*Math.max(0,1+modifierPct(owner,'consumption_pct',{...scope,need:need.name})/100);}
     return needs;
   };
-  for(const province of provinces){const owner=province.owner;if(!owner)continue;const pId=Number(province.id),setting=settingsFor(owner),resource=province.resource;
+  for(const province of provinces){const owner=province.owner;if(!owner||isRebellious('province',province.id))continue;const pId=Number(province.id),setting=settingsFor(owner),resource=province.resource;
     const norm=NORMS[resource], markerList=markersByProvince.get(pId)||[], culture=province.main_culture,religion=province.main_religion;
     const status=statusMultiplier(getStatus(setting,'culture',culture))*statusMultiplier(getStatus(setting,'religion',religion));
-    const crime=Math.max(0,Math.min(100,Number(setting.crime_rate??20)));
+    const crime=effectiveRate(owner,'crime_rate','crime_rate_pp');
     const isOpen=['Древесина','Железная руда','Камень','Пушнина','Бивни','Ворвань','Самоцветы'].includes(resource);
     const threat=season==='Лето'&&isOpen&&!markerList.some(m=>['large_city','city','fortress'].includes(m.type))&&!militaryProvinceIds.has(pId) ? .7 : 1;
     const developmentMultiplier=Math.max(0,1+(Number(province.development??20)-20)*.01);
@@ -269,28 +286,32 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     const regionNames=[province.region,province.province_name].map(value=>String(value||'').trim().toLocaleLowerCase('ru'));
     const foodResource=regionNames.some(name=>NORTHERN_CATTLE_REGIONS.has(name))?'Скот':'Зерно';
     const foodSeason=PEASANT_FOOD_SEASONS[foodResource][seasonIndex];
-    const peasantFoodBase=round(peasantsYards*.95*1.25*foodSeason*status*(1-crime/100)*developmentMultiplier);
-    const resourceAmount=norm?round(provinceYards*.95*norm[0]*norm[1][seasonIndex]*status*(1-crime/100)*threat*developmentMultiplier):0;
+    const foodModifier=modifierPct(owner,'resource_production_pct',{province:String(pId),culture,religion,territory_type:'province',resource:foodResource,item_name:foodResource});
+    const resourceModifier=modifierPct(owner,'resource_production_pct',{province:String(pId),culture,religion,territory_type:'province',resource,item_name:resource});
+    const peasantFoodBase=round(peasantsYards*.95*1.25*foodSeason*status*(1-crime/100)*developmentMultiplier*Math.max(0,1+foodModifier/100));
+    const resourceAmount=norm?round(provinceYards*.95*norm[0]*norm[1][seasonIndex]*status*(1-crime/100)*threat*developmentMultiplier*Math.max(0,1+resourceModifier/100)):0;
     const sameStaple=resource===foodResource;
     const amount=sameStaple?Math.max(resourceAmount,peasantFoodBase):resourceAmount;
     const foodAmount=sameStaple?0:peasantFoodBase;
     const foodAvailable=sameStaple?amount:foodAmount;
     if(resource&&norm){addBalance(production,resource,amount);ownerProduction[owner]??={};addBalance(ownerProduction[owner],resource,amount);}
     if(foodAmount>0){addBalance(production,foodResource,foodAmount);ownerProduction[owner]??={};addBalance(ownerProduction[owner],foodResource,foodAmount);}
-    const destinations=provinceDestinations(pId,markersByProvince,provincesById,adjacency,owner);
+    const destinations=provinceDestinations(pId,markersByProvince,provincesById,adjacency,owner,rebelliousProvinceIds);
     const localBuffer=provinceStored.get(pId)||0;
     const deliveries=[...distributeAmount(amount+localBuffer,destinations).map(item=>({...item,item_name:resource})),...distributeAmount(foodAmount,destinations).map(item=>({...item,item_name:foodResource}))];
+    for(const delivery of deliveries){const penalty=spySabotageEffects.filter(effect=>Number(effect.marker_id)===Number(delivery.marker_id)&&effect.item_name===delivery.item_name&&Number(effect.starts_turn)<=Number(calendar.turn)&&Number(effect.ends_turn)>=Number(calendar.turn)).reduce((max,effect)=>Math.max(max,Number(effect.reduction)||0),0);if(penalty>0)delivery.quantity=round(delivery.quantity*(1-penalty));}
     const primaryDestination=destinations.find(destination=>destination.distance===0)||destinations[0];
     province.target_marker_id=primaryDestination?.marker.id??null;
     const provinceEstates={};for(const estate of ESTATES)provinceEstates[estate]=Math.round(provinceYards*(Number(provinceRatio[estate])||0));
-    const provinceNeeds=calculateNeeds(religion,provinceEstates);
+    const provinceNeeds=calculateNeeds(religion,provinceEstates,owner,culture,'province',pId);
     let localFoodUsed=0;
-    if(destinations.length){for(const delivery of deliveries)if(delivery.item_name)addInv(invByMarker.get(Number(delivery.marker_id)),'resource',delivery.item_name,delivery.quantity);provinceStored.set(pId,0);}
+    if(destinations.length){for(const delivery of deliveries)if(delivery.item_name){addInv(invByMarker.get(Number(delivery.marker_id)),'resource',delivery.item_name,delivery.quantity);if(province.occupied_by)occupationClaims.push({provinceId:pId,occupier:province.occupied_by,markerId:Number(delivery.marker_id),itemName:delivery.item_name,quantity:delivery.quantity});}provinceStored.set(pId,0);}
     else {
       const localFoodDemand=Number(provinceNeeds['Продовольствие'])||0,currentFoodUsed=Math.min(foodAvailable,localFoodDemand),storedFoodUsed=sameStaple?Math.min(localBuffer,Math.max(0,localFoodDemand-currentFoodUsed)):0;
       localFoodUsed=currentFoodUsed+storedFoodUsed;
       if(localFoodUsed>0){addBalance(consumption,foodResource,localFoodUsed);ownerConsumption[owner]??={};addBalance(ownerConsumption[owner],foodResource,localFoodUsed);}
       provinceStored.set(pId,sameStaple?Math.max(0,localBuffer-storedFoodUsed)+Math.max(0,amount-currentFoodUsed):localBuffer+resourceAmount);
+      if(province.occupied_by&&resource)occupationClaims.push({provinceId:pId,occupier:province.occupied_by,markerId:null,itemName:resource,quantity:resourceAmount});
       for(const [need,demand] of Object.entries(provinceNeeds)){const covered=need==='Продовольствие'?localFoodUsed:0;if(demand>covered){addBalance(shortages,need,demand-covered);ownerShortages[owner]??={};addBalance(ownerShortages[owner],need,demand-covered);}addNeedCoverage(owner,need,demand,covered);}
     }
     if(destinations.length){for(const destination of destinations){const markerId=Number(destination.marker.id);if(!demandByMarker.has(markerId))demandByMarker.set(markerId,[]);demandByMarker.get(markerId).push({owner,territoryType:'province',territoryId:pId,needs:Object.fromEntries(Object.entries(provinceNeeds).map(([need,value])=>[need,value*destination.share]))});}}
@@ -298,28 +319,53 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     ownerProvinceReports[owner]??={};ownerProvinceReports[owner][pId]=provinceReports[pId];
   }
   const demandsByMarker=new Map();
-  for(const marker of markers){const owner=marker.owner;if(!owner)continue;const province=provincesById.get(Number(marker.province_id))||{},religion=marker.religion||province.main_religion,yards=Number(marker.yards)||0,type=marker.type;
+  for(const marker of markers){const owner=marker.owner;if(!owner||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;const province=provincesById.get(Number(marker.province_id))||{},culture=marker.culture||province.main_culture,religion=marker.religion||province.main_religion,yards=Number(marker.yards)||0,type=marker.type;
     const ratios=estateRatios[type]||{},estates=Object.fromEntries(ESTATES.map(estate=>[estate,Math.round(yards*(Number(ratios[estate])||0))]));
-    const contributions=[{owner,territoryType:'marker',territoryId:Number(marker.id),needs:calculateNeeds(religion,estates)},...(demandByMarker.get(Number(marker.id))||[])];
+    const contributions=[{owner,territoryType:'marker',territoryId:Number(marker.id),needs:calculateNeeds(religion,estates,owner,culture,'marker',marker.id,type)},...(demandByMarker.get(Number(marker.id))||[])];
     demandsByMarker.set(Number(marker.id),contributions);
   }
-  for(const marker of markers){const owner=marker.owner;if(!owner)continue;const inv=invByMarker.get(Number(marker.id)),setting=settingsFor(owner);
+  for(const marker of markers){const owner=marker.owner;if(!owner||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;const inv=invByMarker.get(Number(marker.id)),setting=settingsFor(owner);
     const province=provincesById.get(Number(marker.province_id))||{}, culture=marker.culture||province.main_culture,religion=marker.religion||province.main_religion;
     const cultureM=statusMultiplier(getStatus(setting,'culture',culture)),religionM=statusMultiplier(getStatus(setting,'religion',religion));
-    const crime=Math.max(0,Math.min(100,Number(setting.crime_rate??20))), corruption=Math.max(0,Math.min(100,Number(setting.corruption_rate??20)));
+    const crime=effectiveRate(owner,'crime_rate','crime_rate_pp'), corruption=effectiveRate(owner,'corruption_rate','corruption_rate_pp');
     const yards=Number(marker.yards)||0,type=marker.type;
-    if(['city','large_city'].includes(type)){
-      const ratios=estateRatios[type]||{}, burghers=Math.round(yards*(Number(ratios.burghers)||0));
+    if(['city','large_city','monastery'].includes(type)){
+      const isMonastery=type==='monastery',ratios=estateRatios[type]||{},workforce=Math.round(yards*(Number(ratios[isMonastery?'clergy':'burghers'])||0));
       const developmentBase=type==='large_city'?200:50;
-      const developmentMultiplier=Math.max(0,1+(Number(marker.development??developmentBase)-developmentBase)*.01);
-      let capacity=burghers*10*(1-crime/100)*cultureM*religionM*developmentMultiplier;
+      const developmentMultiplier=isMonastery?1:Math.max(0,1+(Number(marker.development??developmentBase)-developmentBase)*.01);
+      const craftModifier=modifierPct(owner,'guild_capacity_pct',{marker:String(marker.id),culture,religion,territory_type:type});
+      let capacity=workforce*(isMonastery?5:10)*(1-crime/100)*cultureM*religionM*developmentMultiplier*Math.max(0,1+craftModifier/100);
+      const totalCapacity=capacity;
       let directive=['civilian','military','market'].includes(marker.production_directive)?marker.production_directive:'civilian';
       let orderGood=marker.state_order_good||'', orderQty=Math.min(Number(marker.state_order_qty)||0,Math.max(0,capacity*.5));
       const priority=['Топливо','Сукно и Одежда'];
       const directiveOrders=directive==='military'?['Оружие и Доспехи','Инструменты','Топливо','Сукно и Одежда']:directive==='civilian'?['Инструменты','Обработанный камень','Бумага','Оловина','Топливо','Сукно и Одежда']:[];
       const reserveCost=orderGood&&RECIPES[orderGood]&&orderQty>0?Math.min(capacity*.5,orderQty*RECIPES[orderGood].cost):0;
       const goodsProduced={};
-      const produce=(good,limit=Infinity,capacityLimit=Infinity)=>{const recipe=RECIPES[good];if(!recipe||capacity<=0)return 0;let max=Math.min(limit,capacity/recipe.cost,capacityLimit/recipe.cost);const alternatives=recipe.alternatives||[recipe.inputs];const selected=alternatives.map(inputs=>({inputs,amount:Math.min(max,...inputs.map(([input,qty])=>readInv(inv,'resource',input)/qty))})).sort((a,b)=>b.amount-a.amount)[0];max=Math.floor(selected.amount*100)/100;if(max<=0)return 0;for(const [input,qty] of selected.inputs)inv.set(invKey('resource',input),readInv(inv,'resource',input)-max*qty);addInv(inv,'good',good,max);capacity-=max*recipe.cost;addBalance(production,good,max);goodsProduced[good]=(goodsProduced[good]||0)+max;ownerProduction[owner]??={};addBalance(ownerProduction[owner],good,max);return max;};
+      const produce=(good,limit=Infinity,capacityLimit=Infinity)=>{
+        const recipe=RECIPES[good];
+        if(!recipe||capacity<=0)return 0;
+        const outputLimit=Math.min(limit,capacity/recipe.cost,capacityLimit/recipe.cost);
+        const alternatives=recipe.alternatives||[recipe.inputs];
+        const selected=alternatives.map(inputs=>({inputs,inputLimit:Math.min(...inputs.map(([input,qty])=>readInv(inv,'resource',input)/qty))}))
+          .sort((a,b)=>b.inputLimit-a.inputLimit)[0];
+        const sabotage=spySabotageEffects.filter(effect=>Number(effect.marker_id)===Number(marker.id)&&effect.item_name===good&&Number(effect.starts_turn)<=Number(calendar.turn)&&Number(effect.ends_turn)>=Number(calendar.turn))
+          .reduce((current,effect)=>Math.max(current,Number(effect.reduction)||0),0);
+        const outputModifier=modifierPct(owner,'good_production_pct',{marker:String(marker.id),culture,religion,territory_type:type,good,item_name:good});
+        const productionFactor=Math.max(0,1+outputModifier/100);
+        const plannedOutput=Math.floor(Math.min(outputLimit,selected.inputLimit*productionFactor)*100)/100;
+        const output=Math.floor(plannedOutput*(1-sabotage)*100)/100;
+        if(plannedOutput<=0||output<=0||productionFactor<=0)return 0;
+        const inputUsed=plannedOutput/productionFactor;
+        for(const [input,qty] of selected.inputs)inv.set(invKey('resource',input),Math.max(0,readInv(inv,'resource',input)-inputUsed*qty));
+        addInv(inv,'good',good,output);
+        capacity-=plannedOutput*recipe.cost;
+        addBalance(production,good,output);
+        goodsProduced[good]=(goodsProduced[good]||0)+output;
+        ownerProduction[owner]??={};
+        addBalance(ownerProduction[owner],good,output);
+        return output;
+      };
       priority.forEach(g=>produce(g,Infinity,Math.max(0,capacity-reserveCost)));
       let producedOrder=0;if(orderGood&&RECIPES[orderGood]&&orderQty>0){const unitCost=RECIPES[orderGood].cost;const e=setting.economy||{};const fundedLimit=Math.max(0,Number(e.treasury)||0)/unitCost;producedOrder=produce(orderGood,Math.min(orderQty,fundedLimit));e.treasury=Math.max(0,(Number(e.treasury)||0)-round(producedOrder*unitCost));setting.economy=e;}
       if(directive==='market'){
@@ -327,7 +373,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
         if(candidates[0]?.potential>0)produce(candidates[0].good);
       } else for(const g of directiveOrders)if(!priority.includes(g)&&g!==orderGood)produce(g);
       for(const g of Object.keys(RECIPES).sort())if(!priority.includes(g)&&g!==orderGood)produce(g);
-      markerReports[marker.id]={guild_capacity:round(burghers*10*(1-crime/100)*cultureM*religionM*developmentMultiplier),directive,state_order_good:orderGood,state_order_qty:orderQty,state_order_produced:producedOrder,goods_produced:goodsProduced,max_storage:0};
+      markerReports[marker.id]={guild_capacity:round(totalCapacity),directive,state_order_good:orderGood,state_order_qty:orderQty,state_order_produced:producedOrder,goods_produced:goodsProduced,max_storage:0};
     }
   }
   const transportReports=[],routeGroups=new Map();
@@ -336,9 +382,9 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
   for(const [linkKey,routes] of routeGroups){routes.sort((a,b)=>(Number(a.priority)||100)-(Number(b.priority)||100)||Number(a.id)-Number(b.id));const [sourceId,destinationId]=linkKey.split(':').map(Number),source=markers.find(m=>Number(m.id)===sourceId),destination=markers.find(m=>Number(m.id)===destinationId),owner=source?.owner;
     const sourceProvince=provincesById.get(Number(source?.province_id)),destinationProvince=provincesById.get(Number(destination?.province_id));
     const sameState=source&&destination&&owner&&source.owner===destination.owner&&sourceProvince?.owner===owner&&destinationProvince?.owner===owner&&source.type!=='ruins'&&destination.type!=='ruins';
-    const landDistance=sameState?ownedProvinceDistance(source.province_id,destination.province_id,provincesById,adjacency,owner):null;
+    const landDistance=sameState?ownedProvinceDistance(source.province_id,destination.province_id,provincesById,adjacency,owner,rebelliousProvinceIds):null;
     const waterCandidates=sameState?waterRoute(sourceId,destinationId,{riverComponents,lakeComponents,seaComponents},markersById,provincesById)||[]:[];
-    const water=waterCandidates.filter(candidate=>candidate.mode==='sea'||(candidate.transitOwners.every(transitOwner=>transitOwner===owner)&&candidate.provinceIds.every(provinceId=>provincesById.get(Number(provinceId))?.owner===owner))).sort((a,b)=>routeScore(a)-routeScore(b))[0]||null;
+    const water=waterCandidates.filter(candidate=>!candidate.provinceIds.some(id=>rebelliousProvinceIds.has(Number(id)))&&(candidate.mode==='sea'||(candidate.transitOwners.every(transitOwner=>transitOwner===owner)&&candidate.provinceIds.every(provinceId=>provincesById.get(Number(provinceId))?.owner===owner)))).sort((a,b)=>routeScore(a)-routeScore(b))[0]||null;
     const mode=water?.mode||'land',distance=water?.distance??landDistance,capacity=routeCapacity(mode,distance);let remainingCapacity=capacity;
     for(const route of routes){const sourceInv=invByMarker.get(sourceId),itemType=route.item_type,itemName=route.item_name,key=invKey(itemType,itemName),original=sourceInv?readInv(sourceInv,itemType,itemName):0;
       const reserveMap=new Map();if(sourceInv){const reserved=new Map(sourceInv);for(const need of NEED_GOODS){const demand=(demandsByMarker.get(sourceId)||[]).reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0);takeNeed(reserved,need,demand);}for(const [itemKey,qty] of sourceInv)reserveMap.set(itemKey,Math.max(0,qty-readInv(reserved,itemKey.split('\u0000')[0],itemKey.split('\u0000')[1])));}
@@ -352,7 +398,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
   const externalTradeReports=[],ownerExternalTradeReports={},externalLinkCapacity=new Map(),contractFunds=Object.fromEntries(Object.keys(mechanics).map(owner=>[owner,Math.max(0,Number(mechanics[owner]?.economy?.treasury)||0)]));
   for(const contract of [...tradeContracts].filter(row=>row.status==='active').sort((a,b)=>Number(a.id)-Number(b.id))){
     const sourceId=Number(contract.source_marker_id),destinationId=Number(contract.destination_marker_id),source=markersById.get(sourceId),destination=markersById.get(destinationId),seller=contract.seller_owner,buyer=contract.buyer_owner;
-    if(!source||!destination||source.owner!==seller||destination.owner!==buyer||!seller||!buyer||seller===buyer||source.type==='ruins'||destination.type==='ruins')continue;
+    if(!source||!destination||source.owner!==seller||destination.owner!==buyer||!seller||!buyer||seller===buyer||source.type==='ruins'||destination.type==='ruins'||isRebellious('marker',sourceId)||isRebellious('marker',destinationId)||isRebellious('province',source.province_id)||isRebellious('province',destination.province_id))continue;
     const sourceProvince=provincesById.get(Number(source.province_id)),destinationProvince=provincesById.get(Number(destination.province_id));
     if(sourceProvince?.owner!==seller||destinationProvince?.owner!==buyer)continue;
     const contractRules=tradeTransitRules.filter(rule=>Number(rule.contract_id)===Number(contract.id));
@@ -360,14 +406,14 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     const hasManualRoute=Array.isArray(contract.route_province_ids)&&contract.route_province_ids.length>0;
     const waterCandidates=hasManualRoute?[]:(waterRoute(sourceId,destinationId,{riverComponents,lakeComponents,seaComponents},markersById,provincesById)||[]);
     const tollsFor=owners=>owners.map(owner=>{const rule=contractRules.find(row=>row.transit_owner===owner),configured=Number(rule?.toll_rate);return {owner,rate:Number.isFinite(configured)?Math.max(0,Math.min(50,configured)):10};});
-    const waterOptions=waterCandidates.filter(candidate=>candidate.mode==='sea'||!candidate.transitOwners.some(owner=>blockedOwners.has(owner))).map(candidate=>({...candidate,score:routeScore(candidate,tollsFor(candidate.transitOwners),Number(contract.quantity_per_turn)||0)}));
+    const waterOptions=waterCandidates.filter(candidate=>!candidate.provinceIds.some(id=>rebelliousProvinceIds.has(Number(id)))&&(candidate.mode==='sea'||!candidate.transitOwners.some(owner=>blockedOwners.has(owner)))).map(candidate=>({...candidate,score:routeScore(candidate,tollsFor(candidate.transitOwners),Number(contract.quantity_per_turn)||0)}));
     const landPath=hasManualRoute
       ? manualTradeProvincePath(contract.route_province_ids,source.province_id,destination.province_id,provincesById,adjacency,blockedOwners)
-      : tradeProvincePath(source.province_id,destination.province_id,provincesById,adjacency,blockedOwners);
+      : tradeProvincePath(source.province_id,destination.province_id,provincesById,adjacency,blockedOwners,rebelliousProvinceIds);
     const routeBlocked=!!landPath?.blocked;
     const tollsByOwner=new Map(contractRules.map(rule=>[rule.transit_owner,rule]));
     const landTolls=(landPath?.transitOwners||[]).map(owner=>{const rule=tollsByOwner.get(owner),configured=Number(rule?.toll_rate);return {owner,rate:Number.isFinite(configured)?Math.max(0,Math.min(50,configured)):10};});
-    const selectedRoute=hasManualRoute?(landPath&&!routeBlocked?{...landPath,mode:'land'}:null):([...waterOptions,landPath&&{...landPath,mode:'land',score:routeScore(landPath,landTolls,Number(contract.quantity_per_turn)||0)}].filter(Boolean).sort((a,b)=>a.score-b.score)[0]||null);
+    const selectedRoute=hasManualRoute?(landPath&&!routeBlocked&&!landPath.provinceIds.some(id=>rebelliousProvinceIds.has(Number(id)))?{...landPath,mode:'land'}:null):([...waterOptions,landPath&&{...landPath,mode:'land',score:routeScore(landPath,landTolls,Number(contract.quantity_per_turn)||0)}].filter(Boolean).sort((a,b)=>a.score-b.score)[0]||null);
     const water=selectedRoute&&selectedRoute.mode!=='land'?selectedRoute:null;
     const mode=selectedRoute?.mode||'land',distance=selectedRoute?.distance??null;
     const neutralProvinceCount=selectedRoute?.neutralProvinceCount||0;
@@ -384,7 +430,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     const result={contract_id:Number(contract.id),source_marker_id:sourceId,destination_marker_id:destinationId,source_name:source.name||`Поселение #${sourceId}`,destination_name:destination.name||`Поселение #${destinationId}`,seller_owner:seller,buyer_owner:buyer,item_type:itemType,item_name:itemName,requested,shipped,delivered,route_loss:routeLoss,neutral_province_count:neutralProvinceCount,transit_owners:transitOwners,transit_tolls:tolls,toll_paid:tollPaid,buyer_total_paid:buyerTotalPaid,unit_price:unitPrice,paid,mode,distance,capacity,province_ids:selectedRoute?.provinceIds||[],map_points:mapPoints,manual_route:hasManualRoute,blocked_transit_owners:[...blockedOwners],reason:routeBlocked?'Ручной маршрут проходит через государство, запретившее транзит':distance===null?'Нет доступного сухопутного или водного пути':shipped<requested?(available<=shipped?'Недостаточно свободного избытка':affordable<=shipped?'Недостаточно средств у покупателя':'Ограничение пропускной способности'):null};
     externalTradeReports.push(result);ownerExternalTradeReports[seller]??=[];ownerExternalTradeReports[seller].push({...result,side:'export'});ownerExternalTradeReports[buyer]??=[];ownerExternalTradeReports[buyer].push({...result,side:'import'});for(const toll of tolls){ownerExternalTradeReports[toll.owner]??=[];ownerExternalTradeReports[toll.owner].push({...result,side:'transit',transit_toll_income:toll.amount,transit_toll_owner:toll.owner,transit_toll_rate:toll.rate});}
   }
-  for(const marker of markers){if(!marker.owner||marker.type==='ruins')continue;ownerMarketSupply[marker.owner]??={};for(const [key,quantity] of invByMarker.get(Number(marker.id))||[]){const itemName=key.split('\u0000')[1];addBalance(ownerMarketSupply[marker.owner],itemName,quantity);}}
+  for(const marker of markers){if(!marker.owner||marker.type==='ruins'||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;ownerMarketSupply[marker.owner]??={};for(const [key,quantity] of invByMarker.get(Number(marker.id))||[]){const itemName=key.split('\u0000')[1];addBalance(ownerMarketSupply[marker.owner],itemName,quantity);}}
   const ownerFreeSurplus={};
   for(const marker of markers){
     if(!marker.owner||marker.type==='ruins')continue;
@@ -392,18 +438,49 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     for(const need of NEED_GOODS){const demand=(demandsByMarker.get(markerId)||[]).reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0);takeNeed(free,need,demand);}
     for(const [key,quantity] of free){if(quantity<=0.01)continue;const [item_type,item_name]=key.split('\u0000');ownerFreeSurplus[marker.owner]??=[];ownerFreeSurplus[marker.owner].push({marker_id:markerId,marker_name:marker.name||`Поселение #${markerId}`,item_type,item_name,quantity:round(quantity)});}
   }
-  for(const marker of markers){const owner=marker.owner;if(!owner)continue;const inv=invByMarker.get(Number(marker.id)),province=provincesById.get(Number(marker.province_id))||{},religion=marker.religion||province.main_religion,type=marker.type,yards=Number(marker.yards)||0,setting=settingsFor(owner),corruption=Math.max(0,Math.min(100,Number(setting.corruption_rate??20))),contributions=demandsByMarker.get(Number(marker.id))||[],coverage=[];
+  for(const marker of markers){const owner=marker.owner;if(!owner||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;const inv=invByMarker.get(Number(marker.id)),province=provincesById.get(Number(marker.province_id))||{},religion=marker.religion||province.main_religion,type=marker.type,yards=Number(marker.yards)||0,setting=settingsFor(owner),corruption=effectiveRate(owner,'corruption_rate','corruption_rate_pp'),contributions=demandsByMarker.get(Number(marker.id))||[],coverage=[];
     for(const need of NEED_GOODS){const demand=contributions.reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0),used=takeNeed(inv,need,demand,(item,qty)=>{addBalance(consumption,item,qty);ownerConsumption[owner]??={};addBalance(ownerConsumption[owner],item,qty);});
       addNeedCoverage(owner,need.name,demand,used);
       coverage.push({need:need.name,demand:round(demand),covered:round(used),ratio:demand?round(used/demand):1});if(demand>used){addBalance(shortages,need.name,demand-used);ownerShortages[owner]??={};addBalance(ownerShortages[owner],need.name,demand-used);}
     }
     const capBase=type==='large_city'?[20000,15]:type==='city'?[6000,10]:type==='monastery'?[3000,8]:type==='fortress'?[1000,5]:[0,0];
-    const maxStorage=round((capBase[0]+yards*capBase[1])*(1-corruption/200));
+    const storageModifier=modifierPct(owner,'storage_capacity_pct',{marker:String(marker.id),territory_type:type});
+    const maxStorage=round((capBase[0]+yards*capBase[1])*(1-corruption/200)*Math.max(0,1+storageModifier/100));
     const total=()=>[...inv.values()].reduce((a,b)=>a+b,0);const overflow=Math.max(0,total()-maxStorage),overflowLoss=overflow*.4,current=total();
     if(current>0&&overflowLoss>0)for(const [key,value] of inv)inv.set(key,Math.max(0,value-overflowLoss*value/current));
     markerReports[marker.id]={...markerReports[marker.id],max_storage:maxStorage,stock:round(total()),items:[...inv.entries()].map(([key,quantity])=>{const [item_type,item_name]=key.split('\u0000');return {item_type,item_name,quantity:round(quantity)};}).filter(x=>x.quantity>0),coverage,overflow_loss:round(overflowLoss)};
     markerReports[marker.id]={...markerReports[marker.id],transport:transportReports.filter(item=>item.source_marker_id===Number(marker.id)||item.destination_marker_id===Number(marker.id))};
     ownerMarkerReports[owner]??={};ownerMarkerReports[owner][marker.id]=markerReports[marker.id];
+  }
+  const occupationReports={};
+  for(const claim of occupationClaims.sort((a,b)=>a.provinceId-b.provinceId||a.occupier.localeCompare(b.occupier))){
+    const sourceInv=claim.markerId?invByMarker.get(claim.markerId):null;
+    const stored=claim.markerId?readInv(sourceInv,'resource',claim.itemName):Number(provinceStored.get(claim.provinceId))||0;
+    const seized=round(Math.min(Math.max(0,claim.quantity)*.5,stored*.5));
+    if(seized<=0)continue;
+    if(sourceInv)sourceInv.set(invKey('resource',claim.itemName),Math.max(0,stored-seized));
+    else provinceStored.set(claim.provinceId,Math.max(0,stored-seized));
+    const province=provincesById.get(claim.provinceId),destinations=provinceDestinations(claim.provinceId,markersByProvince,provincesById,adjacency,claim.occupier);
+    let delivered=0;
+    for(const [index,destination] of destinations.entries()){
+      const quantity=index===destinations.length-1?round(seized-delivered):round(seized*destination.share);
+      delivered=round(delivered+quantity);
+      addInv(invByMarker.get(Number(destination.marker.id)),'resource',claim.itemName,quantity);
+      if(quantity>0){ownerFreeSurplus[claim.occupier]??=[];ownerFreeSurplus[claim.occupier].push({marker_id:Number(destination.marker.id),marker_name:destination.marker.name||`Поселение #${destination.marker.id}`,item_type:'resource',item_name:claim.itemName,quantity});}
+    }
+    const legalOwner=province?.owner;
+    if(legalOwner){ownerMarketSupply[legalOwner]??={};ownerMarketSupply[legalOwner][claim.itemName]=round(Math.max(0,(Number(ownerMarketSupply[legalOwner][claim.itemName])||0)-seized));}
+    const sourceSurplus=ownerFreeSurplus[legalOwner]?.find(item=>Number(item.marker_id)===Number(claim.markerId)&&item.item_type==='resource'&&item.item_name===claim.itemName);
+    if(sourceSurplus){sourceSurplus.quantity=round(Math.max(0,sourceSurplus.quantity-seized));if(sourceSurplus.quantity<=.01)ownerFreeSurplus[legalOwner]=ownerFreeSurplus[legalOwner].filter(item=>item!==sourceSurplus);}
+    ownerMarketSupply[claim.occupier]??={};addBalance(ownerMarketSupply[claim.occupier],claim.itemName,delivered);
+    occupationReports[claim.occupier]??=[];
+    occupationReports[claim.occupier].push({province_id:claim.provinceId,resource:claim.itemName,produced:round(claim.quantity),seized:delivered,lost:round(seized-delivered)});
+  }
+  for(const marker of markers){
+    const report=markerReports[marker.id];if(!report)continue;
+    const inv=invByMarker.get(Number(marker.id))||new Map(),items=[...inv.entries()].map(([key,quantity])=>{const [item_type,item_name]=key.split('\u0000');return {item_type,item_name,quantity:round(quantity)};}).filter(item=>item.quantity>0);
+    report.stock=round([...inv.values()].reduce((sum,quantity)=>sum+quantity,0));report.items=items;
+    if(marker.owner){ownerMarkerReports[marker.owner]??={};ownerMarkerReports[marker.owner][marker.id]=report;}
   }
   const ownerMarketReports={};
   for(const owner of new Set([...Object.keys(ownerNeeds),...Object.keys(mechanics)])){
@@ -418,8 +495,24 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
       rows.push({item,base_price:base,price,demand:round(wanted),supply:round(available),consumed:round(consumed),imported,exported,turnover:round(consumed*price)});
     }
     const storedTradeRate=Number(settings.internal_trade_tax_rate);
-    const tradeRate=Number.isFinite(storedTradeRate)?Math.max(0,Math.min(15,storedTradeRate)):5;
-    const tradeIncome=round(turnover*tradeRate/100);settings.market_prices=prices;ownerMarketReports[owner]={prices,rows,turnover:round(turnover),trade_tax_rate:tradeRate,trade_income:tradeIncome};
+    const tradeRate=Number.isFinite(storedTradeRate)?Math.max(0,Math.min(15,storedTradeRate)):15;
+    const tradeModifier=modifierPct(owner,'internal_trade_income_pct');
+    const tradeIncome=round(turnover*tradeRate/100*Math.max(0,1+tradeModifier/100));settings.market_prices=prices;ownerMarketReports[owner]={prices,rows,turnover:round(turnover),trade_tax_rate:tradeRate,trade_income_modifier_pct:tradeModifier,trade_income:tradeIncome};
+  }
+  const taxIncomeByOwner={},territoryTaxReports={};
+  for(const [legalOwner,territories] of Object.entries(ownerTaxTerritories)){
+    const legalSettings=settingsFor(legalOwner),rates={aristocracy:10,clergy:1,burghers:2,peasants:1,...(legalSettings.tax_rates||{})};
+    const crimeRate=effectiveRate(legalOwner,'crime_rate','crime_rate_pp'),corruptionRate=effectiveRate(legalOwner,'corruption_rate','corruption_rate_pp');
+    const multiplier=(1-crimeRate/100)*(1-corruptionRate/100);
+    for(const territory of territories){
+      const assessedTax=round(ESTATES.reduce((sum,estate)=>sum+(Number(territory.taxableYards[estate])||0)*Math.max(0,Number(rates[estate])||0),0)*multiplier);
+      const occupied=!!territory.occupiedBy, baseCollected=occupied?round(assessedTax*.5):assessedTax;
+      const recipient=occupied?territory.occupiedBy:legalOwner;
+      const taxModifier=modifierPct(recipient,'tax_income_pct');
+      const collected=round(baseCollected*Math.max(0,1+taxModifier/100));
+      taxIncomeByOwner[recipient]=round((taxIncomeByOwner[recipient]||0)+collected);
+      territoryTaxReports[`${territory.territoryType}:${territory.id}`]={assessed:assessedTax,base_collected:baseCollected,collected,tax_modifier_pct:taxModifier,occupied_by:occupied?territory.occupiedBy:null};
+    }
   }
   const stateLoyaltyUpdates={},stateEffectsByOwner={};
   for(const owner of new Set([...Object.keys(ownerNeeds),...Object.keys(mechanics)])){
@@ -437,7 +530,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     values.peasants=round(Math.max(0,Math.min(100,values.peasants+(foodDeficit>0?-2*foodDeficit:(food.demand>0?.25:0)))));
     if(season==='Зима'&&fuelDeficit>0)for(const estate of ESTATES)values[estate]=round(Math.max(0,values[estate]-fuelDeficit));
     const storedTradeRate=Number(settings.internal_trade_tax_rate);
-    const tradeRate=Number.isFinite(storedTradeRate)?Math.max(0,Math.min(15,storedTradeRate)):5;
+    const tradeRate=Number.isFinite(storedTradeRate)?Math.max(0,Math.min(15,storedTradeRate)):15;
     // The existing 5% levy is neutral; each percentage point away from it
     // shifts state-wide burgher loyalty by 0.2 points in the opposite direction.
     values.burghers=round(Math.max(0,Math.min(100,values.burghers+(5-tradeRate)*.2)));
@@ -449,26 +542,29 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     const corruptionRate=Math.max(0,Math.min(100,Number(settings.corruption_rate??20)));
     const collectionMultiplier=(1-crimeRate/100)*(1-corruptionRate/100);
     const taxableYards=Object.fromEntries(ESTATES.map(estate=>[estate,round(base[estate])]));
-    let taxIncome=0;
+    const taxIncome=taxIncomeByOwner[owner]||0;
     for(const territory of ownerTaxTerritories[owner]||[]){
-      const territorialTax=round(ESTATES.reduce((sum,estate)=>sum+(Number(territory.taxableYards[estate])||0)*Math.max(0,Number(rates[estate])||0),0)*collectionMultiplier);
-      taxIncome=round(taxIncome+territorialTax);
+      const taxRow=territoryTaxReports[`${territory.territoryType}:${territory.id}`]||{assessed:0,collected:0,occupied_by:null};
+      const territorialTax=territory.occupiedBy?0:taxRow.collected;
       if(territory.territoryType==='province'){
-        provinceReports[territory.id]={...provinceReports[territory.id],tax_income:territorialTax};
+        provinceReports[territory.id]={...provinceReports[territory.id],tax_income:territorialTax,assessed_tax:taxRow.assessed,occupied_by:taxRow.occupied_by,occupier_tax_income:territory.occupiedBy?taxRow.collected:0};
         ownerProvinceReports[owner]??={};
         ownerProvinceReports[owner][territory.id]=provinceReports[territory.id];
+        if(territory.occupiedBy){ownerProvinceReports[territory.occupiedBy]??={};ownerProvinceReports[territory.occupiedBy][territory.id]={tax_income:taxRow.collected,assessed_tax:taxRow.assessed,occupied_by:territory.occupiedBy,occupation_collection:true};}
       }else{
-        markerReports[territory.id]={...markerReports[territory.id],tax_income:territorialTax};
+        markerReports[territory.id]={...markerReports[territory.id],tax_income:territorialTax,assessed_tax:taxRow.assessed,occupied_by:taxRow.occupied_by,occupier_tax_income:territory.occupiedBy?taxRow.collected:0};
         ownerMarkerReports[owner]??={};
         ownerMarkerReports[owner][territory.id]=markerReports[territory.id];
+        if(territory.occupiedBy){ownerMarkerReports[territory.occupiedBy]??={};ownerMarkerReports[territory.occupiedBy][territory.id]={tax_income:taxRow.collected,assessed_tax:taxRow.assessed,occupied_by:territory.occupiedBy,occupation_collection:true};}
       }
     }
     const economy=settings.economy||{},income=economy.income||{},expenses=economy.expenses||{};
     const sumItems=items=>Array.isArray(items)?items.reduce((sum,item)=>sum+Math.max(0,Number(item?.amount)||0),0):0;
     const tradeIncome=ownerMarketReports[owner]?.trade_income||0;
-    const treasuryRecurringIncome=taxIncome+tradeIncome+Math.max(0,Number(income.other_recurring)||0);
+    const recurringTreasuryModifier=modifierPct(owner,'treasury_income_z')-modifierPct(owner,'treasury_expense_z');
+    const treasuryRecurringIncome=taxIncome+tradeIncome+Math.max(0,Number(income.other_recurring)||0)+modifierPct(owner,'treasury_income_z');
     const treasuryOneOffIncome=sumItems(economy.one_off_income_treasury)+Math.max(0,Number(income.other_one_off)||0);
-    const treasuryRecurringExpenses=Math.max(0,Number(expenses.army)||0)+Math.max(0,Number(expenses.trade)||0)+Math.max(0,Number(expenses.other_recurring)||0);
+    const treasuryRecurringExpenses=Math.max(0,Math.max(0,Number(expenses.army)||0)+Math.max(0,Number(expenses.trade)||0)+Math.max(0,Number(expenses.other_recurring)||0)+modifierPct(owner,'treasury_expense_z'));
     const treasuryOneOffExpenses=sumItems(economy.one_off_expenses_treasury)+Math.max(0,Number(expenses.other_one_off)||0);
     const treasuryIncomeTotal=round(treasuryRecurringIncome+treasuryOneOffIncome);
     const treasuryExpenseTotal=round(treasuryRecurringExpenses+treasuryOneOffExpenses);
@@ -479,9 +575,9 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     economy.expenses={...expenses,other_one_off:0};
     economy.one_off_income_treasury=[];
     economy.one_off_expenses_treasury=[];
-    const prestigeIncomeRecurring=Math.max(0,Number(economy.prestige_recurring_income)||0);
+    const prestigeIncomeRecurring=Math.max(0,(Number(economy.prestige_recurring_income)||0)+modifierPct(owner,'prestige_income_op'));
     const prestigeIncomeOneOff=sumItems(economy.one_off_income_prestige);
-    const prestigeExpenseRecurring=Math.max(0,Number(economy.prestige_recurring_expenses)||0);
+    const prestigeExpenseRecurring=Math.max(0,(Number(economy.prestige_recurring_expenses)||0)+modifierPct(owner,'prestige_expense_op'));
     const prestigeExpenseOneOff=sumItems(economy.one_off_expenses_prestige)+Math.max(0,Number(economy.prestige_one_off_expenses)||0);
     const prestigeIncomeTotal=round(prestigeIncomeRecurring+prestigeIncomeOneOff);
     const prestigeExpenseTotal=round(prestigeExpenseRecurring+prestigeExpenseOneOff);
@@ -494,15 +590,27 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},i
     settings.economy=economy;
     const coverage=Object.fromEntries(Object.entries(needs).map(([name,row])=>[name,{demand:round(row.demand),covered:round(row.covered),ratio:row.demand?round(row.covered/row.demand):1}]));
     const externalDeals=ownerExternalTradeReports[owner]||[],externalTradeIncome=round(externalDeals.filter(item=>item.side==='export').reduce((sum,item)=>sum+(Number(item.paid)||0),0)),externalTradeExpenses=round(externalDeals.filter(item=>item.side==='import').reduce((sum,item)=>sum+(Number(item.paid)||0),0)),transitTollIncome=round(externalDeals.filter(item=>item.side==='transit').reduce((sum,item)=>sum+(Number(item.transit_toll_income)||0),0)),transitTollExpenses=round(externalDeals.filter(item=>item.side==='import').reduce((sum,item)=>sum+(Number(item.toll_paid)||0),0));
-    stateEffectsByOwner[owner]={food_coverage:round(foodCoverage),population_loss_rate:round(populationLossRate),yards_before:yardsBefore,yards_lost:yardsLost,peasants_loyalty_change:round(values.peasants-peasantsBefore),burghers_loyalty_change:round(values.burghers-burghersBefore),trade_tax_rate:tradeRate,winter_fuel_coverage:season==='Зима'?round(fuelCoverage):null,taxable_yards:taxableYards,tax_collection_multiplier:round(collectionMultiplier),tax_income:taxIncome,trade_income:tradeIncome,external_trade_income:externalTradeIncome,external_trade_expenses:externalTradeExpenses,transit_toll_income:transitTollIncome,transit_toll_expenses:transitTollExpenses,market_prices:ownerMarketReports[owner]?.prices||{},market_demand:ownerMarketReports[owner]?.rows||[],market_turnover:ownerMarketReports[owner]?.turnover||0,treasury_income:treasuryIncomeTotal,treasury_expenses:treasuryExpenseTotal,treasury_expenses_paid:treasuryExpensePaid,treasury_unpaid:round(treasuryExpenseTotal-treasuryExpensePaid),treasury_balance:economy.treasury,prestige_income:prestigeIncomeTotal,prestige_expenses:prestigeExpenseTotal,prestige_expenses_paid:prestigeExpensePaid,prestige_unpaid:round(prestigeExpenseTotal-prestigeExpensePaid),prestige_balance:economy.prestige};
+    const effectiveEstateLoyalty=Object.fromEntries(ESTATES.map(estate=>[estate,round(Math.max(0,Math.min(100,values[estate]+modifierPct(owner,'estate_loyalty_pp',{estate}))))]));
+    stateEffectsByOwner[owner]={food_coverage:round(foodCoverage),population_loss_rate:round(populationLossRate),yards_before:yardsBefore,yards_lost:yardsLost,peasants_loyalty_change:round(values.peasants-peasantsBefore),burghers_loyalty_change:round(values.burghers-burghersBefore),estate_loyalty:effectiveEstateLoyalty,trade_tax_rate:tradeRate,tax_income_modifier_pct:modifierPct(owner,'tax_income_pct'),trade_income_modifier_pct:modifierPct(owner,'internal_trade_income_pct'),treasury_recurring_modifier_z:recurringTreasuryModifier,winter_fuel_coverage:season==='Зима'?round(fuelCoverage):null,taxable_yards:taxableYards,tax_collection_multiplier:round(collectionMultiplier),tax_income:taxIncome,trade_income:tradeIncome,external_trade_income:externalTradeIncome,external_trade_expenses:externalTradeExpenses,transit_toll_income:transitTollIncome,transit_toll_expenses:transitTollExpenses,market_prices:ownerMarketReports[owner]?.prices||{},market_demand:ownerMarketReports[owner]?.rows||[],market_turnover:ownerMarketReports[owner]?.turnover||0,treasury_income:treasuryIncomeTotal,treasury_expenses:treasuryExpenseTotal,treasury_expenses_paid:treasuryExpensePaid,treasury_unpaid:round(treasuryExpenseTotal-treasuryExpensePaid),treasury_balance:economy.treasury,prestige_income:prestigeIncomeTotal,prestige_expenses:prestigeExpenseTotal,prestige_expenses_paid:prestigeExpensePaid,prestige_unpaid:round(prestigeExpenseTotal-prestigeExpensePaid),prestige_balance:economy.prestige};
     ownerNeeds[owner]??={};ownerNeeds[owner].coverage=coverage;
   }
   const loyaltyUpdates=[];
   const inventoryUpdates=[];for(const [markerId,inv] of invByMarker)for(const [key,quantity] of inv){const [item_type,item_name]=key.split('\u0000');inventoryUpdates.push({marker_id:markerId,item_type,item_name,quantity:round(quantity)});}
   const nextTurn={turn:Number(calendar.turn)+1,season:({Осень:'Зима',Зима:'Весна',Весна:'Лето',Лето:'Осень'})[season],year:Number(calendar.year)+(season==='Осень'?1:0)};
+  const rebellionUpdates=[],rebellionReports=[],rebellionCandidates=new Map();
+  const evaluatedTerritories=[...provinces.filter(row=>row.owner).map(row=>({type:'province',id:Number(row.id),owner:row.owner,culture:row.main_culture,religion:row.main_religion,ratios:estateRatios.province||{}})),...markers.filter(row=>row.owner&&row.type!=='ruins').map(row=>({type:'marker',id:Number(row.id),owner:row.owner,culture:row.culture||provincesById.get(Number(row.province_id))?.main_culture,religion:row.religion||provincesById.get(Number(row.province_id))?.main_religion,ratios:estateRatios[row.type]||{}}))];
+  for(const territory of evaluatedTerritories){const key=`${territory.type}:${territory.id}`,prior=rebellionByTerritory.get(key)||{},active=isRebellious(territory.type,territory.id),settings=settingsFor(territory.owner),estateAverage=ESTATES.reduce((sum,estate)=>sum+(Number(settings.estate_loyalty?.[estate]??50)*(Number(territory.ratios[estate])||0)),0),estateLoyalty=estateAverage||ESTATES.reduce((sum,estate)=>sum+(Number(settings.estate_loyalty?.[estate]??50)),0)/ESTATES.length,cultureLoyalty=Number(settings.culture_loyalty?.[territory.culture]??50),religionLoyalty=Number(settings.religion_loyalty?.[territory.religion]??50),localLoyalty=.5*estateLoyalty+.25*cultureLoyalty+.25*religionLoyalty,food=ownerNeeds[territory.owner]?.['Продовольствие']||{demand:0,covered:0},foodCoverage=food.demand>0?food.covered/food.demand:1,localCultureStatus=getStatus(settings,'culture',territory.culture),localReligionStatus=getStatus(settings,'religion',territory.religion);let instability=prior.owner===territory.owner?(Number(prior.instability)||0):0;
+    instability=Math.max(0,Math.min(100,instability+(localLoyalty>=50?-5:localLoyalty>=40?0:localLoyalty>=30?4:localLoyalty>=20?8:12)+(localCultureStatus==='expulsion'?10:0)+(localReligionStatus==='expulsion'?10:0)+(foodCoverage<.5?5:0)));
+    if(active)instability=Math.max(0,instability-30);
+    const update={territory_type:territory.type,territory_id:territory.id,owner:territory.owner,instability:round(instability),rebellion_turn:null};rebellionUpdates.push(update);
+    if(active)rebellionReports.push({...update,status:'active',local_loyalty:round(localLoyalty)});
+    else if(instability>=50){const candidates=rebellionCandidates.get(territory.owner)||[];candidates.push({...update,local_loyalty:round(localLoyalty)});rebellionCandidates.set(territory.owner,candidates);}
+  }
+  for(const [owner,candidates] of rebellionCandidates){const highest=Math.max(...candidates.map(row=>row.instability)),tied=candidates.filter(row=>row.instability===highest),candidate=tied[Math.floor(Math.random()*tied.length)];if(Math.random()*100<highest-50){const row=rebellionUpdates.find(item=>item.territory_type===candidate.territory_type&&item.territory_id===candidate.territory_id);row.rebellion_turn=nextTurn.turn;rebellionReports.push({...candidate,rebellion_turn:nextTurn.turn,status:'revolt_started'});}}
   for(const p of provinces)if(provinceStored.has(Number(p.id))){const pr=provinceReports[p.id]||{};provinceReports[p.id]={...pr,stored_resource_qty:round(provinceStored.get(Number(p.id)))};}
-  const owners=new Set([...Object.keys(ownerProduction),...Object.keys(ownerConsumption),...Object.keys(ownerShortages),...Object.keys(ownerTransportReports),...Object.keys(ownerNeeds),...Object.keys(ownerExternalTradeReports)]);
-  const ownerReports=Object.fromEntries([...owners].map(owner=>[owner,{processed_calendar:calendar,next_calendar:nextTurn,production:ownerProduction[owner]||{},consumption:ownerConsumption[owner]||{},shortages:ownerShortages[owner]||{},needs_coverage:ownerNeeds[owner]?.coverage||{},state_effects:stateEffectsByOwner[owner]||{},transport:ownerTransportReports[owner]||[],external_trade:ownerExternalTradeReports[owner]||[],free_surplus:ownerFreeSurplus[owner]||[],markerReports:ownerMarkerReports[owner]||{},provinceReports:ownerProvinceReports[owner]||{}}]));
+  const owners=new Set([...Object.keys(mechanics),...provinces.map(item=>item.owner).filter(Boolean),...markers.map(item=>item.owner).filter(Boolean),...Object.keys(ownerProduction),...Object.keys(ownerConsumption),...Object.keys(ownerShortages),...Object.keys(ownerTransportReports),...Object.keys(ownerNeeds),...Object.keys(ownerExternalTradeReports)]);
+  const ownerReports=Object.fromEntries([...new Set([...owners,...Object.keys(occupationReports)])].map(owner=>[owner,{processed_calendar:calendar,next_calendar:nextTurn,production:ownerProduction[owner]||{},consumption:ownerConsumption[owner]||{},shortages:ownerShortages[owner]||{},needs_coverage:ownerNeeds[owner]?.coverage||{},state_effects:stateEffectsByOwner[owner]||{},transport:ownerTransportReports[owner]||[],external_trade:ownerExternalTradeReports[owner]||[],occupation:occupationReports[owner]||[],free_surplus:ownerFreeSurplus[owner]||[],markerReports:ownerMarkerReports[owner]||{},provinceReports:ownerProvinceReports[owner]||{}}]));
   const treasuryAdjustments={};for(const owner of Object.keys(mechanics)){const adjustment=round((Number(mechanics[owner]?.economy?.treasury)||0)-initialTreasury[owner]);if(adjustment)treasuryAdjustments[owner]=adjustment;}
-  return {calendar:nextTurn,inventoryUpdates,loyaltyUpdates,territoryLoyalty:loyaltyUpdates,stateLoyaltyUpdates,provinceUpdates:provinces.map(p=>({id:p.id,yards:p.yards,target_marker_id:p.target_marker_id??null,stored_resource_qty:round(provinceStored.get(Number(p.id))||0)})),markerUpdates:markers.map(marker=>({id:marker.id,yards:marker.yards})),production,consumption,shortages,transportReports,externalTradeReports,markerReports,provinceReports,treasuryAdjustments,ownerReports,report:{processed_calendar:calendar,next_calendar:nextTurn,production,consumption,shortages,transport:transportReports,external_trade:externalTradeReports,markerReports,provinceReports}};
+  for(const row of rebellionReports){const territory=evaluatedTerritories.find(item=>item.type===row.territory_type&&item.id===row.territory_id);if(territory){ownerReports[territory.owner]??={};ownerReports[territory.owner].rebellions||=[];ownerReports[territory.owner].rebellions.push(row);}}
+  return {calendar:nextTurn,inventoryUpdates,loyaltyUpdates,territoryLoyalty:loyaltyUpdates,stateLoyaltyUpdates,rebellionUpdates,rebellionReports,provinceUpdates:provinces.map(p=>({id:p.id,yards:p.yards,target_marker_id:p.target_marker_id??null,stored_resource_qty:round(provinceStored.get(Number(p.id))||0)})),markerUpdates:markers.map(marker=>({id:marker.id,yards:marker.yards})),production,consumption,shortages,transportReports,externalTradeReports,markerReports,provinceReports,treasuryAdjustments,ownerReports,report:{processed_calendar:calendar,next_calendar:nextTurn,production,consumption,shortages,transport:transportReports,external_trade:externalTradeReports,markerReports,provinceReports,rebellions:rebellionReports}};
 }

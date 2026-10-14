@@ -5,6 +5,7 @@
     <title>Sixième Terre</title>
     <link rel="stylesheet" href="map.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </head>
 <body>
 
@@ -47,11 +48,34 @@
             <div id="admin-controls" class="layer-group admin-only" style="display: none;">
                 <span class="layer-title">Администрирование</span>
                 <button id="add-marker-mode-btn"> + Создать маркер</button>
+                <label class="military-terrain-control">Местность / течение клетки
+                    <select id="military-terrain-select">
+                        <option value="plain">Равнина</option>
+                        <option value="forest">Лес</option>
+                        <option value="hill">Возвышенность</option>
+                        <option value="marsh">Болото</option>
+                        <option value="water">Вода</option>
+                        <option value="bridge">Мост через воду</option>
+                        <optgroup label="Направление течения реки">
+                            <option value="flow:1,0">На восток →</option>
+                            <option value="flow:1,1">На юго-восток ↘</option>
+                            <option value="flow:0,1">На юг ↓</option>
+                            <option value="flow:-1,1">На юго-запад ↙</option>
+                            <option value="flow:-1,0">На запад ←</option>
+                            <option value="flow:-1,-1">На северо-запад ↖</option>
+                            <option value="flow:0,-1">На север ↑</option>
+                            <option value="flow:1,-1">На северо-восток ↗</option>
+                        </optgroup>
+                    </select>
+                </label>
+                <button id="military-terrain-edit-btn" aria-pressed="false">Разметка военной карты: выкл.</button>
+                <button id="cancel-military-placement-btn" type="button" style="display:none">Отменить размещение армии</button>
             </div>
 
             <div class="layer-group">
                 <span class="layer-title">Слои карты</span>
                 <button id="toggle-trade-routes-btn">Торговые маршруты: скрыты</button>
+                <button id="toggle-military-grid-btn" aria-pressed="false">Военная сетка: скрыта</button>
                 <button class="layer-btn active" data-layer="political">Государства</button>
                 <button class="layer-btn" data-layer="region">Регионы</button>
                 <button class="layer-btn" data-layer="culture">Культуры</button>
@@ -70,6 +94,21 @@
             </div>
         </div>
     </div>
+
+    <aside id="military-map-tools" class="military-map-tools" hidden aria-label="Инструменты военной карты">
+        <details open>
+            <summary>Строительство объектов</summary>
+            <label>Объект<select id="map-structure-type"><option value="camp">Полевой лагерь</option><option value="watchtower">Сторожевая башня</option><option value="palisade">Засека</option><option value="bridge">Мост</option><option value="ferry">Волок</option></select></label>
+            <div id="map-structure-cost" class="map-structure-cost" aria-live="polite"></div>
+            <label id="map-structure-source-wrap">Склад материалов<select id="map-structure-source"></select></label>
+            <label id="map-structure-owner-wrap" hidden>Государство<select id="map-structure-owner"></select></label>
+            <button id="map-structure-build" class="admin-btn" type="button">Выбрать клетку</button>
+            <button id="map-structure-cancel" class="page-back-btn" type="button" hidden>Отмена</button>
+            <small id="map-structure-status" aria-live="polite"></small>
+        </details>
+    </aside>
+
+    <div id="map-finance-badge" class="map-finance-badge" hidden aria-live="polite"></div>
 
     <div id="login-modal" class="modal-overlay">
         <div class="modal-content">
@@ -99,6 +138,7 @@
     <div id="map-wrapper">
         <img id="visual-map" src="map.png" alt="Карта провинций">
         <canvas id="layer-canvas"></canvas>
+        <canvas id="military-grid-canvas" aria-hidden="true"></canvas>
         <img id="rivers-map" src="rivers.png" alt="Карта рек">
         <canvas id="trade-routes-canvas"></canvas>
         <canvas id="highlight-canvas"></canvas>
@@ -124,6 +164,7 @@
     </section>
 </div>
 
-<script type="module" src="main.js"></script>
+<script type="module" src="main.js?v=automatic-weather-20261015"></script>
 </body>
 </html>
+

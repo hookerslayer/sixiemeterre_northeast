@@ -114,10 +114,46 @@ export async function saveStateMechanics(owner, settings) {
     return data.settings;
 }
 
+export async function submitStateModifierProposal(values) {
+    const { data, error } = await supabaseClient.rpc('submit_state_modifier_proposal', {
+        p_effect_key: values.effectKey, p_value: values.value, p_scope_type: values.scopeType,
+        p_scope_value: values.scopeValue || null, p_target_type: values.targetType || null,
+        p_item_name: values.itemName || null, p_source: values.source,
+        p_starts_turn: values.startsTurn, p_ends_turn: values.endsTurn ?? null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function adminCreateStateModifier(values) {
+    const { data, error } = await supabaseClient.rpc('admin_create_state_modifier', {
+        p_owner: values.owner, p_effect_key: values.effectKey, p_value: values.value,
+        p_scope_type: values.scopeType, p_scope_value: values.scopeValue || null,
+        p_target_type: values.targetType || null, p_item_name: values.itemName || null,
+        p_source: values.source, p_starts_turn: values.startsTurn, p_ends_turn: values.endsTurn ?? null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function adminDecideStateModifier(id, decision) {
+    const { data, error } = await supabaseClient.rpc('admin_decide_state_modifier', { p_modifier_id: id, p_decision: decision });
+    if (error) throw error;
+    return data;
+}
+
 export async function fetchGameCalendar() {
     const { data, error } = await supabaseClient.from('game_calendar').select('turn, season, year').eq('singleton', true).single();
     if (error) throw error;
     return data;
+}
+
+export async function fetchRegionalWeather(turn = null) {
+    let query = supabaseClient.from('regional_weather').select('*').order('region');
+    if (turn !== null && turn !== undefined) query = query.eq('turn', Number(turn));
+    const { data, error } = await query;
+    if (error) throw error;
+    return data || [];
 }
 
 export async function advanceGameTurn() {
@@ -126,8 +162,588 @@ export async function advanceGameTurn() {
     return Array.isArray(data) ? data[0] : data;
 }
 
+export async function fetchMilitaryBattles() {
+    const { data, error } = await supabaseClient.from('military_battles').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+}
+
+export async function fetchMilitaryBattleDetails(battleId) {
+    const [battleResult, armiesResult, reportsResult, adminResult] = await Promise.all([
+        supabaseClient.from('military_battles').select('*').eq('id', battleId).single(),
+        supabaseClient.from('military_battle_armies').select('*').eq('battle_id', battleId).order('side').order('updated_at'),
+        supabaseClient.from('military_battle_reports').select('*').eq('battle_id', battleId),
+        supabaseClient.from('military_battle_admin_results').select('report').eq('battle_id', battleId).maybeSingle()
+    ]);
+    if (battleResult.error) throw battleResult.error;
+    if (armiesResult.error) throw armiesResult.error;
+    if (reportsResult.error) throw reportsResult.error;
+    if (adminResult.error) throw adminResult.error;
+    return { battle: battleResult.data, armies: armiesResult.data || [], reports: reportsResult.data || [], adminReport: adminResult.data?.report || null };
+}
+
+export async function createMilitaryBattle(battle, armies) {
+    const { data, error } = await supabaseClient.rpc('create_military_battle', { p_battle: battle, p_armies: armies });
+    if (error) throw error;
+    return data;
+}
+
+export async function saveMilitaryBattleDecision(armyId, decision) {
+    const { data, error } = await supabaseClient.from('military_battle_armies').update(decision).eq('id', armyId).select().single();
+    if (error) throw error;
+    return data;
+}
+
+export async function confirmMilitaryBattle(battleId, expectedVersion, outcome, adminReport, ownerReports) {
+    const { data, error } = await supabaseClient.rpc('confirm_military_battle', {
+        p_battle_id: battleId,
+        p_expected_version: expectedVersion,
+        p_outcome: outcome,
+        p_admin_report: adminReport,
+        p_owner_reports: ownerReports
+    });
+    if (error) throw error;
+    return data;
+}
+
+async function fetchAllRows(tableName, orderColumns, pageSize = 1000) {
+    const rows = [];
+    for (let from = 0; ; from += pageSize) {
+        let query = supabaseClient.from(tableName).select('*');
+        for (const column of orderColumns) query = query.order(column, { ascending: true });
+        const { data, error } = await query.range(from, from + pageSize - 1);
+        if (error) throw error;
+        rows.push(...(data || []));
+        if (!data || data.length < pageSize) return rows;
+    }
+}
+
+export async function fetchMilitaryTerrainCells() {
+    return fetchAllRows('military_terrain_cells', ['cell_x', 'cell_y']);
+}
+
+export async function fetchMilitaryGridCells() {
+    const [data, currents] = await Promise.all([
+        fetchAllRows('military_grid_cells', ['cell_x', 'cell_y']),
+        fetchAllRows('military_water_currents', ['cell_x', 'cell_y'])
+    ]);
+    const flowByCell = new Map((currents || []).map(row => [`${row.cell_x},${row.cell_y}`, row]));
+    return data.map(cell => {
+        const flow = flowByCell.get(`${cell.cell_x},${cell.cell_y}`);
+        return flow ? { ...cell, flow_dx:Number(flow.flow_dx), flow_dy:Number(flow.flow_dy) } : cell;
+    });
+}
+
+export async function setMilitaryWaterCurrent(cellX, cellY, dx, dy) {
+    const { data, error } = await supabaseClient.rpc('set_military_water_current', {
+        p_cell_x:Number(cellX), p_cell_y:Number(cellY), p_flow_dx:Number(dx), p_flow_dy:Number(dy)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function moveMilitaryForce(forceId, path) {
+    const { data, error } = await supabaseClient.rpc('move_military_force', {
+        p_force_id: forceId,
+        p_path: path
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function transferMilitaryTroops(sourceForceId, targetForceId, units, path, merge = false) {
+    const { data, error } = await supabaseClient.rpc('transfer_military_troops', {
+        p_source_force_id: sourceForceId, p_target_force_id: targetForceId,
+        p_units: units, p_path: path, p_merge: !!merge
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function splitMilitaryForce(forceId, units, name, commanderName, commanderAge, cellX, cellY) {
+    const { data, error } = await supabaseClient.rpc('split_military_force', {
+        p_force_id: forceId, p_units: units, p_name: name, p_commander_name: commanderName,
+        p_commander_age: Number(commanderAge), p_cell_x: Number(cellX), p_cell_y: Number(cellY)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryConditionalOrders() {
+    const { data, error } = await supabaseClient.from('military_conditional_orders').select('*');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function setMilitaryConditionalOrder(forceId, conditionX, conditionY, action, route, targetForceId, reservedAp) {
+    const { data, error } = await supabaseClient.rpc('set_military_conditional_order', {
+        p_force_id:forceId, p_condition_x:Number(conditionX), p_condition_y:Number(conditionY), p_action:action,
+        p_route:route || [], p_target_force_id:targetForceId || null, p_reserved_ap:Number(reservedAp)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function cancelMilitaryConditionalOrder(forceId) {
+    const { data, error } = await supabaseClient.rpc('cancel_military_conditional_order', { p_force_id:forceId });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitarySpyRecords() {
+    const [spies, networks, orders, intel, alerts, effects] = await Promise.all([
+        supabaseClient.from('military_spies').select('*').order('created_at'),
+        supabaseClient.from('military_spy_networks').select('*').order('created_turn'),
+        supabaseClient.from('military_spy_orders').select('*').order('created_at', { ascending: false }).limit(100),
+        supabaseClient.from('military_spy_intel').select('*').order('created_at', { ascending: false }).limit(100),
+        supabaseClient.from('military_spy_alerts').select('*').order('created_at', { ascending: false }).limit(100),
+        supabaseClient.rpc('get_military_spy_sabotage_effects')
+    ]);
+    for (const result of [spies, networks, orders, intel, alerts, effects]) if (result.error) throw result.error;
+    return { spies:spies.data || [], networks:networks.data || [], orders:orders.data || [], intel:intel.data || [], alerts:alerts.data || [], sabotageEffects:effects.data || [] };
+}
+
+export async function fetchDiplomacyData() {
+    const [relations, proposals] = await Promise.all([
+        supabaseClient.from('state_diplomatic_relations').select('*'),
+        supabaseClient.from('state_diplomatic_proposals').select('*').order('created_at', { ascending: false })
+    ]);
+    if (relations.error) throw relations.error;
+    if (proposals.error) throw proposals.error;
+    return { relations: relations.data || [], proposals: proposals.data || [] };
+}
+
+export async function createDiplomacyProposal(targetOwner, action) {
+    const { data, error } = await supabaseClient.rpc('create_diplomacy_proposal', { p_target_owner: targetOwner, p_action: action });
+    if (error) throw error;
+    return data;
+}
+
+export async function decideDiplomacyProposal(proposalId, approve) {
+    const { data, error } = await supabaseClient.rpc('decide_diplomacy_proposal', { p_proposal_id: proposalId, p_approve: !!approve });
+    if (error) throw error;
+    return data;
+}
+
+export async function hireMilitarySpy(name, age) {
+    const { data, error } = await supabaseClient.rpc('hire_military_spy', { p_name:name, p_age:Number(age) });
+    if (error) throw error;
+    return data;
+}
+
+export async function assignMilitarySpyNetwork(spyId, targetOwner) {
+    const { data, error } = await supabaseClient.rpc('assign_military_spy_network', { p_spy_id:spyId, p_target_owner:targetOwner });
+    if (error) throw error;
+    return data;
+}
+
+export async function setMilitarySpyCounterintelligence(spyId, enabled) {
+    const { data, error } = await supabaseClient.rpc('set_military_spy_counterintelligence', { p_spy_id:spyId, p_enabled:!!enabled });
+    if (error) throw error;
+    return data;
+}
+
+export async function queueMilitarySpyOperation(spyId, operation, markerId = null, provinceId = null, itemName = null) {
+    const { data, error } = await supabaseClient.rpc('queue_military_spy_operation', {
+        p_spy_id:spyId, p_operation:operation, p_marker_id:markerId ? Number(markerId) : null,
+        p_province_id:provinceId ? Number(provinceId) : null, p_item_name:itemName || null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function dismissMilitarySpy(spyId) {
+    const { data, error } = await supabaseClient.rpc('dismiss_military_spy', { p_spy_id:spyId });
+    if (error) throw error;
+    return data;
+}
+
+export async function setStateRulerHeir(name, age) {
+    const { data, error } = await supabaseClient.rpc('set_state_ruler_heir', { p_name: name, p_age: Number(age) });
+    if (error) throw error;
+    return data;
+}
+
+export async function proposeStateRuler(name, title, age) {
+    const { data, error } = await supabaseClient.rpc('propose_state_ruler', { p_name: name, p_title: title, p_age: Number(age) });
+    if (error) throw error;
+    return data;
+}
+
+export async function resolveStateRulerProposal(owner, approve) {
+    const { data, error } = await supabaseClient.rpc('resolve_state_ruler_proposal', { p_owner: owner, p_approve: Boolean(approve) });
+    if (error) throw error;
+    return data;
+}
+
+export async function startMilitaryBattle(attackerForceId, defenderForceId) {
+    const { data, error } = await supabaseClient.rpc('start_military_battle', {
+        p_attacker_force_id: attackerForceId,
+        p_defender_force_id: defenderForceId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryColonizationMap() {
+    const { data, error } = await supabaseClient.from('military_active_colonization_map').select('*');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function fetchMilitaryStructures() {
+    const { data, error } = await supabaseClient.from('military_structures').select('*').order('available_from_turn').order('id');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function buildMilitaryStructure(type, cellX, cellY, sourceMarkerId) {
+    const { data, error } = await supabaseClient.rpc('build_military_structure', {
+        p_type: type, p_cell_x: cellX, p_cell_y: cellY, p_source_marker_id: sourceMarkerId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function adminBuildMilitaryStructure(type, cellX, cellY, owner) {
+    const { data, error } = await supabaseClient.rpc('admin_build_military_structure', {
+        p_type: type, p_cell_x: Number(cellX), p_cell_y: Number(cellY), p_owner: owner
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function destroyMilitaryStructure(structureId) {
+    const { data, error } = await supabaseClient.rpc('destroy_military_structure', { p_structure_id: structureId });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitarySieges() {
+    const { data, error } = await supabaseClient.rpc('get_military_sieges');
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+}
+
+export async function fetchMilitaryRaids() {
+    const { data, error } = await supabaseClient.from('military_raids').select('*, military_raid_loot(item_type,item_name,quantity)').order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    return data || [];
+}
+
+export async function startMilitaryRaid(forceId) {
+    const { data, error } = await supabaseClient.rpc('start_military_raid', { p_force_id: forceId });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryColonizationMissions() {
+    const { data, error } = await supabaseClient.from('military_colonization_missions').select('*').order('created_at', { ascending: false }).limit(100);
+    if (error) throw error;
+    return data || [];
+}
+
+export async function startMilitaryColonization(sourceMarkerId, targetProvinceId, extraInvestment = 0, forceId = null) {
+    const { data, error } = await supabaseClient.rpc('start_military_land_colonization_with_escort', {
+        p_source_marker_id: sourceMarkerId,
+        p_target_province_id: targetProvinceId,
+        p_extra_investment: extraInvestment,
+        p_force_id: forceId || null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function startMilitarySeaColonization(sourceMarkerId, targetProvinceId, fleetId, extraInvestment = 0, forceId = null) {
+    const { data, error } = await supabaseClient.rpc('start_military_sea_colonization_with_escort', {
+        p_source_marker_id: sourceMarkerId,
+        p_target_province_id: targetProvinceId,
+        p_fleet_id: fleetId,
+        p_extra_investment: extraInvestment,
+        p_force_id: forceId || null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function cancelMilitaryColonization(missionId) {
+    const { data, error } = await supabaseClient.rpc('cancel_military_colonization', { p_mission_id: missionId });
+    if (error) throw error;
+    return data;
+}
+
+export async function startMilitarySiege(forceId, markerId) {
+    const { data, error } = await supabaseClient.rpc('start_military_siege', {
+        p_force_id: forceId,
+        p_marker_id: markerId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function setMilitarySiegeOrder(siegeId, action, { forceId = null, workMethod = 'bombardment', assaultRoute = 'ladders' } = {}) {
+    const { data, error } = await supabaseClient.rpc('set_military_siege_order', {
+        p_siege_id: siegeId,
+        p_action: action,
+        p_force_id: forceId,
+        p_work_method: workMethod,
+        p_assault_route: assaultRoute
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function setMarkerFortification(markerId, level) {
+    const { data, error } = await supabaseClient.rpc('set_marker_fortification', {
+        p_marker_id: markerId,
+        p_level: level
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function saveMilitaryTerrainCell(cell) {
+    const { error } = await supabaseClient.rpc('set_military_terrain_cell', {
+        p_cell_x: cell.cell_x,
+        p_cell_y: cell.cell_y,
+        p_province_id: cell.province_id,
+        p_terrain: cell.terrain,
+        p_bridge: !!cell.bridge
+    });
+    if (error) throw error;
+}
+
+export async function fetchMilitaryForces() {
+    const { data, error } = await supabaseClient.rpc('get_visible_military_forces');
+    if (error) throw error;
+    state.militaryVisibleCells = new Set((data?.visible_cells || []).map(cell => `${Number(cell.x)},${Number(cell.y)}`));
+    const { data: embarked, error: embarkedError } = await supabaseClient.from('military_forces').select('*').eq('status', 'embarked');
+    if (embarkedError) throw embarkedError;
+    const visibleForces = data?.forces || [];
+    const seen = new Set(visibleForces.map(force => force.id));
+    return [...visibleForces, ...(embarked || []).filter(force => !seen.has(force.id))];
+}
+
+export async function fetchMilitaryCommanders() {
+    const { data, error } = await supabaseClient.from('military_commanders').select('*').order('owner').order('name');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function hireMilitaryCommander(name, age) {
+    const { data, error } = await supabaseClient.rpc('hire_military_commander', { p_name:String(name).trim(), p_age:Number(age) });
+    if (error) throw error;
+    return data;
+}
+
+export async function assignMilitaryCommander(commanderId, forceId) {
+    const { data, error } = await supabaseClient.rpc('assign_military_commander', { p_commander_id:commanderId, p_force_id:forceId });
+    if (error) throw error;
+    return data;
+}
+
+export async function embarkMilitaryForce(forceId, fleetId, shipIndex) {
+    const { data, error } = await supabaseClient.rpc('embark_military_force', {
+        p_force_id: forceId, p_fleet_id: fleetId, p_ship_index: Number(shipIndex)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function disembarkMilitaryForce(forceId, fleetId, cellX, cellY) {
+    const { data, error } = await supabaseClient.rpc('disembark_military_force', {
+        p_force_id: forceId, p_fleet_id: fleetId, p_cell_x: Number(cellX), p_cell_y: Number(cellY)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function saveMilitaryForce(force) {
+    const { data, error } = await supabaseClient.rpc('save_military_force', { p_force: force });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryFleets() {
+    const { data, error } = await supabaseClient.rpc('get_visible_military_fleets');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function fetchMilitaryPrisoners() {
+    const { data, error } = await supabaseClient.from('military_prisoners').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+}
+
+export async function startMilitaryNavalBattle(attackerFleetId, defenderFleetId) {
+    const { data, error } = await supabaseClient.rpc('start_military_naval_battle', {
+        p_attacker_fleet_id:attackerFleetId,
+        p_defender_fleet_id:defenderFleetId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function saveMilitaryFleets(fleets) {
+    const { error } = await supabaseClient.rpc('save_military_fleets', { p_fleets: fleets });
+    if (error) throw error;
+}
+
+export async function fetchMilitaryPorts() {
+    const { data, error } = await supabaseClient.from('military_ports').select('*').order('available_from_turn').order('id');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function buildMilitaryPort(markerId, portType, sourceMarkerId) {
+    const { data, error } = await supabaseClient.rpc('build_military_port', {
+        p_marker_id: markerId,
+        p_port_type: portType,
+        p_source_marker_id: sourceMarkerId
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function startMilitaryShipBuild(values) {
+    const { data, error } = await supabaseClient.rpc('start_military_ship_build', {
+        p_port_marker_id: values.portMarkerId,
+        p_source_marker_id: values.sourceMarkerId,
+        p_ship_type: values.shipType,
+        p_fleet_name: values.fleetName || null,
+        p_commander_name: values.commanderName || null,
+        p_commander_age: values.commanderAge ? Number(values.commanderAge) : null,
+        p_fleet_id: values.fleetId || null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryShipBuildOrders() {
+    const { data, error } = await supabaseClient.from('military_ship_build_orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+}
+
+export async function dockMilitaryFleet(fleetId, markerId) {
+    const { data, error } = await supabaseClient.rpc('dock_military_fleet', { p_fleet_id: fleetId, p_marker_id: markerId });
+    if (error) throw error;
+    return data;
+}
+
+export async function launchMilitaryFleet(fleetId, cellX, cellY) {
+    const { data, error } = await supabaseClient.rpc('launch_military_fleet', { p_fleet_id: fleetId, p_cell_x: cellX, p_cell_y: cellY });
+    if (error) throw error;
+    return data;
+}
+
+export async function moveMilitaryFleet(fleetId, path) {
+    const { data, error } = await supabaseClient.rpc('move_military_fleet', { p_fleet_id: fleetId, p_path: path });
+    if (error) throw error;
+    return data;
+}
+
+export async function transferMilitaryFleetCargo(fleetId, shipIndex, itemType, itemName, quantity, unload = false) {
+    const { data, error } = await supabaseClient.rpc('transfer_military_fleet_cargo', {
+        p_fleet_id:fleetId, p_ship_index:Number(shipIndex), p_item_type:itemType,
+        p_item_name:itemName, p_quantity:Number(quantity), p_unload:Boolean(unload)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function serviceMilitaryShip(fleetId, shipIndex, action, quantity = 0, weapon = null) {
+    const { data, error } = await supabaseClient.rpc('service_military_ship', {
+        p_fleet_id:fleetId, p_ship_index:Number(shipIndex), p_action:action,
+        p_quantity:Number(quantity), p_weapon:weapon
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function trainMilitaryCommander(forceId, skill) {
+    const { data, error } = await supabaseClient.rpc('train_military_commander', {
+        p_force_id: forceId,
+        p_skill: skill
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function trainMilitaryFleetCommander(fleetId, skill) {
+    const { data, error } = await supabaseClient.rpc('train_military_fleet_commander', {
+        p_fleet_id: fleetId,
+        p_skill: skill
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryMercenaryOffers() {
+    const { data, error } = await supabaseClient.from('military_mercenary_market').select('*').order('marker_id').order('slot');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function hireMilitaryMercenary(offerId) {
+    const { data, error } = await supabaseClient.rpc('hire_military_mercenary', { p_offer_id: offerId });
+    if (error) throw error;
+    return data;
+}
+
+export async function hireMilitaryMercenaryCamp(forceId) {
+    const { data, error } = await supabaseClient.rpc('hire_military_mercenary_camp', { p_force_id: forceId });
+    if (error) throw error;
+    return data;
+}
+
+export async function renewMilitaryMercenaryContract(forceId) {
+    const { data, error } = await supabaseClient.rpc('renew_military_mercenary_contract', { p_force_id: forceId });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryLevyOrders() {
+    const { data, error } = await supabaseClient.from('military_levy_orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+}
+
+export async function placeMilitaryLevyOrder(values) {
+    const { data, error } = await supabaseClient.rpc('place_military_levy_order', {
+        p_levy_kind: values.levyKind,
+        p_destination_marker_id: values.destinationMarkerId,
+        p_unit_type: values.unitType,
+        p_unit_count: values.unitCount,
+        p_emergency: !!values.emergency
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function mobilizeMilitaryGarrison(values) {
+    const { data, error } = await supabaseClient.rpc('mobilize_military_garrison', {
+        p_force_id: values.forceId,
+        p_name: values.name,
+        p_commander_name: values.commanderName,
+        p_commander_age: values.commanderAge,
+        p_province_id: values.provinceId,
+        p_cell_x: values.cellX,
+        p_cell_y: values.cellY
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function extendMilitaryMilitiaService(forceId) {
+    const { data, error } = await supabaseClient.rpc('extend_military_militia_service', { p_force_id: forceId });
+    if (error) throw error;
+    return data;
+}
+
 export async function fetchEconomySnapshot() {
-    const queries = await Promise.all([
+    const queries = [
         supabaseClient.from('Provinces').select('*'),
         supabaseClient.from('markers').select('*'),
         supabaseClient.from('marker_inventories').select('*'),
@@ -137,16 +753,47 @@ export async function fetchEconomySnapshot() {
         supabaseClient.from('marker_transport_routes').select('*'),
         supabaseClient.from('turn_economy_reports').select('*').order('year', { ascending: false }).order('turn', { ascending: false }),
         supabaseClient.from('state_trade_contracts').select('*'),
-        supabaseClient.from('state_trade_transit_rules').select('*')
-    ]);
-    const names = ['provinces', 'markers', 'inventories', 'consumptionRates', 'estateRatios', 'mechanics', 'transportRoutes', 'reports', 'tradeContracts', 'tradeTransitRules'];
+        supabaseClient.from('state_trade_transit_rules').select('*'),
+        supabaseClient.from('territory_rebellions').select('*')
+    ];
+    const names = ['provinces', 'markers', 'inventories', 'consumptionRates', 'estateRatios', 'mechanics', 'transportRoutes', 'reports', 'tradeContracts', 'tradeTransitRules', 'rebellions'];
+    const { data: sessionData } = await supabaseClient.auth.getSession();
+    if (sessionData?.session) {
+        queries.push(supabaseClient.from('state_modifiers').select('*'));
+        names.push('modifiers');
+        queries.push(
+            supabaseClient.from('military_forces').select('*').in('status', ['active','embarked']),
+            supabaseClient.from('military_structures').select('*'),
+            supabaseClient.from('military_fleets').select('*').eq('status', 'active'),
+            supabaseClient.from('military_ports').select('*'),
+            supabaseClient.from('military_epidemic_events').select('*')
+        );
+        names.push('militaryForces','militaryStructures','militaryFleets','militaryPorts','militaryEpidemicEvents');
+        queries.push(supabaseClient.rpc('get_military_spy_sabotage_effects'));
+        names.push('militarySpySabotageEffects');
+    }
+    const results = await Promise.all(queries);
     const result = {};
-    queries.forEach((query, index) => {
+    results.forEach((query, index) => {
         if (query.error) throw query.error;
         result[names[index]] = query.data || [];
     });
     result.calendar = await fetchGameCalendar();
     return result;
+}
+
+export async function setMilitaryEpidemicEvent(provinceId, enabled) {
+    const { data, error } = await supabaseClient.rpc('set_military_epidemic_event', {
+        p_province_id:Number(provinceId), p_enabled:!!enabled
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchMilitaryEpidemicEvents() {
+    const { data, error } = await supabaseClient.from('military_epidemic_events').select('*');
+    if (error) throw error;
+    return data || [];
 }
 
 export async function saveMarkerTransportRoute(sourceMarkerId, destinationMarkerId, itemType, itemName, quantityPerTurn) {
@@ -203,6 +850,12 @@ export async function applyEconomyTurn(payload) {
     return data;
 }
 
+export async function saveTerritoryRebellions(rows) {
+    const { data, error } = await supabaseClient.rpc('save_territory_rebellions', { p_rows: rows });
+    if (error) throw error;
+    return data;
+}
+
 export async function saveProductionDirective(markerId, directive, orderGood, orderQuantity) {
     const { data, error } = await supabaseClient.rpc('save_production_directive', {
         p_marker_id: markerId,
@@ -239,6 +892,15 @@ export async function updateProvinceData(id, fields) {
         .eq('id', id)
         .select();
 
+    if (error) throw error;
+    return data;
+}
+
+export async function renameOwnedProvince(id, provinceName) {
+    const { data, error } = await supabaseClient.rpc('rename_owned_province', {
+        p_province_id: id,
+        p_province_name: provinceName
+    });
     if (error) throw error;
     return data;
 }

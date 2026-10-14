@@ -44,6 +44,34 @@ body, html {
     z-index: 2;
 }
 
+#military-grid-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+body.military-terrain-editing #viewport,
+body.military-terrain-editing #visual-map,
+body.military-army-placement #viewport,
+body.military-army-placement #visual-map {
+    cursor: crosshair;
+}
+
+.military-terrain-control {
+    display: grid;
+    gap: 6px;
+    margin: 8px 0;
+    color: var(--text-muted, #b8b9af);
+    font-size: 12px;
+}
+
+.military-terrain-control select {
+    width: 100%;
+    min-height: 34px;
+}
+
 #rivers-map {
     position: absolute;
     top: 0;
@@ -51,7 +79,8 @@ body, html {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 3;
+    /* Keep rivers above political fills but below military terrain symbols. */
+    z-index: 2;
 }
 
 #trade-routes-canvas {
@@ -122,7 +151,7 @@ body, html {
     z-index: 1000;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 0;
     max-height: calc(100vh - 40px);
     pointer-events: none;
 }
@@ -171,6 +200,32 @@ body, html {
     color: #eee8da;
     max-height: 90vh;
     overflow-y: auto;
+}
+
+.military-map-tools {
+    position: fixed; z-index: 1200; left: 18px; bottom: 18px; width: min(330px, calc(100vw - 36px));
+    padding: 12px 14px; color: #eee8da; background: rgba(18,22,20,.96); border: 1px solid rgba(222,210,183,.3); border-radius: 9px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.38); font-size: 13px;
+}
+.military-map-tools[hidden], .map-finance-badge[hidden] { display: none; }
+.military-map-tools details { display: grid; gap: 10px; }
+.military-map-tools summary { color: #e7dcc4; font-weight: 700; cursor: pointer; }
+.military-map-tools label { display: grid; gap: 5px; color: #b7b4a9; }
+.military-map-tools select { min-height: 34px; width: 100%; }
+.map-structure-cost { padding: 8px; border-radius: 6px; background: rgba(255,255,255,.04); color: #ded6c3; line-height: 1.45; }
+.map-finance-badge { position: fixed; z-index: 1001; top: 20px; right: calc(20px + 234px + 9px); display: flex; gap: 12px; padding: 10px 13px; border: 1px solid rgba(222,210,183,.26); border-radius: 8px; color: #eee8da; background: rgba(18,22,20,.94); font-weight: 700; }
+.map-finance-item { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+.finance-coin-icon { color: #e4c47d; font-size: 18px; }
+.finance-op-icon { display: inline-grid; width: 20px; height: 20px; place-items: center; border: 1px solid currentColor; border-radius: 50%; color: #d6c6ec; font-size: 10px; }
+.diplomacy-proposals { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line, #373a34); }
+.diplomacy-proposals h3 {
+    margin: 0 0 12px;
+    padding: 0 20px;
+    color: #eee5d4;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.35;
 }
 
 #controls-content {
@@ -288,8 +343,15 @@ body, html {
     display: flex;
     align-items: center;
     gap: 10px;
-    margin-bottom: 6px;
     font-size: 13px;
+}
+
+.legend-item + .legend-item {
+    padding-top: 6px;
+}
+
+#legend-content {
+    padding-bottom: 6px;
 }
 
 .legend-color {
@@ -418,9 +480,47 @@ body, html {
     pointer-events: auto;
     z-index: 1000;
     min-width: 240px;
-    max-width: 320px;
+    width: min(560px, calc(100vw - 24px));
+    max-width: 560px;
+    max-height: calc(100vh - 24px);
+    overflow: auto;
     box-sizing: border-box;
 }
+
+.province-popup-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; }
+.province-popup-heading { display: grid; gap: 3px; padding-right: 18px; }
+.province-popup-heading strong { color: #f0e6d1; font-size: 15px; line-height: 1.25; }
+.province-popup-heading span { color: #b9b6a9; font-size: 11px; }
+.province-popup-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+.province-popup-facts > span { display: grid; gap: 3px; min-width: 0; padding: 7px 8px; border: 1px solid rgba(232,223,200,.12); border-radius: 6px; background: rgba(255,255,255,.035); }
+.province-popup-facts small { color: #aaa99f; font-size: 10px; }
+.province-popup-facts b { overflow-wrap: anywhere; font-size: 12px; font-weight: 600; }
+.province-popup-section, .map-operation-menu, .province-admin-map-tools { border: 1px solid rgba(232,223,200,.16); border-radius: 7px; background: rgba(255,255,255,.025); }
+.province-popup-section > summary, .map-operation-menu > summary, .province-admin-map-tools > summary, .province-action-sub > summary { padding: 8px 10px; color: #e8dfc8; cursor: pointer; font-weight: 600; }
+.province-popup-section > :not(summary), .map-operation-menu > :not(summary), .province-admin-map-tools > :not(summary) { margin: 0 10px 10px; }
+.province-estates { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px 12px; color: #c7c4b9; font-size: 12px; }
+.province-estates span { display: flex; justify-content: space-between; gap: 10px; }
+.province-estates b { color: #eee8da; }
+.map-operation-menu { display: grid; gap: 7px; margin: 0; padding: 0; }
+.map-operation-menu > .province-action-sub { margin: 0 9px 8px; border-top: 1px solid rgba(232,223,200,.1); }
+.map-operation-menu form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+.map-operation-menu form > strong, .map-operation-menu form > small, .map-operation-menu form > button { grid-column: 1 / -1; }
+.map-operation-menu .admin-form { margin: 0 10px 10px; width: auto; }
+.province-road-admin { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 8px; padding: 10px; }
+.province-road-admin label { display: grid; gap: 4px; color: #b9b6a9; font-size: 11px; }
+.province-road-admin small { grid-column: 1 / -1; color: #aaa99f; }
+.province-admin-map-tools { margin-top: 10px; }
+
+/* Keep military forms and action buttons inside their cards at every width. */
+.page-view .page-panel, .page-view .page-panel-heading, .page-table-wrap { min-width: 0; }
+.page-view .admin-btn, .map-operation-menu .admin-btn { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
+.military-form-grid { grid-template-columns: minmax(220px, 1fr) minmax(160px, auto); }
+.military-form-grid > * { min-width: 0; }
+.military-form-grid > small { grid-column: 1 / -1; line-height: 1.45; }
+.military-character-hire input[name="name"] { width: 100%; min-width: 0; min-height: 38px; }
+.military-character-hire label { min-width: 0; }
+@media (min-width: 720px) { .province-popup-layout { grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; } .province-popup-heading, .province-popup-facts, .province-popup-layout > .popup-economy-info, .province-popup-layout > .province-rename-form, .province-popup-layout > .map-operation-menu { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .popup { left: 12px !important; right: 12px; width: auto; max-width: none; } .province-popup-facts { grid-template-columns: repeat(2,minmax(0,1fr)); } .map-operation-menu form, .province-road-admin { grid-template-columns: 1fr; } .province-road-admin small { grid-column: auto; } .province-estates { grid-template-columns: 1fr; } .military-form-grid { grid-template-columns: 1fr; } .military-form-grid > small { grid-column: auto; } }
 
 .admin-form {
     display: flex;
@@ -525,7 +625,9 @@ body, html {
     display: flex;
     gap: 8px;
     align-items: center;
-    margin-bottom: 8px;
+    height: 44px;
+    box-sizing: border-box;
+    padding-bottom: 8px;
 }
 
 .burger-btn {
@@ -758,6 +860,12 @@ body, html {
 .ruler-fields label, .economy-fields label { display: grid; gap: 7px; color: #b6b8ae; font-size: 12px; }
 .ruler-fields input, .economy-fields input { width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 9px; border: 1px solid rgba(222, 210, 183, .2); border-radius: 5px; color: #eee8da; background: #171b19; font: inherit; }
 .ruler-fields input[readonly] { opacity: .75; }
+.ruler-action-fields, .ruler-pending-proposal { display: flex; align-items: end; flex-wrap: wrap; gap: 12px; padding: 0 20px 16px; }
+.ruler-action-fields label { display: grid; gap: 7px; min-width: 150px; color: #b6b8ae; font-size: 12px; }
+.ruler-action-fields input { width: 100%; min-width: 0; box-sizing: border-box; padding: 8px 9px; border: 1px solid rgba(222, 210, 183, .2); border-radius: 5px; color: #eee8da; background: #171b19; font: inherit; }
+.ruler-pending-proposal { align-items: center; }
+.ruler-pending-proposal > span { margin-right: auto; color: #d8d2c4; }
+.ruler-panel > .page-note { display: block; padding: 0 20px 14px; }
 .economy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .economy-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .economy-fields label > span { display: flex; align-items: center; gap: 7px; }
@@ -1000,6 +1108,16 @@ body, html {
     color: #edb2a9;
 }
 
+.page-warning {
+    margin: 12px 18px;
+    padding: 12px 14px;
+    border: 1px solid rgba(214, 169, 91, .35);
+    border-radius: 8px;
+    color: #e5c987;
+    background: rgba(214, 169, 91, .08);
+    font-size: 13px;
+}
+
 .player-state-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -1138,3 +1256,209 @@ body, html {
     .economy-ledgers { grid-template-columns: 1fr; }
     .ruler-fields { grid-template-columns: 1fr; }
 }
+.military-preview-panel { margin-bottom: 16px; }
+.military-recruitment-panel { margin-bottom: 16px; }
+.military-forces-panel { margin-bottom: 16px; }
+.military-grid-sync { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 18px; border-bottom: 1px solid var(--line, #373a34); }
+.military-grid-sync span { color: #aeb2a7; font-size: 12px; }
+.military-epidemic-admin { display: grid; grid-template-columns: minmax(260px, 1fr); justify-items: start; }
+.military-epidemic-admin form { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; }
+.military-epidemic-admin form label { display: grid; gap: 5px; color: #aeb2a7; font-size: 12px; }
+.military-epidemic-admin small { color: #aeb2a7; font-size: 12px; }
+.military-force-create { padding: 16px 18px; border-top: 1px solid var(--line, #373a34); }
+.military-force-create h3 { margin: 0 0 12px; font: 600 18px Georgia, serif; }
+.military-force-controls { display: grid; grid-template-columns: repeat(4, minmax(150px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.military-force-controls label { display: grid; gap: 6px; color: #aeb2a7; font-size: 12px; }
+.military-force-controls input, .military-force-controls select { min-height: 38px; }
+.military-force-create .page-table-wrap { max-height: 280px; margin-bottom: 12px; }
+.military-recruitment-controls { display: grid; grid-template-columns: repeat(3, minmax(170px, 1fr)); gap: 12px; padding: 16px 18px; }
+.military-recruitment-controls label { display: grid; gap: 6px; color: #aeb2a7; font-size: 12px; }
+.military-recruitment-controls input, .military-recruitment-controls select { min-height: 38px; }
+.military-recruitment-estimate { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 0 18px 14px; }
+.military-recruitment-estimate > div { display: grid; align-content: start; gap: 6px; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; }
+.military-recruitment-estimate span { color: #aeb2a7; font-size: 12px; }
+.military-recruitment-estimate strong { color: #e8dfc8; font-size: 14px; }
+.military-recruitment-estimate > .page-error { grid-column: 1 / -1; margin: 0; }
+.military-preview-panel .page-panel-heading { padding-bottom: 12px; }
+.military-preview-panel .military-unit-count { width: 110px; }
+.military-preview-summary { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 10px; padding: 14px 18px; }
+.military-preview-summary > div { display: grid; gap: 5px; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; }
+.military-preview-summary span { color: #aeb2a7; font-size: 12px; }
+.military-preview-summary strong { color: #e8dfc8; font-size: 18px; }
+.military-step-costs { padding: 4px 18px 14px; }
+.military-step-costs h3 { margin: 10px 0; font: 600 18px Georgia, serif; }
+.military-battle-panel { margin-bottom: 16px; }
+.military-events-panel { margin-bottom: 16px; }
+.military-event-list { display: grid; gap: 8px; padding: 12px 18px; }
+.military-event-card { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; }
+.military-event-card > div { display: grid; gap: 4px; min-width: 0; }
+.military-event-card span, .military-event-card small { color: #aeb2a7; overflow-wrap: anywhere; }
+.military-event-card strong { color: #e8dfc8; }
+.military-event-details { border-top: 1px solid var(--line, #373a34); }
+.military-battle-details { padding: 0 18px 16px; }
+.military-event-detail-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 8px 0; }
+.military-event-detail-heading h3 { margin: 0; font: 600 19px Georgia, serif; color: #e8dfc8; }
+.military-event-armies { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.military-event-army { min-width: 0; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; }
+.military-event-army > header { display: flex; justify-content: space-between; gap: 8px; }
+.military-event-army > header span, .military-event-army small { color: #aeb2a7; }
+.military-event-army p { margin: 8px 0; color: #d8d5c9; line-height: 1.5; }
+.battle-event-decision { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.battle-event-decision label { display: grid; gap: 5px; color: #aeb2a7; font-size: 12px; }
+.battle-event-decision input, .battle-event-decision select { min-width: 0; width: 100%; }
+.battle-event-decision .military-check { display: flex; align-items: center; }
+.military-event-admin-actions { margin-top: 12px; }
+.military-event-calculation { margin-top: 10px; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; }
+.military-event-calculation h4, .military-event-calculation h5 { margin: 4px 0 8px; color: #e8dfc8; }
+.military-event-calculation ul { margin: 0 0 12px; padding-left: 20px; color: #c8c8be; line-height: 1.6; }
+.military-event-report { max-height: 420px; overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; color: #d8d5c9; }
+.military-forces-panel td:nth-child(8) { min-width: 230px; }
+.military-forces-panel td:nth-child(8) > strong,
+.military-forces-panel td:nth-child(8) > small { display: block; margin-bottom: 5px; }
+.military-forces-panel td:nth-child(8) > small { color: #aeb2a7; font-size: 11px; line-height: 1.45; }
+.military-service-term { display: block; margin-top: 4px; color: #c8ae75; font-size: 11px; }
+.military-forces-panel td:nth-child(9) { min-width: 260px; }
+.military-garrison-mobilize { display: grid; grid-template-columns: minmax(100px, 1.2fr) minmax(90px, 1fr) 70px auto; align-items: end; gap: 6px; }
+.military-garrison-mobilize label { display: grid; gap: 4px; color: #aeb2a7; font-size: 10px; }
+.military-garrison-mobilize input { min-width: 0; width: 100%; min-height: 32px; }
+.military-garrison-mobilize .compact-add-btn { white-space: nowrap; }
+.military-force-embark { display: grid; grid-template-columns: minmax(120px, 1fr) auto; align-items: end; gap: 6px; margin-top: 6px; }
+.military-force-embark label { display: grid; gap: 4px; color: #aeb2a7; font-size: 10px; }
+.military-force-embark select { min-width: 0; width: 100%; min-height: 32px; }
+.military-force-reorganization { margin-top: 7px; max-width: 360px; color: #c8c8be; font-size: 11px; }
+.military-force-reorganization summary { cursor: pointer; color: #d6cba8; }
+.military-troop-transfer, .military-force-split { display: grid; grid-template-columns: repeat(2, minmax(100px, 1fr)); gap: 6px; margin-top: 7px; }
+.military-force-reorganization label { display: grid; gap: 4px; min-width: 0; color: #aeb2a7; font-size: 10px; }
+.military-force-reorganization input, .military-force-reorganization select { min-width: 0; width: 100%; min-height: 30px; }
+.military-force-reorganization button { align-self: end; }
+.military-merge-actions { display: flex; flex-wrap: wrap; gap: 5px; margin: 6px 0; }
+.military-passenger { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 6px; margin: 4px 8px 2px 0; }
+.extend-militia-service { margin-top: 7px; white-space: nowrap; }
+.commander-training { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
+.commander-training select { min-width: 0; max-width: 220px; }
+.commander-training .compact-add-btn { flex: 0 0 auto; }
+.military-db-warning { margin: 10px 18px; }
+.military-battle-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding: 16px 18px; }
+.military-battle-controls > label:not(.military-check) { display: grid; gap: 6px; min-width: 170px; color: #aeb2a7; font-size: 12px; }
+.military-battle-controls select { min-height: 38px; }
+.military-battle-controls .military-check { display: inline-flex; align-items: center; gap: 7px; min-height: 38px; color: #c9c8be; font-size: 12px; }
+.military-battle-panel > .page-table-wrap { margin: 0 18px 14px; }
+.military-battle-panel .battle-unit-count { width: 100px; }
+.battle-side-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0 18px 16px; }
+.battle-side-grid > section { min-width: 0; }
+.battle-side-grid > section > header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 10px; }
+.battle-side-grid h3 { margin: 0; font: 600 19px Georgia, serif; color: #e8dfc8; }
+.battle-army-list { display: grid; gap: 12px; }
+.battle-army-card { min-width: 0; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; background: rgba(255,255,255,.015); }
+.battle-army-card > header { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-bottom: 10px; }
+.battle-army-card label { display: grid; gap: 5px; color: #aeb2a7; font-size: 12px; }
+.battle-force-source-label { margin-bottom: 10px; }
+.battle-force-source-label select { width: 100%; min-height: 36px; }
+.battle-army-name { min-width: 140px; }
+.battle-army-controls { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
+.battle-army-controls input, .battle-army-controls select { width: 100%; min-width: 0; }
+.battle-army-card .page-table-wrap { margin: 0; }
+.battle-army-card .battle-unit-count { width: 90px; }
+.battle-remove-army:disabled { opacity: .45; cursor: not-allowed; }
+#calculate-land-battle { margin: 0 18px 16px; }
+.military-battle-result { display: grid; gap: 10px; padding: 0 18px 16px; }
+.military-battle-result h3 { margin: 0; font: 600 19px Georgia, serif; color: #e8dfc8; }
+.military-phase-result { display: grid; gap: 5px; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; color: #c8c8be; font-size: 13px; }
+.military-phase-result small { color: #aeb2a7; line-height: 1.5; }
+.military-phase-result strong { color: #e8dfc8; }
+.military-order-panel { position: fixed; z-index: 1200; left: 50%; bottom: 20px; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; max-width: min(760px, calc(100vw - 28px)); padding: 12px 14px; border: 1px solid rgba(232, 223, 200, .38); border-radius: 9px; background: rgba(22, 25, 23, .96); box-shadow: 0 8px 28px rgba(0, 0, 0, .4); color: #e8dfc8; }
+.military-order-panel[hidden] { display: none; }
+.military-order-panel > span { font-size: 13px; line-height: 1.4; }
+.military-order-panel > div { display: flex; flex: 0 0 auto; gap: 8px; }
+.military-order-panel button { min-height: 34px; padding: 6px 11px; border: 1px solid #615b49; border-radius: 6px; background: #292a24; color: #e8dfc8; cursor: pointer; }
+.military-order-panel button[data-order-confirm] { background: #75633e; border-color: #9c8556; }
+.military-order-panel button:disabled { opacity: .45; cursor: not-allowed; }
+.army-map-actions { flex-wrap: wrap; align-items: center; }
+.army-map-actions select { min-height: 34px; max-width: 220px; padding: 6px 9px; border: 1px solid #615b49; border-radius: 6px; background: #20231f; color: #e8dfc8; color-scheme: dark; }
+.map-operation-menu { display: grid; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(232, 223, 200, .22); }
+.map-operation-menu > p { margin: 0; color: #b9b5a6; }
+.map-operation-menu form { display: grid; gap: 8px; }
+#popup input, #popup select, #popup textarea, .page-view input, .page-view select, .page-view textarea, dialog input, dialog select, dialog textarea { color-scheme: dark; background-color: #20231f; color: #e8dfc8; border: 1px solid #514e43; }
+#popup input::placeholder, .page-view input::placeholder, .page-view textarea::placeholder { color: #aaa695; }
+.military-form-grid { display: grid; grid-template-columns: repeat(3, minmax(150px, 1fr)) auto; gap: 10px; align-items: end; padding: 14px 18px; }
+.military-form-grid label { display: grid; gap: 5px; min-width: 0; color: #aeb2a7; font-size: 12px; }
+.military-form-grid select { min-height: 36px; min-width: 0; width: 100%; }
+.military-form-grid [data-road-status] { grid-column: 1 / -1; color: #c8c8be; font-size: 12px; }
+.military-spy-panel h3 { margin: 18px 18px 8px; }
+.military-spy-controls { display: grid; gap: 8px; min-width: 280px; }
+.military-spy-controls form { display: flex; flex-wrap: wrap; align-items: end; gap: 6px; }
+.military-spy-controls label { display: grid; gap: 4px; color: #aeb2a7; font-size: 11px; }
+.military-spy-controls select, .military-spy-controls input { min-width: 120px; max-width: 210px; }
+.military-spy-operation { padding: 8px; border: 1px solid var(--line, #373a34); border-radius: 7px; }
+.military-spy-panel .page-table td { vertical-align: top; }
+@media (max-width: 900px) { .battle-side-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .military-event-armies { grid-template-columns: 1fr; } }
+@media (max-width: 720px) { .military-form-grid { grid-template-columns: 1fr; } .military-form-grid [data-road-status] { grid-column: auto; } .military-order-panel { left: 12px; right: 12px; bottom: 12px; transform: none; align-items: stretch; flex-direction: column; gap: 8px; } .military-order-panel > div { justify-content: flex-end; } .military-preview-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-recruitment-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-force-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-recruitment-estimate { grid-template-columns: 1fr; } .battle-army-card > header { align-items: stretch; flex-direction: column; } .battle-army-controls { grid-template-columns: 1fr 1fr; } .military-event-card { align-items: stretch; flex-direction: column; } .battle-event-decision { grid-template-columns: 1fr; } }
+
+
+#military-port-build { display: none !important; }
+.military-capacity-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0; }
+.military-capacity-summary > div { display:flex; flex-direction:column; gap:5px; padding:12px 14px; border:1px solid var(--border-color,rgba(220,210,185,.16)); border-radius:10px; background:rgba(255,255,255,.025); }
+.military-capacity-summary span,.military-capacity-summary small { color:var(--muted-color,#a9a89f); font-size:.84rem; }
+.military-capacity-summary strong { color:var(--text-color,#eee7d7); font-size:1.15rem; }
+
+/* Final layout constraints override older per-form rules above. */
+.military-form-grid { grid-template-columns: minmax(220px,1fr) minmax(160px,auto); }
+.military-form-grid > * { min-width: 0; }
+.military-form-grid > small { grid-column: 1 / -1; line-height: 1.45; }
+.military-character-hire input[name="name"] { width: 100%; min-width: 0; min-height: 38px; }
+.page-view .admin-btn, .map-operation-menu .admin-btn { min-width: 0; max-width: 100%; white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
+@media (max-width: 720px) { .military-form-grid { grid-template-columns: 1fr; } .military-form-grid > small { grid-column: auto; } }
+
+.modifier-panel { margin-bottom: 16px; }
+.modifier-panel .page-table { min-width: 980px; }
+.modifier-panel .page-table th, .modifier-panel .page-table td { vertical-align: top; }
+.modifier-form { display: grid; grid-template-columns: repeat(auto-fit,minmax(175px,1fr)); align-items: end; gap: 12px; padding: 16px 18px 18px; }
+.modifier-form label { display: grid; gap: 6px; min-width: 0; color: var(--muted-color,#a9a89f); font-size: 12px; }
+.modifier-form input, .modifier-form select { box-sizing: border-box; width: 100%; min-width: 0; min-height: 38px; padding: 8px 10px; border: 1px solid var(--border-color,rgba(220,210,185,.2)); border-radius: 6px; color: var(--text-color,#eee7d7); background: #20231f; }
+.modifier-form .modifier-source-field { grid-column: span 2; }
+.modifier-form > button { min-height: 38px; justify-self: start; }
+.modifier-form > span { align-self: center; color: var(--muted-color,#a9a89f); font-size: 12px; }
+.modifier-form [hidden] { display: none !important; }
+.modifier-owner-note { margin: 0 0 12px; color: var(--muted-color,#a9a89f); }
+.modifier-status { display: inline-flex; padding: 3px 7px; border-radius: 99px; background: rgba(255,255,255,.06); white-space: nowrap; }
+.modifier-status-active { color: #b8d6a1; background: rgba(120,160,91,.14); }
+.modifier-status-pending { color: #e5c783; background: rgba(194,151,70,.15); }
+.modifier-status-expired, .modifier-status-revoked, .modifier-status-rejected { color: #b8b5aa; }
+.modifier-actions { display: grid; grid-template-columns: repeat(2, minmax(76px, 1fr)); gap: 6px; min-width: 170px; }
+.modifier-actions > button { box-sizing: border-box; width: 100%; min-width: 0; height: auto; min-height: 34px; padding: 7px 8px; font-size: 12px; line-height: 1.25; text-align: center; white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 720px) { .modifier-form { grid-template-columns: 1fr; } .modifier-form .modifier-source-field { grid-column: auto; } }
+
+/* Keep character hire controls compact and aligned. */
+.military-character-hire { grid-template-columns: minmax(0, 280px) minmax(0, 280px); align-items: end; }
+.military-character-hire input[name="name"], .military-character-hire > button { box-sizing: border-box; width: 100%; }
+@media (max-width: 720px) { .military-character-hire { grid-template-columns: minmax(0, 1fr); } }
+
+/* Mercenary offers should fit the page without a horizontal scrollbar. */
+.military-recruitment-panel .page-table-wrap { overflow-x: hidden; }
+.military-recruitment-panel .page-table { width: 100%; min-width: 0; table-layout: fixed; }
+.military-recruitment-panel .page-table th,
+.military-recruitment-panel .page-table td { padding: 9px 8px; white-space: normal; overflow-wrap: anywhere; vertical-align: middle; }
+.military-recruitment-panel .page-table th:nth-child(1) { width: 20%; }
+.military-recruitment-panel .page-table th:nth-child(2) { width: 11%; }
+.military-recruitment-panel .page-table th:nth-child(3) { width: 15%; }
+.military-recruitment-panel .page-table th:nth-child(4) { width: 20%; }
+.military-recruitment-panel .page-table th:nth-child(5) { width: 22%; }
+.military-recruitment-panel .page-table th:nth-child(6) { width: 12%; }
+.military-recruitment-panel [data-hire-mercenary] { box-sizing: border-box; width: 100%; min-width: 0; padding: 7px 6px; font-size: 12px; line-height: 1.25; white-space: normal; overflow-wrap: anywhere; }
+
+/* Province and settlement demographic cards need enough room for labels and values. */
+.province-popup-layout > .province-demography { grid-column: 1 / -1; }
+.province-demography .province-popup-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.province-demography .province-popup-facts > span { min-height: 54px; align-content: center; padding: 9px 11px; }
+.province-demography .province-popup-facts small { font-size: 11px; line-height: 1.35; }
+.province-demography .province-popup-facts b { font-size: 13px; line-height: 1.35; }
+.marker-demography-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.marker-demography-grid section { display: grid; gap: 7px; min-width: 0; padding: 10px 12px; border: 1px solid rgba(232,223,200,.16); border-radius: 7px; background: rgba(255,255,255,.035); }
+.marker-demography-grid section > strong { color: #e8dfc8; line-height: 1.35; }
+.marker-demography-grid section > span { display: flex; justify-content: space-between; gap: 8px; color: #b9b6a9; line-height: 1.35; overflow-wrap: anywhere; }
+.marker-demography-grid b { color: #eee8da; text-align: right; }
+@media (max-width: 420px) { .marker-demography-grid { grid-template-columns: 1fr; } }
+
+.province-name-edit { box-sizing: border-box; width: min(220px, 100%); min-width: 130px; min-height: 32px; }
+.province-rename-actions { display: flex; justify-content: flex-end; padding: 12px 16px 16px; }
