@@ -320,9 +320,15 @@ export function calculateSeasonalUpkeep(unitGroups = [], season = '') {
   };
 }
 
+export function calculateRetinueLimit(totalYards = 0) {
+  // A small household force grows slowly with the state's household base.
+  return 50 + Math.floor(Math.max(0, Number(totalYards) || 0) / 50);
+}
+
 export function resolveSeasonalArmyMaintenance({ army, available = {}, season = '', mayRest = false, overCapacityGarrison = false, upkeepModifierPct = 0, supplyModifierPct = 0, moraleChangeModifier = 0 } = {}) {
   if (!army) throw new Error('Армия не задана.');
   const costs = calculateSeasonalUpkeep(army.units || [], season);
+  if (army.is_retinue) for (const key of ['treasury','food','cloth','grain','fuel']) costs[key] *= 2;
   const upkeepFactor = Math.max(0, 1 + Number(upkeepModifierPct || 0) / 100);
   const supplyFactor = Math.max(0, 1 + Number(supplyModifierPct || 0) / 100);
   for (const key of ['treasury','food','cloth','grain','fuel']) costs[key] *= upkeepFactor * (key === 'treasury' ? 1 : supplyFactor);
@@ -496,6 +502,9 @@ export function simulateMilitaryMaintenance({ forces = [], fleets = [], ports = 
       && (Boolean(force.over_capacity) || (!force.marker_id && garrisonCount > 20));
     const costs = calculateSeasonalUpkeep(units, calendar.season);
     if (force.is_mercenary) costs.treasury += 2; // The hired commander is paid alongside the troop group.
+    if (force.is_retinue) {
+      for (const key of ['treasury','food','cloth','grain','fuel']) costs[key] *= 2;
+    }
     const upkeepFactor = militaryCostFactor(force), supplyFactor = supplyUseFactor(force);
     for (const key of ['treasury','food','cloth','grain','fuel']) costs[key] *= upkeepFactor * (key === 'treasury' ? 1 : supplyFactor);
     const multiplier = overCapacityGarrison ? 3 : 1;

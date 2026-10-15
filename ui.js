@@ -1,7 +1,7 @@
 import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=production-orders-20261015';
 import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=production-orders-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=unified-militia-20261015';
-import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=unified-militia-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=retinue-20261015';
+import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=retinue-20261015';
 import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-20261015';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -2107,7 +2107,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const isAdmin = state.userProfile?.role === 'admin';
     let militaryMercenaryOffers = [];
     let mercenaryMarketError = '';
-    let battleHeaders = [], militaryProfiles = [], militaryFleets = [], militaryPrisoners = [], militaryPorts = [], shipBuildOrders = [], militaryLevyOrders = [], militarySieges = [], militaryRaids = [], colonizationMissions = [], epidemicEvents = [], conditionalOrders = [], spyRecords = { spies:[], networks:[], orders:[], intel:[], alerts:[] }, spyDataError = '', levySnapshot = null, militaryDataError = '', forceDataError = '', fleetDataError = '', prisonerDataError = '', portDataError = '', shipBuildDataError = '', levyDataError = '', structureDataError = '', siegeDataError = '', raidDataError = '', colonizationDataError = '';
+    let battleHeaders = [], militaryProfiles = [], militaryFleets = [], militaryPrisoners = [], militaryPorts = [], shipBuildOrders = [], militaryLevyOrders = [], militaryRetinueOrders = [], militarySieges = [], militaryRaids = [], colonizationMissions = [], epidemicEvents = [], conditionalOrders = [], spyRecords = { spies:[], networks:[], orders:[], intel:[], alerts:[] }, spyDataError = '', levySnapshot = null, militaryDataError = '', forceDataError = '', fleetDataError = '', prisonerDataError = '', portDataError = '', shipBuildDataError = '', levyDataError = '', retinueDataError = '', structureDataError = '', siegeDataError = '', raidDataError = '', colonizationDataError = '';
     let militaryCommanders = [], commanderDataError = '';
     const canUseSpySystem = state.userProfile?.role === 'player' || isAdmin;
     const loadResult = async loader => {
@@ -2133,7 +2133,8 @@ async function renderMilitaryPlanner(spyOnly = false) {
             ['shipOrders', fetchMilitaryShipBuildOrders], ['structures', fetchMilitaryStructures],
             ['sieges', fetchMilitarySieges], ['raids', fetchMilitaryRaids], ['colonization', fetchMilitaryColonizationMissions],
             ['mercenaries', fetchMilitaryMercenaryOffers],
-            ['levy', state.userProfile?.role === 'player' && state.userProfile.owner ? () => Promise.all([fetchEconomySnapshot(), fetchMilitaryLevyOrders()]) : null]
+            ['levy', state.userProfile?.role === 'player' && state.userProfile.owner ? () => Promise.all([fetchEconomySnapshot(), fetchMilitaryLevyOrders()]) : null],
+            ['retinue', state.userProfile?.role === 'player' && state.userProfile.owner ? fetchMilitaryRetinueOrders : null]
         ];
         const results = Object.fromEntries(await Promise.all(loaders.map(async ([key, loader]) => [key, loader ? await loadResult(loader) : { data: null }])));
         const read = key => results[key]?.data;
@@ -2156,6 +2157,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         colonizationMissions = read('colonization') || [];
         militaryMercenaryOffers = read('mercenaries') || [];
         if (read('levy')) [levySnapshot, militaryLevyOrders] = read('levy');
+        militaryRetinueOrders = read('retinue') || [];
         if (error('battles')) militaryDataError = error('battles').message || 'Таблицы военных событий ещё не созданы.';
         if (error('profiles')) forceDataError = error('profiles').message || 'Не удалось загрузить список государств.';
         if (error('forces')) forceDataError = error('forces').message || 'Реестр войск ещё не создан.';
@@ -2173,6 +2175,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         if (error('colonization')) colonizationDataError = error('colonization').message || 'Реестр колонизационных миссий ещё не создан.';
         if (error('mercenaries')) mercenaryMarketError = error('mercenaries').message || 'Рынок наёмников ещё не создан.';
         if (error('levy')) levyDataError = error('levy').message || 'Не удалось загрузить данные для сбора ополчения.';
+        if (error('retinue')) retinueDataError = error('retinue').message || 'Не удалось загрузить дружину.';
         renderMilitaryGrid();
     }
     const playerOwner = state.userProfile?.owner || '';
@@ -2303,6 +2306,23 @@ async function renderMilitaryPlanner(spyOnly = false) {
             <p class="page-note">Состав и численность по каждой квоте система определяет по культуре и сезону. Казна и товары списываются со склада ближайшего контролируемого поселения сразу; приказ не создаётся при нехватке средств или снаряжения.</p>
             <div class="page-table-wrap"><table class="page-table"><thead><tr><th>Отряд</th><th>Место сбора</th><th>Состояние</th><th>Оплачено</th></tr></thead><tbody>${levyOrderRows || '<tr><td colspan="4">Заказов на сбор пока нет.</td></tr>'}</tbody></table></div>
         </section>`;
+    const retinueYards = levyProvinces.reduce((sum, province) => sum + Math.max(0, Number(province.yards) || 0), 0)
+        + ownedLevyMarkers.reduce((sum, marker) => sum + Math.max(0, Number(marker.yards) || 0), 0);
+    const retinueLimit = calculateRetinueLimit(retinueYards);
+    const retinueServing = state.militaryForces.filter(force => force.owner === playerOwner && force.is_retinue && force.status !== 'disbanded')
+        .reduce((sum, force) => sum + (force.unit_groups || []).reduce((inner, group) => inner + (Number(group.count) || 0), 0), 0);
+    const retinueTraining = militaryRetinueOrders.filter(order => order.status === 'training')
+        .reduce((sum, order) => sum + (Number(order.unit_count) || 0), 0);
+    const retinueRemaining = Math.max(0, retinueLimit - retinueServing - retinueTraining);
+    const retinueOrderRows = militaryRetinueOrders.slice(0, 10).map(order =>
+        `<tr><td>${escapeHtml(order.unit_type)} · ${formatNumber(order.unit_count)}</td><td>${escapeHtml(markerName[Number(order.destination_marker_id)] || `Поселение #${order.destination_marker_id}`)}</td><td>${order.status === 'training' ? `Обучение · готова с хода ${formatNumber(order.due_turn)}` : 'В гарнизоне'}</td><td>${formatNumber(order.treasury_paid, 2)} z</td></tr>`
+    ).join('');
+    const retinueUnitOptions = Object.keys(LAND_UNIT_PROFILES).map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('');
+    const retinuePanel = state.userProfile?.role === 'player' ? `<section class="page-panel military-recruitment-panel"><header class="page-panel-heading"><div><h2>Личная дружина</h2><p>Постоянное войско правителя. Набор и оснащение занимают один сезон; готовые бойцы появляются в Гарнизоне выбранного поселения. Дружина не расходует квоты ополчения и сохраняется после окончания срока службы ополчения.</p></div></header>
+        <div class="military-capacity-summary"><div><span>Лимит дружины</span><strong>${formatNumber(retinueLimit)} бойцов</strong><small>50 базовых + 1 боец на каждые 50 дворов государства</small></div><div><span>Служит</span><strong>${formatNumber(retinueServing)}</strong></div><div><span>Обучается</span><strong>${formatNumber(retinueTraining)}</strong></div><div><span>Можно нанять</span><strong>${formatNumber(retinueRemaining)}</strong></div></div>
+        <form id="military-retinue-hire" class="military-form-grid"><label>Поселение<select name="marker_id" required><option value="">Выберите поселение</option>${levyMarkerOptions}</select></label><label>Тип войск<select name="unit_type" required>${retinueUnitOptions}</select></label><label>Численность<input name="unit_count" type="number" min="1" max="${Math.max(1, retinueRemaining)}" value="1" required></label><button class="admin-btn" type="submit" ${retinueRemaining < 1 || !levyMarkerOptions ? 'disabled' : ''}>Нанять дружинников</button><small>Разовая стоимость и оснащение совпадают с обычным сбором. Содержание дружины — двойное по сравнению с обычным войском.</small></form>
+        <div id="retinue-estimate" class="military-recruitment-estimate" aria-live="polite"></div>${retinueDataError ? `<p class="page-error">Не удалось загрузить дружину: ${escapeHtml(retinueDataError)}. Примените supabase/military_retinue.sql.</p>` : ''}
+        <div class="page-table-wrap"><table class="page-table"><thead><tr><th>Отряд</th><th>Поселение</th><th>Состояние</th><th>Оплачено</th></tr></thead><tbody>${retinueOrderRows || '<tr><td colspan="4">Приказов на набор дружины пока нет.</td></tr>'}</tbody></table></div></section>` : '';
     const mercenaryMarketRows = militaryMercenaryOffers.filter(offer => isAdmin || state.dbMarkers?.find(marker => Number(marker.id) === Number(offer.marker_id))?.owner === playerOwner).map(offer => {
         const marker = state.dbMarkers?.find(item => Number(item.id) === Number(offer.marker_id));
         const roster = (offer.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ');
@@ -2359,7 +2379,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         const canTrain = force.force_kind === 'land_army' && force.status === 'active' && force.owner === state.userProfile?.owner;
         const canReorganize = !isAdmin && canTrain && !force.in_pending_battle && !force.is_militia && !force.is_mercenary;
         const reorgTargets = state.militaryForces.filter(target => target.id !== force.id && target.force_kind === 'land_army'
-            && target.status === 'active' && target.owner === force.owner && !target.in_pending_battle && !target.is_militia && !target.is_mercenary);
+            && target.status === 'active' && target.owner === force.owner && !target.in_pending_battle && !target.is_militia && !target.is_mercenary && Boolean(target.is_retinue) === Boolean(force.is_retinue));
         const reorgTargetOptions = reorgTargets.map(target => `<option value="${escapeHtml(target.id)}">${escapeHtml(target.name)} · ${Number(target.cell_x)+1}:${Number(target.cell_y)+1}</option>`).join('');
         const options = commanderSkills.filter(([key]) => (Number(force.commander_skills?.[key]) || 0) < 5).map(([key, label]) => {
             const level = Number(force.commander_skills?.[key]) || 0;
@@ -2383,6 +2403,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         const campHireAction = !isAdmin && force.owner === 'Лагерь наёмников' && force.force_kind === 'land_army' && force.status === 'active'
             ? `<button type="button" class="compact-add-btn hire-mercenary-camp" data-force-id="${escapeHtml(force.id)}">Нанять лагерь · 2 z/чел.</button>` : '';
         const militiaTerm = force.is_militia && force.service_end_turn ? `<small class="military-service-term">Ополчение · служба до хода ${formatNumber(force.service_end_turn)}</small>` : '';
+        const retinueTerm = force.is_retinue ? '<small class="military-service-term">Постоянная дружина · двойное содержание</small>' : '';
         const canExtend = !isAdmin && force.owner === state.userProfile?.owner && force.is_militia && force.status === 'active' && Number(force.service_end_turn) > (Number(state.gameCalendar?.turn) || 0);
         const extensionCost = (force.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 0) * 0.25;
         const extendAction = canExtend ? `<button type="button" class="compact-add-btn extend-militia-service" data-force-id="${escapeHtml(force.id)}">Продлить на сезон · ${formatNumber(extensionCost, 2)} z</button>` : '';
@@ -2393,7 +2414,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
             && Number(force.service_end_turn) <= (Number(state.gameCalendar?.turn) || 0) + 1;
         const renewMercenaryAction = canRenewMercenary ? `<button type="button" class="compact-add-btn renew-mercenary-contract" data-force-id="${escapeHtml(force.id)}">Продлить на сезон · ${formatNumber(forcePeople * 2)} z</button>` : '';
         const supplyCell = force.last_maintenance_turn == null ? 'нет расчёта' : `${formatNumber((Number(force.maintenance_coverage) || 0) * 100, 1)}% снабжения · ${Number(force.underfunded_turns) || 0} сез. дефицита`;
-        return `<tr><td>${escapeHtml(force.name)}${militiaTerm}${mercenaryTerm}</td><td>${escapeHtml(force.owner)}</td><td>${position}</td><td>${force.commander_name ? `${escapeHtml(force.commander_name)}, ${formatNumber(force.commander_age)} лет` : '—'}</td><td>${composition}${cargo ? `<small class="military-supply-status">Добыча: ${cargo}</small>` : ''}</td><td>${formatNumber(force.morale)}%<small class="military-supply-status">${escapeHtml(supplyCell)}</small></td><td>${formatNumber(force.action_points)} ОД</td><td>${experienceCell}</td><td>${campHireAction}${mobilizeAction}${extendAction}${renewMercenaryAction}${embarkAction}${reorganization}${conditionalAction}</td></tr>`;
+        return `<tr><td>${escapeHtml(force.name)}${retinueTerm}${militiaTerm}${mercenaryTerm}</td><td>${escapeHtml(force.owner)}</td><td>${position}</td><td>${force.commander_name ? `${escapeHtml(force.commander_name)}, ${formatNumber(force.commander_age)} лет` : '—'}</td><td>${composition}${cargo ? `<small class="military-supply-status">Добыча: ${cargo}</small>` : ''}</td><td>${formatNumber(force.morale)}%<small class="military-supply-status">${escapeHtml(supplyCell)}</small></td><td>${formatNumber(force.action_points)} ОД</td><td>${experienceCell}</td><td>${campHireAction}${mobilizeAction}${extendAction}${renewMercenaryAction}${embarkAction}${reorganization}${conditionalAction}</td></tr>`;
     }).join('');
     const ownedCommanders = militaryCommanders.filter(row => isAdmin || row.owner === playerOwner);
     const availableCommanders = ownedCommanders.filter(row => row.status === 'available');
@@ -2412,7 +2433,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const fleetPanel = `<section class="page-panel military-fleets-panel"><header class="page-panel-heading"><div><h2>Флотилии</h2><p>Маршрут прокладывается по рекам, озёрам и морям, доступным всем судам в составе. В зиму внутренние воды закрыты; для использования карты после обновления водоёмов нужна синхронизация сетки.</p></div></header>${fleetDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр флотов: ${escapeHtml(fleetDataError)}. Примените supabase/military_fleets.sql.</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Корабли и экипажи</th><th>Положение</th><th>Мораль</th><th>ОД</th><th>Приказы</th></tr></thead><tbody>${fleetRows || '<tr><td colspan="7">Сохранённых флотилий пока нет.</td></tr>'}</tbody></table></div></section>`;
     const prisonerPanel = militaryPrisoners.length || prisonerDataError ? `<section class="page-panel military-prisoners-panel"><header class="page-panel-heading"><div><h2>Пленные после морских сражений</h2><p>Захваченные пассажиры учитываются отдельно от корабельных экипажей и не возвращаются в состав исходной армии.</p></div></header>${prisonerDataError ? `<p class="page-error military-db-warning">Не удалось загрузить список пленных: ${escapeHtml(prisonerDataError)}</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Отряд</th><th>Исходное государство</th><th>Пленители</th><th>Командир</th><th>Состав</th><th>Статус</th></tr></thead><tbody>${prisonerRows || '<tr><td colspan="6">Записей о пленных нет.</td></tr>'}</tbody></table></div></section>` : '';
     const shipServicePanel = state.userProfile?.role === 'player' ? `<section class="page-panel"><header class="page-panel-heading"><div><h2>Обслуживание кораблей</h2><p>Ремонт: до 4 очков корпуса за сезон, 1 z, 1 Древесина и 0,1 Инструмента за очко. Экипаж: 0,5 z, 0,05 оружия и 0,025 сукна за человека. Переоснащение доступно один раз; судно остаётся в порту до следующего хода.</p></div></header><form id="military-ship-service" class="military-form-grid"><label>Судно<select name="fleet_ship" required><option value="">Выбрать судно в порту</option>${cargoShipOptions}</select></label><label>Действие<select name="action"><option value="repair">Ремонт корпуса</option><option value="recruit">Пополнить экипаж</option><option value="refit">Переоснастить один раз</option></select></label><label>Очки корпуса / моряки<input name="quantity" type="number" min="1" max="100" step="1" value="1"></label><label>Вооружение<select name="weapon"><option value="deck">Палубное метательное оружие</option><option value="light_gun">Лёгкое корабельное орудие</option></select></label><button class="admin-btn" type="submit" ${!cargoShipOptions ? 'disabled' : ''}>Выполнить обслуживание</button></form></section>` : '';
-    const content = spyOnly ? spyPanel : `${commanderPanel}${forcePanel}${isAdmin ? siegePanel : ""}${isAdmin ? raidPanel : ""}${isAdmin ? colonizationPanel : ""}${portPanel}${shipServicePanel}${fleetPanel}${prisonerPanel}${eventPanel}${recruitmentPanel}${mercenaryPanel}`;
+    const content = spyOnly ? spyPanel : `${commanderPanel}${forcePanel}${isAdmin ? siegePanel : ""}${isAdmin ? raidPanel : ""}${isAdmin ? colonizationPanel : ""}${portPanel}${shipServicePanel}${fleetPanel}${prisonerPanel}${eventPanel}${recruitmentPanel}${retinuePanel}${mercenaryPanel}`;
     showPageView(spyOnly ? 'Шпионаж и Саботаж' : 'Военное дело', content, { navId: spyOnly ? 'nav-spy' : 'nav-military', subtitle: state.userProfile?.owner || '' });
     elements.pageView.querySelector('#military-commander-hire')?.addEventListener('submit', async event => {
         event.preventDefault(); const form=event.currentTarget,button=form.querySelector('button[type="submit"]'); button.disabled=true;
@@ -3126,6 +3147,58 @@ async function renderMilitaryPlanner(spyOnly = false) {
             showToast(`Не удалось начать сбор: ${error.message}`, 7000);
             button.disabled = false;
             updateLevyEstimate();
+        }
+    });
+    const retinueForm = elements.pageView.querySelector('#military-retinue-hire');
+    const updateRetinueEstimate = () => {
+        if (!retinueForm) return;
+        const count = Math.max(0, Math.floor(Number(retinueForm.elements.unit_count.value) || 0));
+        const type = retinueForm.elements.unit_type.value;
+        const groups = count ? [{ type, count }] : [];
+        const cost = calculateLevyCosts(groups);
+        const upkeep = calculateSeasonalUpkeep(groups, state.gameCalendar?.season || 'Весна');
+        for (const key of ['treasury','food','cloth','grain','fuel']) upkeep[key] *= 2;
+        const estimate = elements.pageView.querySelector('#retinue-estimate');
+        if (estimate) estimate.innerHTML = `<div><span>Разовый набор</span><strong>${formatNumber(cost.treasury,2)} z · ${formatNumber(cost.arms,3)} оружия · ${formatNumber(cost.cloth,3)} одежды</strong></div><div><span>Двойное содержание за сезон</span><strong>${formatNumber(upkeep.treasury,2)} z · ${formatNumber(upkeep.food,2)} продовольствия · ${formatNumber(upkeep.cloth,3)} одежды${upkeep.grain ? ` · ${formatNumber(upkeep.grain,2)} зерна` : ''}${upkeep.fuel ? ` · ${formatNumber(upkeep.fuel,3)} топлива` : ''}</strong></div>`;
+    };
+    const updateRetinueUnitChoices = () => {
+        if (!retinueForm) return;
+        const marker = levySnapshot?.markers?.find(item => Number(item.id) === Number(retinueForm.elements.marker_id.value));
+        const province = levySnapshot?.provinces?.find(item => Number(item.id) === Number(marker?.province_id));
+        const culture = `${marker?.culture || ''} ${province?.main_culture || ''}`.toLocaleLowerCase('ru');
+        [...retinueForm.elements.unit_type.options].forEach(option => {
+            if (!option.value) return;
+            const allowed = (option.value !== 'Арбалетчики' || /свей|эст/.test(culture))
+                && (option.value !== 'Конные лучники' || culture.includes('казан'))
+                && (option.value !== 'Лыжники-разведчики' || (/коми|саам/.test(culture) && state.gameCalendar?.season === 'Зима'));
+            option.hidden = !allowed;
+            option.disabled = !allowed;
+        });
+        if (retinueForm.elements.unit_type.selectedOptions[0]?.disabled) {
+            retinueForm.elements.unit_type.value = [...retinueForm.elements.unit_type.options].find(option => option.value && !option.disabled)?.value || '';
+        }
+        updateRetinueEstimate();
+    };
+    retinueForm?.addEventListener('input', updateRetinueEstimate);
+    retinueForm?.elements.marker_id.addEventListener('change', updateRetinueUnitChoices);
+    retinueForm?.addEventListener('change', updateRetinueEstimate);
+    updateRetinueUnitChoices();
+    updateRetinueEstimate();
+    retinueForm?.addEventListener('submit', async event => {
+        event.preventDefault();
+        const form = event.currentTarget, button = form.querySelector('button[type="submit"]');
+        button.disabled = true;
+        try {
+            const result = await placeMilitaryRetinueOrder({
+                markerId: Number(form.elements.marker_id.value),
+                unitType: form.elements.unit_type.value,
+                unitCount: Number(form.elements.unit_count.value)
+            });
+            showToast(`Набор дружины начат: ${formatNumber(result.unit_count)} · ${result.unit_type}. Готовность с хода ${formatNumber(result.due_turn)}.`);
+            await renderMilitaryPlanner();
+        } catch (error) {
+            showToast(`Не удалось нанять дружинников: ${error.message}`, 7000);
+            button.disabled = false;
         }
     });
 }

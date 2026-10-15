@@ -1,5 +1,6 @@
 -- Transfer units between field armies, split an army into a new command, and
 -- merge adjacent same-state armies with server-side route and AP validation.
+alter table public.military_forces add column if not exists is_retinue boolean not null default false;
 create or replace function public.transfer_military_troops(
     p_source_force_id uuid,
     p_target_force_id uuid,
@@ -42,7 +43,8 @@ begin
         raise exception 'You may reorganize only your own armies' using errcode='42501';
     end if;
     if source_force.owner is distinct from target_force.owner then raise exception 'Armies must belong to the same state' using errcode='22023'; end if;
-    if source_force.is_militia is distinct from target_force.is_militia or source_force.is_mercenary or target_force.is_mercenary then
+    if source_force.is_militia is distinct from target_force.is_militia or source_force.is_mercenary or target_force.is_mercenary
+       or source_force.is_retinue is distinct from target_force.is_retinue then
         raise exception 'Militia and mercenary contracts cannot be transferred between commands' using errcode='22023';
     end if;
     if exists(select 1 from public.military_battle_armies army join public.military_battles battle on battle.id=army.battle_id
@@ -211,9 +213,9 @@ begin
     update public.military_forces set unit_groups=source_next,action_points=action_points-10,
         status=case when jsonb_array_length(source_next)=0 then 'disbanded' else status end,updated_at=now() where id=source_force.id;
     insert into public.military_forces(owner,name,force_kind,province_id,cell_x,cell_y,commander_name,commander_age,
-        commander_skills,unit_groups,siege_equipment,morale,action_points,status)
+        commander_skills,unit_groups,siege_equipment,morale,action_points,status,is_retinue)
     values(source_force.owner,btrim(p_name),'land_army',destination.province_id,p_cell_x,p_cell_y,btrim(p_commander_name),p_commander_age,
-        '{}'::jsonb,p_units,'{}'::jsonb,source_force.morale,0,'active') returning id into new_id;
+        '{}'::jsonb,p_units,'{}'::jsonb,source_force.morale,0,'active',source_force.is_retinue) returning id into new_id;
     return new_id;
 end;
 $function$;

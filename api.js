@@ -783,6 +783,22 @@ export async function placeMilitaryLevyOrder(provinceId) {
     return data;
 }
 
+export async function fetchMilitaryRetinueOrders() {
+    const { data, error } = await supabaseClient.from('military_retinue_orders').select('*').order('created_at', { ascending: false });
+    if (error) throw error;
+    return data || [];
+}
+
+export async function placeMilitaryRetinueOrder(values) {
+    const { data, error } = await supabaseClient.rpc('place_military_retinue_order', {
+        p_marker_id: values.markerId,
+        p_unit_type: values.unitType,
+        p_unit_count: values.unitCount
+    });
+    if (error) throw error;
+    return data;
+}
+
 export async function mobilizeMilitaryGarrison(values) {
     const { data, error } = await supabaseClient.rpc('mobilize_military_garrison', {
         p_force_id: values.forceId,
