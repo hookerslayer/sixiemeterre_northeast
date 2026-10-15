@@ -393,13 +393,15 @@ export function renderMilitaryGrid() {
             ctx.lineWidth = 2.5;
             ctx.stroke();
         }
-        ctx.font = `600 ${Math.max(10, size * .48)}px sans-serif`;
-        ctx.textAlign = 'left';
-        ctx.strokeStyle = 'rgba(18, 20, 19, .8)';
-        ctx.lineWidth = 3;
-        ctx.strokeText(force.name, x + size * .42, y - size * .25);
-        ctx.fillStyle = '#fffaf0';
-        ctx.fillText(force.name, x + size * .42, y - size * .25);
+        if (state.militaryHoveredForceId === force.id) {
+            ctx.font = `600 ${Math.max(10, size * .48)}px sans-serif`;
+            ctx.textAlign = 'left';
+            ctx.strokeStyle = 'rgba(18, 20, 19, .9)';
+            ctx.lineWidth = 3;
+            ctx.strokeText(force.name, x + size * .42, y - size * .25);
+            ctx.fillStyle = '#fffaf0';
+            ctx.fillText(force.name, x + size * .42, y - size * .25);
+        }
     }
     for (const fleet of state.militaryFleets || []) {
         if (fleet.status !== 'active' || fleet.location_kind !== 'water' || fleet.cell_x == null || fleet.cell_y == null) continue;
@@ -566,7 +568,7 @@ export function renderMarkers() {
 function drawTradeRouteLabel(ctx, route, points, routeIndex = 0) {
     if (points.length < 2 || !route.source_name || !route.destination_name) return;
     const scale = Math.max(.1, Number(state.scale) || 1);
-    const fontSize = 12 / scale, paddingX = 8 / scale, paddingY = 5 / scale;
+    const fontSize = 12 / scale;
     const maxWidth = 260 / scale;
     let source = String(route.source_name), destination = String(route.destination_name);
     const labelText = () => `${source} → ${destination}`;
@@ -593,21 +595,17 @@ function drawTradeRouteLabel(ctx, route, points, routeIndex = 0) {
     let angle = Math.atan2(segment.dy, segment.dx);
     if (angle > Math.PI / 2 || angle < -Math.PI / 2) angle += Math.PI;
     const offset = ((routeIndex % 2) ? 7 : -7) / scale;
-    const labelWidth = ctx.measureText(labelText()).width, labelHeight = fontSize + paddingY * 2;
     ctx.translate(x - Math.sin(angle) * offset, y + Math.cos(angle) * offset);
     ctx.rotate(angle);
     const hovered = state.hoveredTradeRouteIndex === routeIndex;
     ctx.globalAlpha = hovered ? 1 : 0.62;
-    ctx.fillStyle = 'rgba(18, 22, 20, .82)';
-    ctx.strokeStyle = 'rgba(236, 220, 180, .45)';
-    ctx.lineWidth = 1 / scale;
-    ctx.beginPath();
-    ctx.rect(-labelWidth / 2 - paddingX, -labelHeight / 2, labelWidth + paddingX * 2, labelHeight);
-    ctx.fill();
-    ctx.stroke();
     ctx.fillStyle = '#f1e7d1';
+    ctx.strokeStyle = 'rgba(18, 22, 20, .95)';
+    ctx.lineWidth = 3 / scale;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.lineJoin = 'round';
+    ctx.strokeText(labelText(), 0, 0);
     ctx.fillText(labelText(), 0, 0);
     ctx.restore();
 }
@@ -629,7 +627,7 @@ function drawTradeRouteArrow(ctx, points, scale) {
     const x = Number(segment.from.x) + (Number(segment.to.x) - Number(segment.from.x)) * ratio;
     const y = Number(segment.from.y) + (Number(segment.to.y) - Number(segment.from.y)) * ratio;
     const angle = Math.atan2(Number(segment.to.y) - Number(segment.from.y), Number(segment.to.x) - Number(segment.from.x));
-    const size = 13 / Math.max(0.1, scale);
+    const size = 9 / Math.max(0.1, scale);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);
@@ -655,10 +653,11 @@ export function renderTradeRoutes(routes = []) {
         ctx.globalAlpha = hovered ? 1 : .82;
         ctx.strokeStyle = route.mode === 'land' ? (state.dbOwnerColors[route.seller_owner] || '#cfac6d') : '#76b8c4';
         ctx.fillStyle = ctx.strokeStyle;
-        ctx.lineWidth = 7 / Math.max(.1, Number(state.scale) || 1);
+        const inverseScale = 1 / Math.max(.1, Number(state.scale) || 1);
+        ctx.lineWidth = 4 * inverseScale;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-        ctx.setLineDash(route.mode === 'land' ? [] : [9, 7]);
+        ctx.setLineDash(route.mode === 'land' ? [] : [9 * inverseScale, 7 * inverseScale]);
         ctx.beginPath();
         ctx.moveTo(Number(points[0].x), Number(points[0].y));
         for (const point of points.slice(1)) ctx.lineTo(Number(point.x), Number(point.y));
@@ -667,7 +666,7 @@ export function renderTradeRoutes(routes = []) {
         drawTradeRouteArrow(ctx, points, state.scale);
         for (const point of [points[0], points.at(-1)]) {
             ctx.beginPath();
-            ctx.arc(Number(point.x), Number(point.y), 4, 0, Math.PI * 2);
+            ctx.arc(Number(point.x), Number(point.y), 2.5 * inverseScale, 0, Math.PI * 2);
             ctx.fill();
         }
         drawTradeRouteLabel(ctx, route, points, routeIndex);
@@ -681,16 +680,17 @@ export function renderTradeRoutes(routes = []) {
             ctx.save();
             ctx.strokeStyle = '#f2d17e';
             ctx.fillStyle = '#f2d17e';
-            ctx.lineWidth = 5;
+            const inverseScale = 1 / Math.max(.1, Number(state.scale) || 1);
+            ctx.lineWidth = 3 * inverseScale;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
-            ctx.setLineDash([10, 7]);
+            ctx.setLineDash([10 * inverseScale, 7 * inverseScale]);
             ctx.beginPath();
             ctx.moveTo(Number(points[0].x), Number(points[0].y));
             for (const point of points.slice(1)) ctx.lineTo(Number(point.x), Number(point.y));
             ctx.stroke();
             ctx.setLineDash([]);
-            for (const point of points) { ctx.beginPath(); ctx.arc(Number(point.x), Number(point.y), 5, 0, Math.PI * 2); ctx.fill(); }
+            for (const point of points) { ctx.beginPath(); ctx.arc(Number(point.x), Number(point.y), 3 * inverseScale, 0, Math.PI * 2); ctx.fill(); }
             drawTradeRouteLabel(ctx, draft, points);
             ctx.restore();
         }
@@ -716,6 +716,23 @@ export function setTradeRouteHoverAt(x, y) {
     if (state.hoveredTradeRouteIndex === hoveredIndex) return;
     state.hoveredTradeRouteIndex = hoveredIndex;
     renderTradeRoutes(routes);
+}
+
+export function setMilitaryGridHoverAt(x, y) {
+    let hoveredForceId = null;
+    if (state.showMilitaryGrid && Number.isFinite(x) && Number.isFinite(y)) {
+        const size = MILITARY_GRID_CELL_SIZE;
+        const radius = Math.max(8, size * .34);
+        hoveredForceId = (state.militaryForces || []).find(force => {
+            if (force.force_kind !== 'land_army' || force.status !== 'active') return false;
+            const centerX = Number(force.cell_x) * size + size / 2;
+            const centerY = Number(force.cell_y) * size + size / 2;
+            return Math.hypot(x - centerX, y - centerY) <= radius;
+        })?.id ?? null;
+    }
+    if (state.militaryHoveredForceId === hoveredForceId) return;
+    state.militaryHoveredForceId = hoveredForceId;
+    renderMilitaryGrid();
 }
 
 export function drawMarkerLabel(ctx, text, x, y) {

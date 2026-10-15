@@ -1,7 +1,7 @@
 import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=loading-optimization-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=military-tactics-trade-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=trade-label-hover-cycle-extension-20261015';
 import { signUpUser, signInUser, signOutUser, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=military-tactics-trade-20261015';
-import { calculateArmyMobility, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=auto-cycle-tactics-20261015';
+import { calculateArmyMobility, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=extended-land-cycles-20261015';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -2806,8 +2806,8 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 const pursuitSummary = calculation.pursuit
                     ? `<p>Преследование: ${calculation.pursuit.success ? calculation.pursuit.captured ? `захвачено судно ${escapeHtml(calculation.pursuit.targetShipId)}` : `судно ${escapeHtml(calculation.pursuit.targetShipId)} получило урон корпуса ${calculation.pursuit.hullDamage} и потеряло ${formatNumber(calculation.pursuit.crewLoss)} чел. экипажа` : escapeHtml(calculation.pursuit.reason || 'перехват не удался')} · шанс ${formatNumber(calculation.pursuit.chance, 1)}%, бросок ${formatNumber(calculation.pursuit.roll * 100, 1)}.</p>`
                     : '';
-                const casualties = battle.battle_type === 'naval' ? [] : ['attacker','defender'].flatMap(side => calculation.phases.flatMap(phase => phase.casualties[side].map(row => ({ ...row, side, phase: phase.phase }))));
-                const lossesSummary = casualties.map(row => `<li>${escapeHtml(details.armies.find(army => army.id === row.armyId)?.name || row.armyId)}: −${formatNumber(row.losses)} чел. · Мораль ${formatNumber(row.morale)}%</li>`).join('');
+                const casualties = battle.battle_type === 'naval' ? [] : ['attacker','defender'].flatMap(side => calculation.phases.flatMap(phase => phase.casualties[side].map(row => ({ ...row, side, phase: phase.phase, cycle: phase.cycle }))));
+                const lossesSummary = casualties.map(row => `<li>${row.phase === 'first' ? 'Первое столкновение' : `Цикл ${row.cycle}`} · ${escapeHtml(details.armies.find(army => army.id === row.armyId)?.name || row.armyId)}: −${formatNumber(row.losses)} чел. · Мораль −${formatNumber(row.moraleLoss || 0, 1)} → ${formatNumber(row.morale)}%</li>`).join('');
                 const tacticsSummary = battle.battle_type === 'naval' ? '' : calculation.phases.map((phase, index) => {
                     const sideNames = { attacker: 'Атакующие', defender: 'Защитники' };
                     const rows = ['attacker', 'defender'].flatMap(side => (phase.tactics?.[side] || []).map(item => `${escapeHtml(item.name)} (${sideNames[side]}) — ${escapeHtml(LAND_TACTICS[item.tactic] || item.tactic)}`));
@@ -3551,6 +3551,7 @@ export function initEventListeners() {
 
         if (!state.isDragging) {
             setTradeRouteHoverAt(imgX, imgY);
+            setMilitaryGridHoverAt(imgX, imgY);
             return;
         }
         const newTx = e.clientX - state.startX;
@@ -3560,7 +3561,10 @@ export function initEventListeners() {
         state.ty = newTy;
         updateTransform();
     });
-    elements.viewport?.addEventListener('mouseleave', () => setTradeRouteHoverAt(Number.NaN, Number.NaN));
+    elements.viewport?.addEventListener('mouseleave', () => {
+        setTradeRouteHoverAt(Number.NaN, Number.NaN);
+        setMilitaryGridHoverAt(Number.NaN, Number.NaN);
+    });
 
     window.addEventListener('mouseup', async () => {
         if (state.isDraggingMarker && state.movingMarkerId !== null) {

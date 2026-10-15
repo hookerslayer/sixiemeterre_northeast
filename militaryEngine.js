@@ -1482,13 +1482,13 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
         if (!(row.army.units || []).some(group => integer(group.count) > 0)) row.army.active = false;
         const lossRatio = row.count ? armyLosses / row.count : 0;
         const infected = row.army.conditions.infected === true;
-        const moraleLoss = infected ? 0 : Math.min(15, lossRatio * 50) * row.skills.moraleLossMultiplier;
+        const moraleLoss = infected ? 0 : Math.min(15, lossRatio * (50 + cycle * 10) + 0.5 + cycle * 0.35) * row.skills.moraleLossMultiplier;
         row.army.morale = infected ? 100 : clamp(row.army.morale - moraleLoss, 0, 100);
         let broke = false;
         if (!infected && row.army.morale <= 0) broke = true;
         else if (!infected && row.army.morale <= 30) broke = row.army.breakRoll < (30 - row.army.morale) * 0.025;
         if (broke) row.army.active = false;
-        casualties[side].push({ armyId: row.army.id, losses: armyLosses, lossesByType: lossesByArmyType.get(row.army), morale: row.army.morale, broke });
+        casualties[side].push({ armyId: row.army.id, losses: armyLosses, lossesByType: lossesByArmyType.get(row.army), moraleLoss, morale: row.army.morale, broke });
       }
       casualties[side].total = totalSideLosses;
     }
@@ -1496,7 +1496,7 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
     report.push({ phase, cycle, totals, adjustedStrike, random, tactics, casualties, withdrawalInterception: phase === 'first' && withdrawalDisrupted, ...(siegeModifiers ? { siege: siegeModifiers } : {}) });
   };
   applyPhase('first');
-  for (let cycle = 1; cycle <= 3; cycle++) {
+  for (let cycle = 1; cycle <= 7; cycle++) {
     if (!sides.attacker.some(army => army.active) || !sides.defender.some(army => army.active)) break;
     applyPhase('break', cycle);
   }

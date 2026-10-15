@@ -36,6 +36,7 @@ export const state = {
     militaryStructures: [],
     militaryForces: [],
     militarySelectedForceId: null,
+    militaryHoveredForceId: null,
     militaryMoveDraft: null,
     militaryPorts: [],
     militaryFleets: [],
