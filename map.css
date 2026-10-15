@@ -1164,6 +1164,25 @@ body.military-army-placement #visual-map {
     font-size: 12px;
 }
 
+.admin-state-create-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px; align-items: start; }
+.admin-state-wide-field { grid-column: 1 / -1; }
+.admin-state-maritime-check { flex-direction: row !important; align-items: center; gap: 8px !important; }
+.admin-state-maritime-check input, .admin-state-create-form label > input[type="checkbox"] { width: auto; }
+.admin-state-city-fields { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; padding: 12px; border: 1px solid rgba(212,178,112,.3); border-radius: 7px; }
+.admin-state-city-fields[hidden] { display: none; }
+.admin-state-city-fields > strong, .admin-state-city-fields > p { grid-column: 1 / -1; margin: 0; }
+.admin-state-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.player-state-card { cursor: default; }
+.player-state-card:hover { cursor: default; }
+.admin-state-card-actions .page-back-btn { cursor: pointer; }
+.admin-state-card-actions .page-back-btn.danger { border-color: rgba(184,82,72,.55); color: #f0b4a8; }
+.admin-state-card-actions .page-back-btn.danger:hover { border-color: #d17669; background: rgba(184,82,72,.12); }
+@media (max-width: 650px) {
+    .admin-state-create-form { grid-template-columns: 1fr; }
+    .admin-state-wide-field, .admin-state-city-fields { grid-column: auto; }
+    .admin-state-city-fields { grid-template-columns: 1fr; }
+}
+
 .page-empty-state {
     display: grid;
     justify-items: center;

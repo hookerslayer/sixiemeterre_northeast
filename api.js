@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=river-crossing-features-20261015';
+import { supabaseClient, state } from './config.js?v=admin-state-management-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -114,6 +114,40 @@ export async function fetchStateProfiles() {
 
     if (error) throw error;
     return data || [];
+}
+
+export async function fetchAdminStateUsers() {
+    if (state.userProfile?.role !== 'admin') throw new Error('Only an administrator can load state registration users.');
+    const { data, error } = await supabaseClient.from('profiles').select('nickname,role,owner')
+        .eq('role', 'player').is('owner', null).order('nickname');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function fetchAdminStateNames() {
+    if (state.userProfile?.role !== 'admin') throw new Error('Only an administrator can load the state list.');
+    const { data, error } = await supabaseClient.from('state_mechanics').select('owner').order('owner');
+    if (error) throw error;
+    return data || [];
+}
+
+export async function adminCreateState(values) {
+    const { data, error } = await supabaseClient.rpc('admin_create_state', {
+        p_username: values.username, p_owner: values.owner, p_government_form: values.governmentForm,
+        p_ruler_name: values.rulerName, p_ruler_age: values.rulerAge, p_region: values.region,
+        p_titular_culture: values.culture, p_titular_religion: values.religion,
+        p_province_ids: values.provinceIds, p_capital_province_id: values.capitalProvinceId,
+        p_owner_color: values.color, p_city_name: values.cityName || null,
+        p_city_x: values.cityX ?? null, p_city_y: values.cityY ?? null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function adminDeleteState(owner) {
+    const { data, error } = await supabaseClient.rpc('admin_delete_state', { p_owner: owner });
+    if (error) throw error;
+    return data;
 }
 
 export async function fetchStateMechanics(owner) {

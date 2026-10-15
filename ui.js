@@ -1,6 +1,6 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=river-crossing-features-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=river-crossing-features-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=river-crossing-features-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=admin-state-management-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=admin-state-management-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=admin-state-management-20261015';
 import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=extended-land-cycles-20261015';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
@@ -1173,38 +1173,121 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
 
 async function renderAdminStateList() {
     activePageOwner = '';
-    showPageView('Статистика игроков', '<div class="page-loading">Загружаю список игроков…</div>', { navId: 'nav-stats' });
+    showPageView('Государства', '<div class="page-loading">Загружаю список государств…</div>', { navId: 'nav-stats' });
     try {
-        const profiles = (await fetchStateProfiles()).filter(profile => String(profile.owner || '').trim());
-        if (!profiles.length) {
-            showPageView('Статистика игроков', '<div class="page-empty">Пока нет игроков с назначенными государствами.</div>', { navId: 'nav-stats' });
-            return;
-        }
-
-        const cards = profiles.map((profile, index) => {
-            const stats = getOwnerStatistics(profile.owner);
-            return `<button class="player-state-card" data-player-index="${index}">
-                <span class="player-state-name">${escapeHtml(profile.nickname || 'Игрок')}</span>
-                <strong>${escapeHtml(profile.owner)}</strong>
-                <span class="player-state-summary">${formatNumber(stats.provinces.length)} пров. · ${formatNumber(stats.population)} чел.</span>
-                <span class="player-state-open">Открыть статистику →</span>
-            </button>`;
+        const [profiles, stateRows, availableUsers] = await Promise.all([fetchStateProfiles(), fetchAdminStateNames(), fetchAdminStateUsers()]);
+        const playersByOwner = new Map(profiles.filter(profile => profile.owner).map(profile => [profile.owner, profile.nickname || 'Игрок без имени']));
+        const owners = [...new Set([...stateRows.map(row => row.owner), ...profiles.map(profile => profile.owner).filter(Boolean)])].sort((a,b) => a.localeCompare(b,'ru'));
+        const colors = ['#914444','#426b54','#425f87','#9a783e','#75558b','#3d7779','#9b5a36','#667846'];
+        const existingColors = new Set(Object.values(state.dbOwnerColors).map(value => String(value).toLowerCase()));
+        const defaultColor = colors.find(color => !existingColors.has(color)) || `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6,'0')}`;
+        const regionOptions = Object.keys(state.dbRegionColors).sort((a,b) => a.localeCompare(b,'ru')).map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        const cultureOptions = Object.keys(state.dbCultureColors).sort((a,b) => a.localeCompare(b,'ru')).map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        const religionOptions = Object.keys(state.dbReligionColors).sort((a,b) => a.localeCompare(b,'ru')).map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('');
+        const userOptions = availableUsers.filter(user => user.nickname).map(user => `<option value="${escapeHtml(user.nickname)}">${escapeHtml(user.nickname)}</option>`).join('');
+        const cards = owners.map((owner, index) => {
+            const stats = getOwnerStatistics(owner);
+            return `<article class="player-state-card"><span class="player-state-name">${escapeHtml(playersByOwner.get(owner) || 'Игрок не назначен')}</span><strong>${escapeHtml(owner)}</strong><span class="player-state-summary">${formatNumber(stats.provinces.length)} пров. · ${formatNumber(stats.population)} чел.</span><div class="admin-state-card-actions"><button class="page-back-btn" type="button" data-admin-open-state="${index}">Открыть статистику</button><button class="page-back-btn danger" type="button" data-admin-delete-state="${escapeHtml(owner)}">Удалить государство</button></div></article>`;
         }).join('');
-        showPageView('Статистика игроков', `<p class="page-intro">Выберите государство, чтобы открыть его показатели отдельно.</p><div class="player-state-grid">${cards}</div>`, { navId: 'nav-stats' });
-        elements.pageView.querySelectorAll('[data-player-index]').forEach(button => {
-            button.addEventListener('click', () => {
-                const profile = profiles[Number(button.dataset.playerIndex)];
-                renderStateStatistics(profile.owner, profile.nickname || 'Игрок', {
-                    onBack: renderAdminStateList,
-                    backLabel: '← К игрокам'
-                });
-            });
+        const content = `<section class="page-panel admin-state-create-panel"><header class="page-panel-heading"><div><h2>Создать государство</h2><p>Игрок должен <a href="https://hookerslayer.github.io/sixiemeterre_northeast/" target="_blank" rel="noopener">зарегистрироваться на странице карты</a> и подтвердить аккаунт по почте. Историко-ролевое соответствие названия и данных проверяет администратор.</p></div></header>
+            <p class="page-note">Если при регистрации новый игрок видит ошибку из-за часового лимита регистраций, ему нужно повторить попытку позднее. Подтверждение аккаунта выполняется по письму Supabase.</p>
+            <form id="admin-create-state-form" class="admin-form admin-state-create-form">
+                <label>Имя пользователя на сайте<select name="username" required><option value="">Выберите зарегистрированного игрока</option>${userOptions}</select></label>
+                <label>Название государства<input name="owner" maxlength="80" required></label>
+                <label>Форма правления<select name="government_form" required><option value="">Выберите</option>${governmentForms.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join('')}</select></label>
+                <label>Имя правителя<input name="ruler_name" maxlength="80" required></label>
+                <label>Возраст правителя<input name="ruler_age" type="number" min="30" max="89" required><small>Для регистрации доступны 30–89 лет; в 90 лет наступает гарантированная смерть.</small></label>
+                <label>Регион<select name="region" required><option value="">Выберите регион</option>${regionOptions}</select></label>
+                <label>Титульная культура<select name="culture" required><option value="">Выберите культуру</option>${cultureOptions}</select></label>
+                <label>Титульная религия<select name="religion" required><option value="">Выберите религию</option>${religionOptions}</select></label>
+                <label class="admin-state-wide-field">ID провинций через запятую<input name="province_ids" placeholder="Например: 12, 13, 14" required><small>До четырёх стартовых очков. Несоответствие титульной культуре или религии либо наличие Крупного города удваивает стоимость провинции.</small></label>
+                <label>ID столичной провинции<input name="capital_province_id" type="number" min="1" step="1" required></label>
+                <label>Цвет государства<input name="color" type="color" value="${defaultColor}" required></label>
+                <label class="admin-state-maritime-check"><input name="maritime_connection" type="checkbox"> Провинции прямо соседствуют через море (островной случай из анкеты)</label>
+                <section class="admin-state-city-fields" data-admin-state-city hidden><strong>В выбранных провинциях нет Города или Крупного города</strong><p>Будет создан Город с 400 дворами в столичной провинции.</p><label>Название города<input name="city_name" maxlength="80"></label><label>Координата X<input name="city_x" type="number" min="0" max="10000" step="1"></label><label>Координата Y<input name="city_y" type="number" min="0" max="10000" step="1"></label></section>
+                <label class="admin-state-wide-field"><input name="name_reviewed" type="checkbox" required> Подтверждаю соответствие названия историко-ролевым правилам анкеты</label>
+                <p class="admin-state-wide-field page-note">«Вождество» доступно только для язычества и финно-угорских/самодийских культур. Если государству нужен новый столичный Город, задайте его название и координаты с карты. После создания символику можно загрузить в разделе «Статистика» (PNG, JPEG или WebP до 2 МБ).</p>
+                <div class="admin-actions admin-state-wide-field"><button class="admin-btn" type="submit" ${userOptions ? '' : 'disabled'}>Создать государство</button><span data-admin-state-status aria-live="polite">${userOptions ? '' : 'Нет незанятых профилей игроков. Сначала пользователь должен зарегистрироваться на сайте.'}</span></div>
+            </form></section>
+            <section class="page-panel"><header class="page-panel-heading"><div><h2>Государства игроков</h2><p>Удаление снимает принадлежность провинций и поселений, удаляет войска, флот и государственные записи. Дворы, культура и религия сохраняются.</p></div></header>${owners.length ? `<div class="player-state-grid">${cards}</div>` : '<div class="page-empty">Пока нет созданных государств.</div>'}</section>`;
+        showPageView('Государства', content, { navId: 'nav-stats' });
+        const form = elements.pageView.querySelector('#admin-create-state-form');
+        const formStatus = form.querySelector('[data-admin-state-status]');
+        const cityFields = form.querySelector('[data-admin-state-city]');
+        const getProvinceIds = () => form.elements.province_ids.value.split(/[\s,;]+/).filter(Boolean).map(value => Number(value.trim()));
+        const updateCityFields = () => {
+            const ids = getProvinceIds();
+            const hasCity = state.dbMarkers.some(marker => ids.includes(Number(marker.province_id)) && ['city','large_city'].includes(marker.type));
+            cityFields.hidden = hasCity || !ids.length;
+            for (const field of cityFields.querySelectorAll('input')) field.required = !cityFields.hidden;
+        };
+        form.elements.province_ids.addEventListener('input', updateCityFields);
+        form.addEventListener('submit', async event => {
+            event.preventDefault();
+            const provinceIds = getProvinceIds(), region = form.elements.region.value;
+            const culture = form.elements.culture.value, religion = form.elements.religion.value;
+            const capitalProvinceId = Number(form.elements.capital_province_id.value), owner = form.elements.owner.value.trim();
+            const governmentForm = form.elements.government_form.value;
+            const selectedProvinces = provinceIds.map(id => state.dbProvinces[id]);
+            const rawProvinceIds = form.elements.province_ids.value.split(/[\s,;]+/).filter(Boolean);
+            const cityRequired = !state.dbMarkers.some(marker => provinceIds.includes(Number(marker.province_id)) && ['city','large_city'].includes(marker.type));
+            const isChiefdomCulture = ['Вотяки','Вогулы','Самоеды','Саамы','Сумь','Емь','Эсты','Водь','Ижора','Корелы','Коми','Весь'].includes(culture);
+            let cost = 0;
+            for (const province of selectedProvinces) {
+                const mismatch = province.main_culture !== culture || province.main_religion !== religion;
+                const hasLargeCity = state.dbMarkers.some(marker => Number(marker.province_id) === Number(province.id) && marker.type === 'large_city');
+                cost += mismatch || hasLargeCity ? 2 : 1;
+            }
+            if (!provinceIds.length || provinceIds.length > 4 || rawProvinceIds.some(value => !/^\d+$/.test(value)) || new Set(provinceIds).size !== provinceIds.length || selectedProvinces.some((province,index) => !province || Number(province.id) !== provinceIds[index])) { formStatus.textContent = 'Укажите от одной до четырёх существующих ID провинций без повторов.'; return; }
+            if (selectedProvinces.some(province => province.region !== region || province.owner || province.occupied_by)) { formStatus.textContent = 'Выбирайте только свободные и неоккупированные провинции выбранного региона.'; return; }
+            if (cost > 4) { formStatus.textContent = `Выбрано ${cost} стартовых очков при лимите 4.`; return; }
+            if (!provinceIds.includes(capitalProvinceId)) { formStatus.textContent = 'Столичная провинция должна входить в список выбранных.'; return; }
+            if (!cityRequired && !state.dbMarkers.some(marker => Number(marker.province_id) === capitalProvinceId && ['city','large_city'].includes(marker.type))) { formStatus.textContent = 'В столичной провинции должен находиться Город или Крупный город.'; return; }
+            if (state.provinceAdjacency.size) {
+                const connected = new Set([provinceIds[0]]), queue = [provinceIds[0]];
+                while (queue.length) for (const neighbor of state.provinceAdjacency.get(queue.shift()) || []) {
+                    const id = Number(neighbor);
+                    if (provinceIds.includes(id) && !connected.has(id)) { connected.add(id); queue.push(id); }
+                }
+                if (connected.size !== provinceIds.length && !form.elements.maritime_connection.checked) { formStatus.textContent = 'Провинции не соприкасаются по суше. Проверьте прямую морскую смежность островных провинций и отметьте соответствующий пункт.'; return; }
+            } else if (!form.elements.maritime_connection.checked) { formStatus.textContent = 'Данные соседства карты ещё загружаются. Подождите или подтвердите проверенную прямую морскую смежность.'; return; }
+            if (governmentForm === 'Вождество' && (religion !== 'Язычество' || !isChiefdomCulture)) { formStatus.textContent = 'Вождество доступно только с язычеством и финно-угорской или самодийской культурой.'; return; }
+            formStatus.textContent = 'Создаю государство…';
+            form.querySelector('[type="submit"]').disabled = true;
+            try {
+                await adminCreateState({ username:form.elements.username.value, owner, governmentForm,
+                    rulerName:form.elements.ruler_name.value.trim(), rulerAge:Number(form.elements.ruler_age.value), region, culture, religion,
+                    provinceIds, capitalProvinceId, color:form.elements.color.value,
+                    cityName:form.elements.city_name.value.trim(), cityX:form.elements.city_x.value ? Number(form.elements.city_x.value) : null,
+                    cityY:form.elements.city_y.value ? Number(form.elements.city_y.value) : null });
+                showToast(`Государство «${owner}» создано.`, 5000);
+                window.location.reload();
+            } catch (error) {
+                formStatus.textContent = `Не удалось создать государство: ${error.message}`;
+                form.querySelector('[type="submit"]').disabled = false;
+            }
         });
+        elements.pageView.querySelectorAll('[data-admin-open-state]').forEach(button => button.addEventListener('click', () => {
+            const owner = owners[Number(button.dataset.adminOpenState)];
+            renderStateStatistics(owner, playersByOwner.get(owner) || 'Игрок не назначен', { onBack:renderAdminStateList, backLabel:'← К государствам' });
+        }));
+        elements.pageView.querySelectorAll('[data-admin-delete-state]').forEach(button => button.addEventListener('click', async () => {
+            const owner = button.dataset.adminDeleteState;
+            if (!window.confirm(`Удалить государство «${owner}»? Войска, флот, казна, дипломатические и военные записи будут удалены. Провинции и поселения останутся без владельца; дворы, культура и религия сохранятся.`)) return;
+            button.disabled = true;
+            try {
+                await adminDeleteState(owner);
+                showToast(`Государство «${owner}» удалено; население и культурно-религиозные данные сохранены.`, 6000);
+                window.location.reload();
+            } catch (error) {
+                showToast(`Не удалось удалить государство: ${error.message}`, 7000);
+                button.disabled = false;
+            }
+        }));
     } catch (error) {
-        showPageView('Статистика игроков', `<div class="page-error">Не удалось загрузить список игроков: ${escapeHtml(error.message)}</div>`, { navId: 'nav-stats' });
+        showPageView('Государства', `<div class="page-error">Не удалось загрузить управление государствами: ${escapeHtml(error.message)}</div>`, { navId: 'nav-stats' });
     }
 }
-
 async function renderOwnerProvinces(owner) {
     let provinceReports = {};
     let growthRate = 0;
