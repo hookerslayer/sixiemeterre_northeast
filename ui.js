@@ -48,6 +48,25 @@ function syncMilitaryMovePanel() {
             ? `${active.name}: ${draft.path.length - 1} кл. · ${formatNumber(cost)} из ${formatNumber(active.action_points)} ОД · маршрут флота`
             : `${active.name} выбрана · ${formatNumber(active.action_points)} ОД. Щёлкни по доступной водной клетке для прокладки пути.`;
     panel.querySelector('[data-order-confirm]').disabled = !draft;
+    const attackTarget = panel.querySelector('[data-attack-target]');
+    const attackButton = panel.querySelector('[data-order-attack]');
+    if (attackTarget && attackButton) {
+        const enemies = force && state.userProfile?.role === 'player'
+            ? state.militaryForces.filter(enemy => enemy.force_kind === 'land_army' && enemy.status === 'active'
+                && enemy.owner !== force.owner && !enemy.in_pending_battle
+                && Math.max(Math.abs(Number(enemy.cell_x) - Number(force.cell_x)), Math.abs(Number(enemy.cell_y) - Number(force.cell_y))) === 1
+                && state.militaryVisibleCells.has(`${Number(enemy.cell_x)},${Number(enemy.cell_y)}`))
+            : [];
+        const previousTarget = attackTarget.value;
+        attackTarget.innerHTML = enemies.length
+            ? enemies.map(enemy => `<option value="${escapeHtml(enemy.id)}">${escapeHtml(enemy.name)} · ${escapeHtml(enemy.owner)}</option>`).join('')
+            : '<option value="">Нет видимой вражеской армии рядом</option>';
+        if (enemies.some(enemy => String(enemy.id) === previousTarget)) attackTarget.value = previousTarget;
+        attackTarget.hidden = !enemies.length;
+        attackButton.hidden = !enemies.length;
+        attackButton.disabled = Number(force?.action_points) < 10;
+        attackButton.title = attackButton.disabled ? 'Для приказа атаковать нужно не менее 10 ОД.' : '';
+    }
     const targetSelect = panel.querySelector('[data-siege-target]');
     if (targetSelect && force) {
         const current = targetSelect.value;
@@ -3347,7 +3366,7 @@ export function initEventListeners() {
         panel.id = 'military-order-panel';
         panel.className = 'military-order-panel';
         panel.hidden = true;
-        panel.innerHTML = '<span data-order-summary></span><div class="army-map-actions"><select data-siege-target aria-label="Поселение для осады"><option value="">Поселение для осады</option></select><button type="button" data-order-siege>Начать осаду</button><button type="button" data-order-raid>Набег</button><button type="button" data-order-cancel>Отмена</button><button type="button" data-order-confirm>Выполнить движение</button></div>';
+        panel.innerHTML = '<span data-order-summary></span><div class="army-map-actions"><select data-attack-target aria-label="Вражеская армия" hidden></select><button type="button" data-order-attack hidden>Напасть · 10 ОД</button><select data-siege-target aria-label="Поселение для осады"><option value="">Поселение для осады</option></select><button type="button" data-order-siege>Начать осаду</button><button type="button" data-order-raid>Набег</button><button type="button" data-order-cancel>Отмена</button><button type="button" data-order-confirm>Выполнить движение</button></div>';
         document.body.append(panel);
         panel.addEventListener('click', async event => {
             const action = event.target.closest('button');
@@ -3359,6 +3378,25 @@ export function initEventListeners() {
                 state.militaryFleetMoveDraft = null;
                 renderMilitaryGrid();
                 syncMilitaryMovePanel();
+                return;
+            }
+            if (action.matches('[data-order-attack]')) {
+                const attacker = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
+                const defenderId = panel.querySelector('[data-attack-target]')?.value;
+                if (!attacker || !defenderId) return;
+                action.disabled = true;
+                try {
+                    const battleId = await startMilitaryBattle(attacker.id, defenderId);
+                    state.militarySelectedForceId = null;
+                    state.militaryMoveDraft = null;
+                    state.militaryForces = await fetchMilitaryForces();
+                    renderMilitaryGrid();
+                    syncMilitaryMovePanel();
+                    showToast(`Приказ атаковать отправлен. Сражение ${String(battleId).slice(0, 8)} ожидает решения сторон и подтверждения администратора.`, 7000);
+                } catch (error) {
+                    showToast(`Не удалось начать сражение: ${error.message}`, 7000);
+                    action.disabled = false;
+                }
                 return;
             }
             if (action.matches('[data-order-raid]')) {
