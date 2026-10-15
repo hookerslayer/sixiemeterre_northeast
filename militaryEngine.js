@@ -228,22 +228,76 @@ export function allocateSupplyCapacity(armies = [], capacity = 0) {
   });
 }
 
-export function calculateLevyCapacity(yards, levyKind, extraordinary = false) {
+export function calculateLevyCapacity(yards, levyKind) {
   const rule = LEVY_RULES[levyKind];
   if (!rule) throw new Error('Неизвестный источник набора.');
-  const divisor = rule.yardsPerFighter / (extraordinary ? 2 : 1);
-  return Math.floor(Math.max(0, Number(yards) || 0) / divisor);
+  return Math.floor(Math.max(0, Number(yards) || 0) / rule.yardsPerFighter);
 }
 
-export function calculateRecruitmentCost(count, unitClass, extraordinary = false) {
+export function calculateRecruitmentCost(count, unitClass) {
   const amount = integer(count);
   const rate = LEVY_COSTS[unitClass];
   if (!rate) throw new Error('Неизвестная категория войск.');
   return {
-    treasury: amount * rate.treasury * (extraordinary ? 2 : 1),
+    treasury: amount * rate.treasury,
     arms: amount * rate.arms,
     cloth: amount * rate.cloth
   };
+}
+
+const LEVY_COMPOSITION = Object.freeze({
+  aristocracy: [['Конные копейщики', 70], ['Лёгкая конница', 30]],
+  burghers: [['Копейщики', 45], ['Пешие ратники', 35], ['Лучники', 20]],
+  peasants: [['Пешие ратники', 40], ['Копейщики', 35], ['Лучники', 20], ['Лёгкая конница', 5]]
+});
+
+export function calculateLevyComposition(count, levyKind, culture = '', season = '') {
+  const total = integer(count);
+  const profile = LEVY_COMPOSITION[levyKind];
+  if (!profile) throw new Error('Неизвестный источник набора.');
+  const cultureName = String(culture).toLocaleLowerCase('ru');
+  let weighted = profile.map(([type, weight]) => [type, weight]);
+  const ranged = weighted.findIndex(([type]) => type === 'Лучники');
+  if (ranged >= 0 && /свей|эст/.test(cultureName)) {
+    const crossbowWeight = weighted[ranged][1] / 2;
+    weighted[ranged][1] -= crossbowWeight;
+    weighted.push(['Арбалетчики', crossbowWeight]);
+  }
+  if (cultureName.includes('казан')) {
+    const cavalryWeights = weighted.filter(([type]) => LAND_UNIT_PROFILES[type]?.role === 'cavalry');
+    const cavalryShare = cavalryWeights.reduce((sum, [, weight]) => sum + weight, 0);
+    if (cavalryShare) {
+      weighted = weighted.map(([type, weight]) => LAND_UNIT_PROFILES[type]?.role === 'cavalry' ? [type, weight / 2] : [type, weight]);
+      weighted.push(['Конные лучники', cavalryShare / 2]);
+    }
+  }
+  if (season === 'Зима' && /коми|саам/.test(cultureName) && levyKind !== 'aristocracy') {
+    const foot = weighted.findIndex(([type]) => type === 'Пешие ратники');
+    if (foot >= 0) {
+      const skierWeight = Math.min(5, weighted[foot][1]);
+      weighted[foot][1] -= skierWeight;
+      weighted.push(['Лыжники-разведчики', skierWeight]);
+    }
+  }
+  const allocations = weighted.map(([type, weight], index) => {
+    const exact = total * weight / 100;
+    return { type, count: Math.floor(exact), remainder: exact - Math.floor(exact), index };
+  });
+  let unassigned = total - allocations.reduce((sum, group) => sum + group.count, 0);
+  [...allocations].sort((a, b) => b.remainder - a.remainder || a.index - b.index)
+    .slice(0, unassigned).forEach(group => { group.count += 1; });
+  return allocations.filter(group => group.count > 0).map(({ type, count: groupCount }) => ({ type, count: groupCount }));
+}
+
+export function calculateLevyCosts(unitGroups = []) {
+  return unitGroups.reduce((total, group) => {
+    const category = LAND_UNIT_PROFILES[group.type]?.role === 'cavalry' ? 'cavalry' : 'foot';
+    const cost = calculateRecruitmentCost(group.count, category);
+    total.treasury += cost.treasury;
+    total.arms += cost.arms;
+    total.cloth += cost.cloth;
+    return total;
+  }, { treasury: 0, arms: 0, cloth: 0 });
 }
 
 export function calculateSeasonalUpkeep(unitGroups = [], season = '') {
