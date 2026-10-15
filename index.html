@@ -117,9 +117,21 @@
             <input type="email" id="auth-email" placeholder="Email">
             <input type="password" id="auth-password" placeholder="Пароль">
             <button id="auth-login-btn">Вход</button>
+            <button id="auth-reset-password-btn" class="auth-secondary-btn" type="button">Забыли пароль?</button>
             <div class="auth-register-link">
                 <span id="open-register-btn">Регистрация</span>
             </div>
+        </div>
+    </div>
+
+    <div id="password-recovery-modal" class="modal-overlay" aria-hidden="true">
+        <div class="modal-content">
+            <span id="password-recovery-close" class="modal-close">&times;</span>
+            <div class="modal-title">Новый пароль</div>
+            <p>Введите новый пароль для своей учётной записи.</p>
+            <input type="password" id="password-recovery-new" placeholder="Новый пароль" autocomplete="new-password">
+            <input type="password" id="password-recovery-confirm" placeholder="Повторите пароль" autocomplete="new-password">
+            <button id="password-recovery-submit" type="button">Сохранить пароль</button>
         </div>
     </div>
 
@@ -164,7 +176,7 @@
     </section>
 </div>
 
-<script type="module" src="main.js?v=trade-label-hover-cycle-extension-20261015"></script>
+<script type="module" src="main.js?v=army-inspector-password-reset-20261015"></script>
 </body>
 </html>
 

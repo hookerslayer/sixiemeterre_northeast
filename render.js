@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js?v=loading-optimization-20261015';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js?v=army-inspector-password-reset-20261015';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';

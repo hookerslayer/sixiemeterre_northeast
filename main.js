@@ -1,7 +1,7 @@
-import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=loading-optimization-20261015';
-import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=military-tactics-trade-20261015';
-import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=trade-label-hover-cycle-extension-20261015';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay } from './ui.js?v=trade-label-hover-cycle-extension-20261015';
+import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=army-inspector-password-reset-20261015';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=army-inspector-password-reset-20261015';
+import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=army-inspector-password-reset-20261015';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=army-inspector-password-reset-20261015';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -85,10 +85,12 @@ Promise.all([
     fetchMilitaryTerrainCells().then(rows => {
         state.militaryTerrainCells = new Map(rows.map(row => [`${row.cell_x},${row.cell_y}`, row]));
         renderMilitaryGrid();
+        refreshSelectedMilitaryReach();
     }).catch(err => console.info('Разметка военной местности пока не загружена:', err.message));
     fetchMilitaryGridCells().then(rows => {
         state.militaryGridCells = new Map(rows.map(row => [`${row.cell_x},${row.cell_y}`, row]));
         renderMilitaryGrid();
+        refreshSelectedMilitaryReach();
     }).catch(err => console.info('Геометрия военной сетки пока не синхронизирована:', err.message));
     fetchGameCalendar().then(calendar => {
         state.gameCalendar = calendar;
@@ -120,6 +122,11 @@ Promise.all([
     }, 60_000);
 
     supabaseClient.auth.onAuthStateChange(async (event, session) => {
+        if (event === 'PASSWORD_RECOVERY') {
+            elements.loginModal?.classList.remove('active');
+            elements.passwordRecoveryModal?.classList.add('active');
+            elements.passwordRecoveryModal?.setAttribute('aria-hidden', 'false');
+        }
         if (state.currentUser?.id !== session?.user?.id) {
             state.pendingMilitaryPlacement = null;
             state.pendingMilitaryStructure = null;

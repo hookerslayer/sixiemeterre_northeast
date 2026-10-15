@@ -1,6 +1,6 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=loading-optimization-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=trade-label-hover-cycle-extension-20261015';
-import { signUpUser, signInUser, signOutUser, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=military-tactics-trade-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=army-inspector-password-reset-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=army-inspector-password-reset-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=army-inspector-password-reset-20261015';
 import { calculateArmyMobility, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=extended-land-cycles-20261015';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
@@ -40,6 +40,15 @@ function syncMilitaryMovePanel() {
     const visible = state.showMilitaryGrid && !elements.pageView?.classList.contains('active') && !!active;
     panel.hidden = !visible;
     if (!visible) return;
+    const info = panel.querySelector('[data-force-details]');
+    if (info && force) {
+        const groups = (force.unit_groups || []).filter(group => Number(group.count) > 0);
+        const troopCount = groups.reduce((sum, group) => sum + (Number(group.count) || 0), 0);
+        const roster = groups.length ? groups.map(group => `<li>${escapeHtml(group.type)} <strong>${formatNumber(group.count)}</strong></li>`).join('') : '<li>Состав не указан</li>';
+        const skills = Object.entries(force.commander_skills || {}).filter(([, value]) => Number(value) > 0)
+            .map(([name, value]) => `<span>${escapeHtml(name)} ${formatNumber(value)}</span>`).join(' · ') || 'Навыки не указаны';
+        info.innerHTML = `<h3>${escapeHtml(force.name || 'Армия')}</h3><p>${escapeHtml(force.owner)} · ${troopCount ? `${formatNumber(troopCount)} бойцов` : 'численность не указана'}</p><div class="army-inspector-columns"><section><strong>Состав</strong><ul>${roster}</ul></section><section><strong>Состояние</strong><p>Мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД</p><p>Снабжение ${force.supply_points != null || force.supply != null ? formatNumber(force.supply_points ?? force.supply) : 'не указано'}</p><p>Воевода: ${escapeHtml(force.commander_name || 'не назначен')}${force.commander_age ? ` · ${formatNumber(force.commander_age)} лет` : ''}</p><p>Навыки: ${skills}</p></section></div>`;
+    }
     const cost = draft?.cost;
     const troopCount = (force?.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 0);
     panel.querySelector('[data-order-summary]').textContent = force
@@ -82,6 +91,54 @@ function syncMilitaryMovePanel() {
     if (siegeButton) siegeButton.hidden = !force;
 }
 
+function showEnemyArmyPopup(enemy) {
+    let popup = document.getElementById('enemy-army-popup');
+    if (!popup) {
+        popup = document.createElement('section');
+        popup.id = 'enemy-army-popup';
+        popup.className = 'enemy-army-popup';
+        document.body.append(popup);
+        popup.addEventListener('click', async event => {
+            const button = event.target.closest('[data-enemy-attack]');
+            if (!button || button.disabled) return;
+            const attackerId = popup.querySelector('[data-enemy-attacker]')?.value;
+            const targetId = popup.dataset.enemyId;
+            if (!attackerId || !targetId) return;
+            button.disabled = true;
+            try {
+                const battleId = await startMilitaryBattle(attackerId, targetId);
+                popup.hidden = true;
+                state.militarySelectedForceId = null;
+                state.militaryReachableCells = new Set();
+                state.militaryMoveDraft = null;
+                state.militaryForces = await fetchMilitaryForces();
+                renderMilitaryGrid(); syncMilitaryMovePanel();
+                showToast(`Приказ атаковать отправлен. Сражение ${String(battleId).slice(0, 8)} ожидает решений сторон и подтверждения администратора.`, 7000);
+            } catch (error) { showToast(`Не удалось начать сражение: ${error.message}`, 7000); }
+            finally { button.disabled = false; }
+        });
+        popup.addEventListener('change', event => {
+            if (!event.target.matches('[data-enemy-attacker]')) return;
+            const attacker = state.militaryForces.find(force => String(force.id) === event.target.value);
+            const attackButton = popup.querySelector('[data-enemy-attack]');
+            if (attackButton) attackButton.disabled = Number(attacker?.action_points) < 10;
+        });
+    }
+    const isPlayer = state.userProfile?.role === 'player';
+    const nearbyFriendlies = isPlayer ? state.militaryForces.filter(force => force.force_kind === 'land_army' && force.status === 'active'
+        && force.owner === state.userProfile.owner && !force.in_pending_battle
+        && Math.max(Math.abs(Number(force.cell_x) - Number(enemy.cell_x)), Math.abs(Number(force.cell_y) - Number(enemy.cell_y))) === 1
+        && state.militaryVisibleCells.has(`${Number(force.cell_x)},${Number(force.cell_y)}`)) : [];
+    const selectedOwn = nearbyFriendlies.find(force => force.id === state.militarySelectedForceId);
+    const groups = (enemy.unit_groups || []).filter(group => Number(group.count) > 0);
+    const roster = groups.length ? groups.map(group => `<li>${escapeHtml(group.type)}: ${formatNumber(group.count)}</li>`).join('') : '<li>Состав не указан</li>';
+    const attackers = selectedOwn ? [selectedOwn] : nearbyFriendlies;
+    popup.dataset.enemyId = enemy.id;
+    popup.innerHTML = `<header><strong>${escapeHtml(enemy.name || 'Вражеская армия')}</strong><button type="button" data-enemy-close aria-label="Закрыть">×</button></header><p>${escapeHtml(enemy.owner)} · Воевода ${escapeHtml(enemy.commander_name || 'не назначен')}</p><p>Мораль ${formatNumber(enemy.morale)}% · ${formatNumber(groups.reduce((sum, group) => sum + (Number(group.count) || 0), 0))} бойцов</p><ul>${roster}</ul>${attackers.length ? `<label>Атакующая армия<select data-enemy-attacker>${attackers.map(force => `<option value="${escapeHtml(force.id)}">${escapeHtml(force.name)} · ${formatNumber(force.action_points)} ОД</option>`).join('')}</select></label><button type="button" data-enemy-attack ${Number(attackers[0].action_points) < 10 ? 'disabled' : ''}>Напасть · 10 ОД</button>` : '<small>Нет своей армии в соседней клетке.</small>'}`;
+    popup.hidden = false;
+    popup.querySelector('[data-enemy-close]')?.addEventListener('click', () => { popup.hidden = true; });
+}
+
 function getReachableMilitaryCells(force) {
     const cellAt = (x, y) => {
         const key = `${x},${y}`;
@@ -109,7 +166,6 @@ function getReachableMilitaryCells(force) {
         for (const [dx, dy] of directions) {
             const nx = x + dx, ny = y + dy, key = `${nx},${ny}`, to = cellAt(nx, ny);
             if (!to?.province_id || (to.terrain === 'water' && !to.bridge)) continue;
-            if (state.userProfile?.role === 'player' && !state.militaryVisibleCells.has(key)) continue;
             if (state.militaryForces.some(other => other.id !== force.id && other.force_kind === 'land_army' && other.status === 'active'
                 && Number(other.cell_x) === nx && Number(other.cell_y) === ny && other.owner !== force.owner)) continue;
             if (state.militaryStructures.some(item => item.structure_type === 'palisade' && item.status === 'active'
@@ -130,6 +186,14 @@ function getReachableMilitaryCells(force) {
     }
     costs.delete(origin);
     return new Set(costs.keys());
+}
+
+export function refreshSelectedMilitaryReach() {
+    const force = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
+    if (!force) return;
+    state.militaryReachableCells = getReachableMilitaryCells(force);
+    renderMilitaryGrid();
+    syncMilitaryMovePanel();
 }
 
 function planMilitaryMove(force, cellX, cellY) {
@@ -3095,7 +3159,7 @@ export function initEventListeners() {
         panel.id = 'military-order-panel';
         panel.className = 'military-order-panel';
         panel.hidden = true;
-        panel.innerHTML = '<span data-order-summary></span><div class="army-map-actions"><select data-attack-target aria-label="Вражеская армия" hidden></select><button type="button" data-order-attack hidden>Напасть · 10 ОД</button><select data-siege-target aria-label="Поселение для осады"><option value="">Поселение для осады</option></select><button type="button" data-order-siege>Начать осаду</button><button type="button" data-order-raid>Набег</button><button type="button" data-order-cancel>Отмена</button><button type="button" data-order-confirm>Выполнить движение</button></div>';
+        panel.innerHTML = '<div class="army-inspector-info" data-force-details></div><div class="army-inspector-actions"><p data-order-summary></p><button type="button" data-order-confirm>Проложить / выполнить движение</button><button type="button" data-order-raid>Набег</button><label class="army-siege-control">Цель осады<select data-siege-target aria-label="Поселение для осады"><option value="">Поселение для осады</option></select></label><button type="button" data-order-siege>Начать осаду</button><button type="button" data-order-cancel>Закрыть</button></div>';
         document.body.append(panel);
         panel.addEventListener('click', async event => {
             const action = event.target.closest('button');
@@ -3272,6 +3336,41 @@ export function initEventListeners() {
         } finally {
             elements.authLoginBtn.textContent = 'Вход';
         }
+    });
+
+    elements.authResetPasswordBtn?.addEventListener('click', async () => {
+        const email = elements.authEmailInput?.value.trim();
+        if (!email) { showToast('Сначала укажите email в поле входа.'); elements.authEmailInput?.focus(); return; }
+        const button = elements.authResetPasswordBtn;
+        button.disabled = true;
+        try {
+            await requestPasswordReset(email);
+            showToast('Если для этого email есть учётная запись, письмо со ссылкой для сброса уже отправлено.', 7000);
+        } catch (error) { showToast(`Не удалось отправить письмо: ${error.message}`, 7000); }
+        finally { button.disabled = false; }
+    });
+
+    const closeRecovery = () => {
+        elements.passwordRecoveryModal?.classList.remove('active');
+        elements.passwordRecoveryModal?.setAttribute('aria-hidden', 'true');
+    };
+    elements.passwordRecoveryClose?.addEventListener('click', closeRecovery);
+    elements.passwordRecoveryModal?.addEventListener('click', event => { if (event.target === elements.passwordRecoveryModal) closeRecovery(); });
+    elements.passwordRecoverySubmit?.addEventListener('click', async () => {
+        const password = elements.passwordRecoveryNew?.value || '';
+        const confirmation = elements.passwordRecoveryConfirm?.value || '';
+        if (password.length < 6) { showToast('Пароль должен содержать не менее 6 символов.'); return; }
+        if (password !== confirmation) { showToast('Пароли не совпадают.'); return; }
+        const button = elements.passwordRecoverySubmit;
+        button.disabled = true;
+        try {
+            await updateCurrentUserPassword(password);
+            elements.passwordRecoveryNew.value = '';
+            elements.passwordRecoveryConfirm.value = '';
+            closeRecovery();
+            showToast('Пароль успешно изменён.', 7000);
+        } catch (error) { showToast(`Не удалось изменить пароль: ${error.message}`, 7000); }
+        finally { button.disabled = false; }
     });
 
     elements.openRegisterBtn?.addEventListener('click', () => {
@@ -3469,6 +3568,7 @@ export function initEventListeners() {
         state.scale = newScale;
 
         updateTransform();
+        if (state.showTradeRoutes || state.tradeRouteDraft) renderTradeRoutes(state.tradeRouteOverlay || []);
     }, { passive: false });
 
     elements.viewport?.addEventListener('mousedown', async (e) => {
@@ -3807,14 +3907,16 @@ export function initEventListeners() {
             if (force) {
                 const canCommand = state.userProfile?.role === 'admin' || force.owner === state.userProfile?.owner;
                 if (canCommand) {
+                    document.getElementById('enemy-army-popup')?.setAttribute('hidden', '');
                     state.militarySelectedForceId = force.id;
                     state.militaryReachableCells = getReachableMilitaryCells(force);
                     state.militaryMoveDraft = null;
                     renderMilitaryGrid();
                     syncMilitaryMovePanel();
-                    showToast(`Выбрана армия «${force.name}». Щёлкни по клетке назначения.`);
                     return;
                 }
+                if (state.userProfile?.role === 'player' && force.owner !== state.userProfile.owner
+                    && state.militaryVisibleCells.has(`${cellX},${cellY}`)) { showEnemyArmyPopup(force); return; }
                 const selectedForce = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
                 if (state.userProfile?.role === 'player' && selectedForce?.owner === state.userProfile.owner && force.owner !== state.userProfile.owner) {
                     try {

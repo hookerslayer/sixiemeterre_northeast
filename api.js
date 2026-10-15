@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=loading-optimization-20261015';
+import { supabaseClient, state } from './config.js?v=army-inspector-password-reset-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -68,6 +68,20 @@ export async function signInUser(email, password) {
         email,
         password
     });
+    if (error) throw error;
+    return data;
+}
+
+export async function requestPasswordReset(email) {
+    const { data, error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: 'https://hookerslayer.github.io/sixiemeterre_northeast/'
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function updateCurrentUserPassword(password) {
+    const { data, error } = await supabaseClient.auth.updateUser({ password });
     if (error) throw error;
     return data;
 }

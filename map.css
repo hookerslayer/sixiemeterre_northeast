@@ -1462,3 +1462,30 @@ body.military-army-placement #visual-map {
 
 .province-name-edit { box-sizing: border-box; width: min(220px, 100%); min-width: 130px; min-height: 32px; }
 .province-rename-actions { display: flex; justify-content: flex-end; padding: 12px 16px 16px; }
+
+/* Army detail and orders are grouped in one compact side-by-side inspector. */
+.military-order-panel { position: fixed; z-index: 1200; right: 18px; top: 50%; left: auto; bottom: auto; transform: translateY(-50%); display: grid; grid-template-columns: minmax(250px, 1.2fr) minmax(210px, .8fr); gap: 16px; width: min(720px, calc(100vw - 36px)); max-height: min(78vh, 680px); overflow: auto; padding: 16px; }
+.military-order-panel[hidden] { display: none; }
+.army-inspector-info h3 { margin: 0 0 5px; font: 600 20px Georgia, serif; }
+.army-inspector-info > p, .army-inspector-columns p { margin: 5px 0; color: #c6c2b5; font-size: 12px; line-height: 1.5; }
+.army-inspector-columns { display: grid; grid-template-columns: 1fr 1.15fr; gap: 14px; margin-top: 14px; }
+.army-inspector-columns section { min-width: 0; padding: 10px; border: 1px solid rgba(232, 223, 200, .14); border-radius: 7px; background: rgba(255,255,255,.025); }
+.army-inspector-columns ul { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 18px; color: #d1cdbc; font-size: 12px; }
+.army-inspector-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding-left: 14px; border-left: 1px solid rgba(232,223,200,.16); }
+.army-inspector-actions > p { margin: 0 0 4px; color: #c6c2b5; font-size: 12px; line-height: 1.5; }
+.army-siege-control { display: grid; gap: 5px; color: #b9b5a6; font-size: 12px; }
+.enemy-army-popup { position: fixed; z-index: 1210; top: 18px; right: 18px; width: min(310px, calc(100vw - 36px)); padding: 14px; border: 1px solid rgba(232,223,200,.4); border-radius: 9px; background: rgba(22,25,23,.98); color: #e8dfc8; box-shadow: 0 8px 28px rgba(0,0,0,.45); }
+.enemy-army-popup[hidden] { display: none; }
+.enemy-army-popup header { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.enemy-army-popup p, .enemy-army-popup small { display: block; margin: 7px 0; color: #c6c2b5; font-size: 12px; }
+.enemy-army-popup ul { display: grid; gap: 3px; max-height: 125px; overflow: auto; padding-left: 18px; font-size: 12px; }
+.enemy-army-popup label { display: grid; gap: 4px; margin: 8px 0; color: #b9b5a6; font-size: 11px; }
+.enemy-army-popup select { min-height: 32px; }
+.enemy-army-popup button { min-height: 32px; padding: 5px 9px; color: #e8dfc8; border: 1px solid #615b49; border-radius: 6px; background: #292a24; cursor: pointer; }
+.enemy-army-popup button:disabled { opacity: .45; cursor: not-allowed; }
+.auth-secondary-btn { margin-top: 6px; opacity: .85; }
+@media (max-width: 720px) {
+  .military-order-panel { left: 10px; right: 10px; top: auto; bottom: 10px; transform: none; width: auto; max-height: 58vh; grid-template-columns: 1fr; gap: 10px; }
+  .army-inspector-actions { padding-left: 0; border-left: 0; border-top: 1px solid rgba(232,223,200,.16); padding-top: 10px; }
+  .army-inspector-columns { grid-template-columns: 1fr 1fr; }
+}
