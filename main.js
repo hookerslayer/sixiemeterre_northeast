@@ -1,7 +1,7 @@
-import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=army-inspector-password-reset-20261015';
-import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=army-inspector-password-reset-20261015';
-import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=army-inspector-password-reset-20261015';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=army-inspector-password-reset-20261015';
+import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=explicit-move-siege-popup-20261015';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryColonizationMap } from './api.js?v=explicit-move-siege-popup-20261015';
+import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=explicit-move-siege-popup-20261015';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=explicit-move-siege-popup-20261015';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -128,6 +128,11 @@ Promise.all([
             elements.passwordRecoveryModal?.setAttribute('aria-hidden', 'false');
         }
         if (state.currentUser?.id !== session?.user?.id) {
+            state.militarySelectedForceId = null;
+            state.militaryMoveMode = false;
+            state.militaryReachableCells = new Set();
+            state.militaryMoveDraft = null;
+            state.militarySieges = [];
             state.pendingMilitaryPlacement = null;
             state.pendingMilitaryStructure = null;
             state.pendingMilitaryMobilization = null;
@@ -149,10 +154,12 @@ Promise.all([
                 state.militaryFleets = await fetchMilitaryFleets();
                 renderMilitaryGrid();
             } catch (err) { console.info('Постоянные военные силы пока не загружены:', err.message); }
-try {
-                state.militaryStructures = await fetchMilitaryStructures();
-                renderMilitaryGrid();
-            } catch (err) { console.info('Полевые сооружения пока не загружены:', err.message); }
+            const [structuresResult, siegesResult] = await Promise.allSettled([fetchMilitaryStructures(), fetchMilitarySieges()]);
+            if (structuresResult.status === 'fulfilled') state.militaryStructures = structuresResult.value;
+            else console.info('Полевые сооружения пока не загружены:', structuresResult.reason?.message);
+            if (siegesResult.status === 'fulfilled') state.militarySieges = siegesResult.value;
+            else console.info('Состояние осад пока не загружено:', siegesResult.reason?.message);
+            renderMilitaryGrid();
             if (state.userProfile?.owner) {
                 try {
                     state.stateMechanics[state.userProfile.owner] = await fetchStateMechanics(state.userProfile.owner) || {};
@@ -166,6 +173,7 @@ try {
             state.stateMechanics = {};
             state.militaryForces = [];
             state.militaryStructures = [];
+            state.militarySieges = [];
             state.militaryVisibleCells = new Set();
             renderMilitaryGrid();
         }

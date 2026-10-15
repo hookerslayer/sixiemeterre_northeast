@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=army-inspector-password-reset-20261015';
+import { supabaseClient, state } from './config.js?v=explicit-move-siege-popup-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([

@@ -1,6 +1,6 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=army-inspector-password-reset-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=army-inspector-password-reset-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=army-inspector-password-reset-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=explicit-move-siege-popup-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=explicit-move-siege-popup-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=explicit-move-siege-popup-20261015';
 import { calculateArmyMobility, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=extended-land-cycles-20261015';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
@@ -48,47 +48,30 @@ function syncMilitaryMovePanel() {
         const skills = Object.entries(force.commander_skills || {}).filter(([, value]) => Number(value) > 0)
             .map(([name, value]) => `<span>${escapeHtml(name)} ${formatNumber(value)}</span>`).join(' · ') || 'Навыки не указаны';
         info.innerHTML = `<h3>${escapeHtml(force.name || 'Армия')}</h3><p>${escapeHtml(force.owner)} · ${troopCount ? `${formatNumber(troopCount)} бойцов` : 'численность не указана'}</p><div class="army-inspector-columns"><section><strong>Состав</strong><ul>${roster}</ul></section><section><strong>Состояние</strong><p>Мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД</p><p>Снабжение ${force.supply_points != null || force.supply != null ? formatNumber(force.supply_points ?? force.supply) : 'не указано'}</p><p>Воевода: ${escapeHtml(force.commander_name || 'не назначен')}${force.commander_age ? ` · ${formatNumber(force.commander_age)} лет` : ''}</p><p>Навыки: ${skills}</p></section></div>`;
-    }
+    } else if (info && fleet) {
+        const ships = fleet.ships || [];
+        info.innerHTML = `<h3>${escapeHtml(fleet.name || 'Флотилия')}</h3><p>${escapeHtml(fleet.owner)} · ${ships.length} судов</p><div class="army-inspector-columns"><section><strong>Состав</strong><ul>${ships.map(ship => `<li>${escapeHtml(ship.ship_type || ship.name || 'Судно')} · экипаж ${formatNumber(ship.crew)}</li>`).join('') || '<li>Состав не указан</li>'}</ul></section><section><strong>Состояние</strong><p>${formatNumber(fleet.action_points)} ОД</p><p>Воевода: ${escapeHtml(fleet.commander_name || 'не назначен')}</p></section></div>`;
+    } else if (info) info.innerHTML = '';
     const cost = draft?.cost;
     const troopCount = (force?.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 0);
     panel.querySelector('[data-order-summary]').textContent = force
-        ? `${force.name} · Воевода ${force.commander_name || '—'} · ${formatNumber(troopCount)} бойцов · мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД${draft ? ` · путь ${draft.path.length - 1} кл. / ${formatNumber(cost)} ОД` : '. Выберите подсвеченную клетку для движения.'}`
+        ? `${force.name} · Воевода ${force.commander_name || '—'} · ${formatNumber(troopCount)} бойцов · мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД${draft ? ` · путь ${draft.path.length - 1} кл. / ${formatNumber(cost)} ОД` : state.militaryMoveMode ? '. Выберите подсвеченную клетку для движения.' : '. Нажмите «Переместить», чтобы проложить маршрут.'}`
         : draft
             ? `${active.name}: ${draft.path.length - 1} кл. · ${formatNumber(cost)} из ${formatNumber(active.action_points)} ОД · маршрут флота`
             : `${active.name} выбрана · ${formatNumber(active.action_points)} ОД. Щёлкни по доступной водной клетке для прокладки пути.`;
     panel.querySelector('[data-order-confirm]').disabled = !draft;
-    const attackTarget = panel.querySelector('[data-attack-target]');
-    const attackButton = panel.querySelector('[data-order-attack]');
-    if (attackTarget && attackButton) {
-        const enemies = force && state.userProfile?.role === 'player'
-            ? state.militaryForces.filter(enemy => enemy.force_kind === 'land_army' && enemy.status === 'active'
-                && enemy.owner !== force.owner && !enemy.in_pending_battle
-                && Math.max(Math.abs(Number(enemy.cell_x) - Number(force.cell_x)), Math.abs(Number(enemy.cell_y) - Number(force.cell_y))) === 1
-                && state.militaryVisibleCells.has(`${Number(enemy.cell_x)},${Number(enemy.cell_y)}`))
-            : [];
-        const previousTarget = attackTarget.value;
-        attackTarget.innerHTML = enemies.length
-            ? enemies.map(enemy => `<option value="${escapeHtml(enemy.id)}">${escapeHtml(enemy.name)} · ${escapeHtml(enemy.owner)}</option>`).join('')
-            : '<option value="">Нет видимой вражеской армии рядом</option>';
-        if (enemies.some(enemy => String(enemy.id) === previousTarget)) attackTarget.value = previousTarget;
-        attackTarget.hidden = !enemies.length;
-        attackButton.hidden = !enemies.length;
-        attackButton.disabled = Number(force?.action_points) < 10;
-        attackButton.title = attackButton.disabled ? 'Для приказа атаковать нужно не менее 10 ОД.' : '';
-    }
-    const targetSelect = panel.querySelector('[data-siege-target]');
-    if (targetSelect && force) {
-        const current = targetSelect.value;
-        const choices = (state.dbMarkers || []).filter(marker => marker.owner && marker.owner !== force.owner && marker.type !== 'ruins'
-            && (marker.type === 'fortress' || Number(marker.fortification_level) > 0)
-            && (state.userProfile?.role !== 'player' || state.militaryVisibleCells.has(`${Math.floor(Number(marker.coord_1)/MILITARY_GRID_CELL_SIZE)},${Math.floor(Number(marker.coord_2)/MILITARY_GRID_CELL_SIZE)}`)));
-        targetSelect.innerHTML = `<option value="">Поселение для осады</option>${choices.map(marker => `<option value="${Number(marker.id)}">${escapeHtml(marker.name || `Поселение #${marker.id}`)} · ${escapeHtml(marker.owner)}</option>`).join('')}`;
-        if (choices.some(marker => String(marker.id) === current)) targetSelect.value = current;
-    }
     const raidButton = panel.querySelector('[data-order-raid]');
     if (raidButton) raidButton.hidden = !force;
-    const siegeButton = panel.querySelector('[data-order-siege]');
-    if (siegeButton) siegeButton.hidden = !force;
+    const moveButton = panel.querySelector('[data-order-move-start]');
+    if (moveButton) {
+        moveButton.hidden = !force;
+        moveButton.textContent = state.militaryMoveMode ? 'Отменить перемещение' : 'Переместить';
+    }
+    const confirmButton = panel.querySelector('[data-order-confirm]');
+    if (confirmButton) {
+        confirmButton.hidden = force ? !state.militaryMoveMode || !draft : !draft;
+        confirmButton.textContent = 'Завершить движение';
+    }
 }
 
 function showEnemyArmyPopup(enemy) {
@@ -109,6 +92,7 @@ function showEnemyArmyPopup(enemy) {
                 const battleId = await startMilitaryBattle(attackerId, targetId);
                 popup.hidden = true;
                 state.militarySelectedForceId = null;
+                state.militaryMoveMode = false;
                 state.militaryReachableCells = new Set();
                 state.militaryMoveDraft = null;
                 state.militaryForces = await fetchMilitaryForces();
@@ -191,7 +175,7 @@ function getReachableMilitaryCells(force) {
 export function refreshSelectedMilitaryReach() {
     const force = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
     if (!force) return;
-    state.militaryReachableCells = getReachableMilitaryCells(force);
+    state.militaryReachableCells = state.militaryMoveMode ? getReachableMilitaryCells(force) : new Set();
     renderMilitaryGrid();
     syncMilitaryMovePanel();
 }
@@ -545,6 +529,19 @@ export function showMarkerPopup(marker) {
     const portSources = state.dbMarkers.filter(row => row.owner === playerOwner && row.type !== 'ruins');
     const mapPortActions = marker.owner === playerOwner && marker.type !== 'ruins' ? `<section class="map-operation-menu"><strong>Порт</strong><form id="map-port-form" class="admin-form"><label>Тип порта<select name="port_type"><option value="river_port">Речной порт</option><option value="port">Морской порт</option></select></label><label>Склад материалов<select name="source_marker_id">${portSources.map(row => `<option value="${Number(row.id)}">${escapeHtml(row.name || `Поселение #${row.id}`)}</option>`).join('')}</select></label><button type="submit" class="admin-btn">Начать строительство порта</button></form><small>Речной порт: 2 000 z, 150 Древесины и 30 Инструментов. Морской: 4 000 z, 300 Древесины и 60 Инструментов.</small></section>` : '';
     const markerLevyActions = marker.owner === playerOwner && marker.type !== 'ruins' ? `<section class="map-operation-menu"><strong>Сбор ополчения</strong><p>Доступность зависит от дворов источника, культуры, уже собранных войск и снабжения.</p><form id="map-levy-form" class="admin-form"><label>Сословие источника<select name="kind"><option value="peasants">Крестьянство провинции</option><option value="burghers">Горожане</option><option value="aristocracy">Аристократия</option><option value="clergy">Духовенство</option></select></label><label>Тип отряда<select name="unit">${levyUnits.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}</select></label><label>Численность<input name="count" type="number" min="1" max="10000" value="50"></label><label>Чрезвычайный набор<select name="emergency"><option value="false">Нет</option><option value="true">Да</option></select></label><small data-levy-limit></small><button class="admin-btn" type="submit">Начать сбор</button></form></section>` : '';
+    const targetCellX = Math.floor(Number(marker.coord_1) / MILITARY_GRID_CELL_SIZE);
+    const targetCellY = Math.floor(Number(marker.coord_2) / MILITARY_GRID_CELL_SIZE);
+    const currentSiege = (state.militarySieges || []).find(siege => Number(siege.marker_id) === Number(marker.id) && ['active', 'battle_pending'].includes(siege.status));
+    const siegeArmies = playerOwner && marker.owner && marker.owner !== playerOwner && marker.type !== 'ruins'
+        && (marker.type === 'fortress' || Number(marker.fortification_level) >= 1)
+        && !marker.military_controlled_by
+        ? state.militaryForces.filter(force => force.force_kind === 'land_army' && force.status === 'active'
+            && force.owner === playerOwner && !force.in_pending_battle && Number(force.action_points) >= 20
+            && Math.max(Math.abs(Number(force.cell_x) - targetCellX), Math.abs(Number(force.cell_y) - targetCellY)) === 1
+            && (!currentSiege || currentSiege.status === 'active' && currentSiege.attacker_owner === playerOwner
+                && !(currentSiege.attacker_force_ids || []).includes(force.id)))
+        : [];
+    const markerSiegeAction = siegeArmies.length ? `<section class="map-operation-menu marker-siege-action"><strong>Осада</strong><p>Армия должна находиться рядом и иметь не менее 20 ОД.</p><label>Армия<select data-siege-force>${siegeArmies.map(force => `<option value="${escapeHtml(force.id)}">${escapeHtml(force.name)} · ${formatNumber(force.action_points)} ОД</option>`).join('')}</select></label><button type="button" class="admin-btn" data-start-marker-siege="${Number(marker.id)}">Начать осаду</button></section>` : '';
     if (isAdmin) {
         const optionsHtml = MARKER_TYPES.map(t => `<option value="${t}" ${t === marker.type ? 'selected' : ''}>${markerTypeLabels[t]}</option>`).join('');
         elements.popupContent.innerHTML = `
@@ -681,6 +678,7 @@ export function showMarkerPopup(marker) {
             <hr>
             <div class="marker-demography-grid"><section><strong>Демография</strong><span>Дворов <b>${formatNumber(yards)}</b></span><span>Население <b>${formatNumber(pop)} чел.</b></span></section><section><strong>Сословия</strong><span>Аристократия <b>${formatNumber(estates.aristocracy)}</b></span><span>Духовенство <b>${formatNumber(estates.clergy)}</b></span><span>Горожане <b>${formatNumber(estates.burghers)}</b></span><span>Крестьянство <b>${formatNumber(estates.peasants)}</b></span></section></div>
             ${markerEconomySummary(marker)}
+            ${markerSiegeAction}
             ${markerLevyActions}
             ${mapPortActions}
         `;
@@ -2517,6 +2515,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         const fleet = state.militaryFleets.find(item => item.id === button.dataset.selectFleet);
         if (!fleet) return;
         state.militarySelectedFleetId = fleet.id; state.militarySelectedForceId = null;
+        state.militaryMoveMode = false; state.militaryReachableCells = new Set();
         state.militaryMoveDraft = null; state.militaryFleetMoveDraft = null;
         closePageView();
         state.showMilitaryGrid = true;
@@ -3159,16 +3158,28 @@ export function initEventListeners() {
         panel.id = 'military-order-panel';
         panel.className = 'military-order-panel';
         panel.hidden = true;
-        panel.innerHTML = '<div class="army-inspector-info" data-force-details></div><div class="army-inspector-actions"><p data-order-summary></p><button type="button" data-order-confirm>Проложить / выполнить движение</button><button type="button" data-order-raid>Набег</button><label class="army-siege-control">Цель осады<select data-siege-target aria-label="Поселение для осады"><option value="">Поселение для осады</option></select></label><button type="button" data-order-siege>Начать осаду</button><button type="button" data-order-cancel>Закрыть</button></div>';
+        panel.innerHTML = '<div class="army-inspector-info" data-force-details></div><div class="army-inspector-actions"><p data-order-summary></p><button type="button" data-order-move-start>Переместить</button><button type="button" data-order-confirm hidden>Завершить движение</button><button type="button" data-order-raid>Набег</button><button type="button" data-order-cancel>Закрыть</button></div>';
         document.body.append(panel);
         panel.addEventListener('click', async event => {
             const action = event.target.closest('button');
             if (!action) return;
             if (action.matches('[data-order-cancel]')) {
                 state.militarySelectedForceId = null;
+                state.militaryMoveMode = false;
+                state.militaryReachableCells = new Set();
                 state.militaryMoveDraft = null;
                 state.militarySelectedFleetId = null;
                 state.militaryFleetMoveDraft = null;
+                renderMilitaryGrid();
+                syncMilitaryMovePanel();
+                return;
+            }
+            if (action.matches('[data-order-move-start]')) {
+                const force = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
+                if (!force) return;
+                state.militaryMoveMode = !state.militaryMoveMode;
+                state.militaryMoveDraft = null;
+                state.militaryReachableCells = state.militaryMoveMode ? getReachableMilitaryCells(force) : new Set();
                 renderMilitaryGrid();
                 syncMilitaryMovePanel();
                 return;
@@ -3200,15 +3211,6 @@ export function initEventListeners() {
                 catch(error) { showToast(`Не удалось начать набег: ${error.message}`,7000); action.disabled=false; }
                 return;
             }
-            if (action.matches('[data-order-siege]')) {
-                const army = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
-                const markerId = panel.querySelector('[data-siege-target]')?.value;
-                if (!army || !markerId) { showToast('Выберите укреплённое поселение.'); return; }
-                action.disabled = true;
-                try { const result=await startMilitarySiege(army.id,Number(markerId)); showToast(`Осада начата. Потрачено ${formatNumber(result.spent_action_points)} ОД.`); state.militaryForces=await fetchMilitaryForces(); renderMilitaryGrid(); syncMilitaryMovePanel(); }
-                catch(error) { showToast(`Не удалось начать осаду: ${error.message}`,7000); action.disabled=false; }
-                return;
-            }
             if (!action.matches('[data-order-confirm]') || (!state.militaryMoveDraft && !state.militaryFleetMoveDraft)) return;
             action.disabled = true;
             try {
@@ -3220,6 +3222,8 @@ export function initEventListeners() {
                 state.militaryMoveDraft = null;
                 state.militaryFleetMoveDraft = null;
                 state.militarySelectedForceId = null;
+                state.militaryMoveMode = false;
+                state.militaryReachableCells = new Set();
                 state.militarySelectedFleetId = null;
                 renderMilitaryGrid();
                 syncMilitaryMovePanel();
@@ -3230,6 +3234,26 @@ export function initEventListeners() {
             }
         });
     }
+    elements.popupContent?.addEventListener('click', async event => {
+        const button = event.target.closest('[data-start-marker-siege]');
+        if (!button || button.disabled) return;
+        const markerId = Number(button.dataset.startMarkerSiege);
+        const forceId = elements.popupContent.querySelector('[data-siege-force]')?.value;
+        if (!forceId || !markerId) return;
+        button.disabled = true;
+        try {
+            const result = await startMilitarySiege(forceId, markerId);
+            state.militaryForces = await fetchMilitaryForces();
+            state.militarySieges = await fetchMilitarySieges();
+            renderMilitaryGrid();
+            clearSelection();
+            showToast(`Осада начата. Потрачено ${formatNumber(result.spent_action_points)} ОД.`, 7000);
+        } catch (error) {
+            showToast(`Не удалось начать осаду: ${error.message}`, 7000);
+            button.disabled = false;
+        }
+    });
+
     if (window.innerWidth <= 768) {
         elements.legendPanel?.classList.add('collapsed');
         elements.controlsPanel?.classList.add('collapsed');
@@ -3453,7 +3477,7 @@ export function initEventListeners() {
         elements.militaryGridToggleBtn.textContent = `Военная сетка: ${state.showMilitaryGrid ? 'показана' : 'скрыта'}`;
         if (elements.militaryMapTools) elements.militaryMapTools.hidden = !state.showMilitaryGrid || !['player','admin'].includes(state.userProfile?.role);
         if (!state.showMilitaryGrid) {
-            state.militarySelectedForceId = null; state.militaryMoveDraft = null;
+            state.militarySelectedForceId = null; state.militaryMoveMode = false; state.militaryReachableCells = new Set(); state.militaryMoveDraft = null;
             state.militarySelectedFleetId = null; state.militaryFleetMoveDraft = null; state.pendingMilitaryFleetLaunch = null;
         }
         renderMilitaryGrid();
@@ -3867,6 +3891,8 @@ export function initEventListeners() {
                 } else if (fleetAtCell.owner === state.userProfile?.owner || state.userProfile?.role === 'admin') {
                     state.militarySelectedFleetId = fleetAtCell.id;
                     state.militarySelectedForceId = null;
+                    state.militaryMoveMode = false;
+                    state.militaryReachableCells = new Set();
                     state.militaryMoveDraft = null;
                     state.militaryFleetMoveDraft = null;
                     renderMilitaryGrid();
@@ -3909,7 +3935,10 @@ export function initEventListeners() {
                 if (canCommand) {
                     document.getElementById('enemy-army-popup')?.setAttribute('hidden', '');
                     state.militarySelectedForceId = force.id;
-                    state.militaryReachableCells = getReachableMilitaryCells(force);
+                    state.militarySelectedFleetId = null;
+                    state.militaryFleetMoveDraft = null;
+                    state.militaryMoveMode = false;
+                    state.militaryReachableCells = new Set();
                     state.militaryMoveDraft = null;
                     renderMilitaryGrid();
                     syncMilitaryMovePanel();
@@ -3917,24 +3946,10 @@ export function initEventListeners() {
                 }
                 if (state.userProfile?.role === 'player' && force.owner !== state.userProfile.owner
                     && state.militaryVisibleCells.has(`${cellX},${cellY}`)) { showEnemyArmyPopup(force); return; }
-                const selectedForce = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
-                if (state.userProfile?.role === 'player' && selectedForce?.owner === state.userProfile.owner && force.owner !== state.userProfile.owner) {
-                    try {
-                        const battleId = await startMilitaryBattle(selectedForce.id, force.id);
-                        state.militarySelectedForceId = null;
-                        state.militaryMoveDraft = null;
-                        state.militaryForces = await fetchMilitaryForces();
-                        renderMilitaryGrid();
-                        syncMilitaryMovePanel();
-                        showToast(`Приказ атаковать отправлен. Сражение ${String(battleId).slice(0, 8)} ожидает решения сторон и подтверждения администратора.` , 6000);
-                    } catch (error) { showToast(`Не удалось начать сражение: ${error.message}`, 7000); }
-                    return;
-                }
-                const roster = (force.unit_groups || []).map(group => `${group.type}: ${formatNumber(group.count)}`).join(' · ') || 'состав не задан';
-                showToast(`${force.name} · ${force.owner} · Воевода ${force.commander_name || 'не назначен'} · Мораль ${formatNumber(force.morale)}% · ${roster}`, 7000);
                 return;
+
             }
-            if (state.militarySelectedForceId) {
+            if (state.militarySelectedForceId && state.militaryMoveMode) {
                 const selectedForce = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
                 const draft = selectedForce && planMilitaryMove(selectedForce, cellX, cellY);
                 if (!draft) showToast('До этой клетки нельзя дойти за оставшиеся ОД или путь заблокирован.');

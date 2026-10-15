@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js?v=army-inspector-password-reset-20261015';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js?v=explicit-move-siege-popup-20261015';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
@@ -318,7 +318,7 @@ export function renderMilitaryGrid() {
         }
         ctx.restore();
     }
-    if (state.militarySelectedForceId && state.militaryReachableCells?.size) {
+    if (state.militarySelectedForceId && state.militaryMoveMode && state.militaryReachableCells?.size) {
         ctx.save();
         // Movement reach is intentionally drawn after fog: the player always sees
         // the range of their selected force, including cells not yet scouted.

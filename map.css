@@ -1489,3 +1489,6 @@ body.military-army-placement #visual-map {
   .army-inspector-actions { padding-left: 0; border-left: 0; border-top: 1px solid rgba(232,223,200,.16); padding-top: 10px; }
   .army-inspector-columns { grid-template-columns: 1fr 1fr; }
 }
+.army-inspector-actions button[data-order-move-start], .army-inspector-actions button[data-order-confirm] { background: #75633e; border-color: #9c8556; }
+.marker-siege-action p { margin: 5px 0 8px; color: #b9b5a6; font-size: 12px; }
+.marker-siege-action label { display: grid; gap: 5px; margin: 8px 0; color: #b9b5a6; font-size: 12px; }
