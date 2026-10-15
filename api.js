@@ -775,10 +775,9 @@ export async function fetchMilitaryLevyOrders() {
     return data || [];
 }
 
-export async function placeMilitaryLevyOrder(values) {
+export async function placeMilitaryLevyOrder(provinceId) {
     const { data, error } = await supabaseClient.rpc('place_military_levy_order', {
-        p_levy_kind: values.levyKind,
-        p_destination_marker_id: values.destinationMarkerId
+        p_province_id: provinceId
     });
     if (error) throw error;
     return data;

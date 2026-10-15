@@ -1,7 +1,7 @@
 import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=production-orders-20261015';
 import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=production-orders-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=automatic-militia-20261015';
-import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=automatic-militia-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=unified-militia-20261015';
+import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=unified-militia-20261015';
 import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-20261015';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -426,13 +426,9 @@ export function showProvincePopup(imgX, imgY, info) {
     const hasUncapturedSettlement = provinceSettlements.some(marker => marker.type !== 'ruins' && marker.owner !== playerOwner);
     const colonySources = state.dbMarkers.filter(marker => marker.owner === playerOwner && marker.type !== 'ruins' && Number(marker.yards) >= 50);
     const colonyEscorts = state.militaryForces.filter(force => force.owner === playerOwner && force.force_kind === 'land_army' && force.status === 'active' && !force.colonization_mission_id);
-    const provincePeasantCap = dbRow.owner === playerOwner ? calculateLevyCapacity((Number(dbRow.yards)||0)*(Number(state.dbEstateRatios.province?.peasants)||0.95),'peasants') : 0;
-    const provincePeasantRaised = state.militaryForces.filter(force=>force.owner===playerOwner&&force.is_militia&&force.status==='active'&&force.levy_source_kind==='peasants'&&Number(force.levy_source_id)===Number(info.id))
-        .reduce((sum,force)=>sum+(force.unit_groups||[]).reduce((inner,group)=>inner+(Number(group.count)||0),0),0);
-    const provincePeasantRemaining = Math.max(0,provincePeasantCap-provincePeasantRaised);
     const playerMapActions = playerOwner ? `<details class="map-operation-menu"><summary>Действия на карте</summary>
         ${!dbRow.owner ? `<details class="province-action-sub"><summary>Колонизация</summary><p>${hasUncapturedSettlement ? 'Колонизация недоступна: сначала захватите поселение в этой провинции.' : colonySources.length ? 'Колонизация возможна при наличии соседней контролируемой провинции, 50 дворов поселенцев и достаточной казны.' : 'Нет поселения с 50 дворами для отправки колонистов.'}</p>${!hasUncapturedSettlement && colonySources.length ? `<form id="map-colonization-form" class="admin-form"><label>Поселение-источник<select name="source_marker_id">${colonySources.map(marker => `<option value="${Number(marker.id)}">${escapeHtml(marker.name || `Поселение #${marker.id}`)} · ${formatNumber(marker.yards)} дворов</option>`).join('')}</select></label><label>Сопровождение<select name="force_id"><option value="">Без армии</option>${colonyEscorts.map(force => `<option value="${force.id}">${escapeHtml(force.name)}</option>`).join('')}</select></label><label>Дополнительное вложение<select name="extra"><option value="0">Нет</option><option value="1000">1 000 z · +5%</option><option value="2000">2 000 z · +10%</option></select></label><button class="admin-btn" type="submit">Начать колонизацию</button></form>` : ''}</details>` : ''}
-        ${dbRow.owner === playerOwner && !dbRow.occupied_by && provinceSettlements.some(marker => marker.owner === playerOwner && marker.type !== 'ruins') ? `<details class="province-action-sub"><summary>Сбор крестьянского ополчения · доступно ${formatNumber(provincePeasantRemaining)}</summary><form id="map-province-levy-form" class="admin-form"><label>Куда направить<select name="destination">${provinceSettlements.filter(marker => marker.owner === playerOwner && marker.type !== 'ruins').map(marker => `<option value="${Number(marker.id)}">${escapeHtml(marker.name || `Поселение #${marker.id}`)}</option>`).join('')}</select></label><button class="admin-btn" type="submit" ${provincePeasantRemaining < 1 ? 'disabled' : ''}>Начать сбор всего доступного ополчения</button><small>Состав определяется автоматически по культуре и сезону; доступно ${formatNumber(provincePeasantRemaining)} из ${formatNumber(provincePeasantCap)} бойцов.</small></form></details>` : ''}
+        ${dbRow.owner === playerOwner && !dbRow.occupied_by ? `<details class="province-action-sub"><summary>Сбор ополчения из провинции</summary><form id="map-province-levy-form" class="admin-form"><button class="admin-btn" type="submit">Собрать доступное ополчение</button><small>Приказ охватывает крестьянство провинции, служилых землевладельцев и горожан в контролируемых поселениях. Состав и численность рассчитываются автоматически. Отряд появится в ближайшем поселении с вашим гарнизоном.</small></form></details>` : ''}
     </details>` : '';
 
     if (isAdmin) {
@@ -513,7 +509,7 @@ export function showProvincePopup(imgX, imgY, info) {
             try { await startMilitaryColonization(Number(form.elements.source_marker_id.value),Number(info.id),Number(form.elements.extra.value),form.elements.force_id.value||null); state.militaryColonizationMap=await fetchMilitaryColonizationMap(); renderActiveLayer(); showToast('Колонизационная миссия начата.'); clearSelection(); }
             catch(error) { showToast(`Невозможно начать колонизацию: ${error.message}`,7000); button.disabled=false; }
         });
-        document.getElementById('map-province-levy-form')?.addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type="submit"]');button.disabled=true;try{const result=await placeMilitaryLevyOrder({levyKind:'peasants',destinationMarkerId:Number(form.elements.destination.value)});showToast(`Крестьянское ополчение собирается: ${formatNumber(result.unit_count)} бойцов, прибытие с хода ${formatNumber(result.due_turn)}.`);clearSelection();}catch(error){showToast(`Не удалось начать сбор ополчения: ${error.message}`,7000);button.disabled=false;}});
+        document.getElementById('map-province-levy-form')?.addEventListener('submit',async event=>{event.preventDefault();const form=event.currentTarget,button=form.querySelector('button[type="submit"]');button.disabled=true;try{const result=await placeMilitaryLevyOrder(Number(info.id));showToast(`Сбор ополчения начат: ${formatNumber(result.unit_count)} бойцов. Гарнизон: ${escapeHtml(state.dbMarkers.find(item=>Number(item.id)===Number(result.destination_marker_id))?.name||'ближайшее контролируемое поселение')}; прибытие с хода ${formatNumber(result.due_turn)}.`);clearSelection();}catch(error){showToast(`Не удалось начать сбор ополчения: ${error.message}`,7000);button.disabled=false;}});
     }
 
     elements.popup.style.display = 'block';
@@ -541,7 +537,7 @@ export function showMarkerPopup(marker) {
     const playerOwner = state.userProfile?.role === 'player' ? state.userProfile.owner : null;
     const portSources = state.dbMarkers.filter(row => row.owner === playerOwner && row.type !== 'ruins');
     const mapPortActions = marker.owner === playerOwner && marker.type !== 'ruins' ? `<section class="map-operation-menu"><strong>Порт</strong><form id="map-port-form" class="admin-form"><label>Тип порта<select name="port_type"><option value="river_port">Речной порт</option><option value="port">Морской порт</option></select></label><label>Склад материалов<select name="source_marker_id">${portSources.map(row => `<option value="${Number(row.id)}">${escapeHtml(row.name || `Поселение #${row.id}`)}</option>`).join('')}</select></label><button type="submit" class="admin-btn">Начать строительство порта</button></form><small>Речной порт: 2 000 z, 150 Древесины и 30 Инструментов. Морской: 4 000 z, 300 Древесины и 60 Инструментов.</small></section>` : '';
-    const markerLevyActions = marker.owner === playerOwner && marker.type !== 'ruins' && !owningProvince.occupied_by ? `<section class="map-operation-menu"><strong>Сбор ополчения</strong><p>Выберите сословный источник. Число бойцов и их состав определяются автоматически по квоте, культуре и сезону.</p><form id="map-levy-form" class="admin-form"><label>Сословие источника<select name="kind"><option value="peasants">Крестьянство провинции</option>${['city','large_city'].includes(marker.type) ? '<option value="burghers">Горожане</option>' : ''}<option value="aristocracy">Служилые землевладельцы</option></select></label><small data-levy-limit></small><button class="admin-btn" type="submit">Начать сбор</button></form></section>` : '';
+    const markerLevyActions = marker.owner === playerOwner && marker.type !== 'ruins' && !owningProvince.occupied_by ? `<section class="map-operation-menu"><strong>Сбор ополчения из провинции</strong><p>Одним приказом собираются все доступные сословные квоты провинции: крестьянская, служилая и городская. Состав и численность рассчитываются автоматически; войска появятся в ближайшем поселении с вашим гарнизоном.</p><button type="button" class="admin-btn" id="map-levy-form">Собрать доступное ополчение</button></section>` : '';
     const targetCellX = Math.floor(Number(marker.coord_1) / MILITARY_GRID_CELL_SIZE);
     const targetCellY = Math.floor(Number(marker.coord_2) / MILITARY_GRID_CELL_SIZE);
     const currentSiege = (state.militarySieges || []).find(siege => Number(siege.marker_id) === Number(marker.id) && ['active', 'battle_pending'].includes(siege.status));
@@ -695,21 +691,7 @@ export function showMarkerPopup(marker) {
             ${markerLevyActions}
             ${mapPortActions}
         `;
-        const levyForm = document.getElementById('map-levy-form');
-        if (levyForm) {
-            const refreshLimit = () => {
-                const kind=levyForm.elements.kind.value, province=state.dbProvinces[Number(marker.province_id)] || {};
-                const estate=kind==='peasants'?'peasants':kind;
-                const baseYards=kind==='peasants'?(Number(province.yards)||0):(Number(marker.yards)||0);
-                const share=kind==='peasants'?(Number(state.dbEstateRatios.province?.peasants)||.95):(Number(state.dbEstateRatios[marker.type]?.[estate])||0);
-                const max=calculateLevyCapacity(baseYards*share,kind);
-                const culture=kind==='peasants'?(province.main_culture||marker.culture):(marker.culture||province.main_culture)||'';
-                const groups=calculateLevyComposition(max,kind,culture,state.gameCalendar?.season||'Весна');
-                levyForm.querySelector('[data-levy-limit]').textContent=`Квота: ${formatNumber(max)} бойцов. Автоматический состав: ${groups.map(group=>`${group.type} — ${formatNumber(group.count)}`).join('; ')||'квота пока пуста'}. Сервер проверит остаток, казну и снаряжение.`;
-            };
-            levyForm.elements.kind.addEventListener('change',refreshLimit); refreshLimit();
-            levyForm.addEventListener('submit',async event=>{event.preventDefault();const button=levyForm.querySelector('button[type="submit"]');button.disabled=true;try{const result=await placeMilitaryLevyOrder({levyKind:levyForm.elements.kind.value,destinationMarkerId:Number(marker.id)});showToast(`Сбор ополчения начат: ${formatNumber(result.unit_count)} бойцов, прибытие с хода ${formatNumber(result.due_turn)}.`);clearSelection();}catch(error){showToast(`Не удалось начать сбор ополчения: ${error.message}`,7000);button.disabled=false;}});
-        }
+        document.getElementById('map-levy-form')?.addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{const result=await placeMilitaryLevyOrder(Number(marker.province_id));showToast(`Сбор ополчения начат: ${formatNumber(result.unit_count)} бойцов. Гарнизон: ${escapeHtml(state.dbMarkers.find(item=>Number(item.id)===Number(result.destination_marker_id))?.name||'ближайшее контролируемое поселение')}; прибытие с хода ${formatNumber(result.due_turn)}.`);clearSelection();}catch(error){showToast(`Не удалось начать сбор ополчения: ${error.message}`,7000);button.disabled=false;}});
         document.getElementById('map-port-form')?.addEventListener('submit', async event => {
             event.preventDefault(); const form=event.currentTarget,button=form.querySelector('button[type="submit"]'); button.disabled=true;
             try { await buildMilitaryPort(Number(marker.id),form.elements.port_type.value,Number(form.elements.source_marker_id.value)); showToast('Строительство порта начато; оно займёт сезон.'); clearSelection(); }
@@ -2216,6 +2198,8 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const spyAlertRows = spyRecords.alerts.filter(item => isAdmin || item.owner === playerOwner).slice(0,12).map(item => `<article class="military-event-card"><div><strong>${escapeHtml(item.message)}</strong><span>Ход ${formatNumber(item.created_turn)}</span></div></article>`).join('');
     const spyPanel = state.userProfile?.role === 'player' || isAdmin ? `<section class="page-panel military-spy-panel"><header class="page-panel-heading"><div><h2>Шпионаж</h2><p>Сеть растёт на 5 пунктов за сезон и на 2 дополнительных за каждый уровень агента выше первого. Операция разрешается при смене хода; шанс успеха и риск раскрытия учитывают силу сети и контршпионаж.</p></div></header>${spyDataError ? `<p class="page-error">Не удалось загрузить шпионскую систему: ${escapeHtml(spyDataError)}</p>` : ''}${state.userProfile?.role === 'player' ? `<form id="military-spy-hire" class="military-form-grid military-character-hire"><label>Имя шпиона<input name="name" maxlength="80" autocomplete="off" required></label><button class="admin-btn" type="submit">Нанять · 10 ОП</button><small>Возраст шпиона определяется случайно: от 30 до 60 лет. Лимит: 1 шпион + 1 за каждый Крупный город; до 3 сверх лимита с содержанием 2 ОП/ход.</small></form>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Агент</th><th>Опыт</th><th>Назначение</th><th>Приказы</th></tr></thead><tbody>${spyRows || '<tr><td colspan="4">Шпионов пока нет.</td></tr>'}</tbody></table></div><h3>Сведения разведки</h3><div class="military-event-list">${spyIntelRows || '<p class="page-note">Действующей разведывательной информации нет.</p>'}</div><h3>Уведомления службы</h3><div class="military-event-list">${spyAlertRows || '<p class="page-note">Новых уведомлений нет.</p>'}</div></section>` : '';
     const ownedLevyMarkers = (levySnapshot?.markers || []).filter(marker => marker.owner === playerOwner && marker.type !== 'ruins' && (levySnapshot?.provinces || []).some(province => Number(province.id) === Number(marker.province_id) && province.owner === playerOwner && !province.occupied_by));
+    const levyProvinces = (levySnapshot?.provinces || []).filter(province => province.owner === playerOwner && !province.occupied_by);
+    const levyProvinceOptions = levyProvinces.map(province => `<option value="${Number(province.id)}">${escapeHtml(province.province_name || `Провинция ${province.id}`)}</option>`).join('');
     const levyMarkerOptions = ownedLevyMarkers.map(marker => {
         const province = levySnapshot.provinces.find(item => Number(item.id) === Number(marker.province_id));
         return `<option value="${Number(marker.id)}" data-culture="${escapeHtml(marker.culture || province?.main_culture || '')}">${escapeHtml(marker.name || `Поселение #${marker.id}`)} · ${escapeHtml(markerTypeLabels[marker.type] || marker.type)} · провинция ${escapeHtml(province?.province_name || marker.province_id)}</option>`;
@@ -2285,14 +2269,13 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const levyPotential = (() => {
         if (!levySnapshot || !playerOwner) return null;
         const provinces = (levySnapshot.provinces || []).filter(row => row.owner === playerOwner && !row.occupied_by);
-        const markers = (levySnapshot.markers || []).filter(row => row.owner === playerOwner && row.type !== 'ruins');
+        const markers = ownedLevyMarkers;
         const provinceRatio = levySnapshot.estateRatios?.find(row => row.settlement_type === 'province') || {};
-        const yards = {
-            peasants: provinces.reduce((sum,row) => sum + (Number(row.yards)||0) * (Number(provinceRatio.peasants)||0.95),0),
-            aristocracy: markers.reduce((sum,row) => sum + (Number(row.yards)||0) * (Number(levySnapshot.estateRatios?.find(r=>r.settlement_type===row.type)?.aristocracy)||0),0),
-            burghers: markers.filter(row => ['city','large_city'].includes(row.type)).reduce((sum,row) => sum + (Number(row.yards)||0) * (Number(levySnapshot.estateRatios?.find(r=>r.settlement_type===row.type)?.burghers)||0),0)
+        const caps = {
+            peasants: provinces.reduce((sum,row) => sum + calculateLevyCapacity((Number(row.yards)||0)*(Number(provinceRatio.peasants)||0.95),'peasants'),0),
+            aristocracy: markers.reduce((sum,row) => sum + calculateLevyCapacity((Number(row.yards)||0)*(Number(levySnapshot.estateRatios?.find(r=>r.settlement_type===row.type)?.aristocracy)||0),'aristocracy'),0),
+            burghers: markers.filter(row => ['city','large_city'].includes(row.type)).reduce((sum,row) => sum + calculateLevyCapacity((Number(row.yards)||0)*(Number(levySnapshot.estateRatios?.find(r=>r.settlement_type===row.type)?.burghers)||0),'burghers'),0)
         };
-        const caps = Object.fromEntries(Object.entries(yards).map(([kind,value]) => [kind,calculateLevyCapacity(value,kind)]));
         const provincePotentialRows = provinces.map(province => {
             const cap=calculateLevyCapacity((Number(province.yards)||0)*(Number(provinceRatio.peasants)||0.95),'peasants');
             const used=state.militaryForces.filter(force=>force.owner===playerOwner&&force.is_militia&&force.status==='active'&&force.levy_source_kind==='peasants'&&Number(force.levy_source_id)===Number(province.id))
@@ -2310,17 +2293,14 @@ async function renderMilitaryPlanner(spyOnly = false) {
     })();
     const recruitmentPanel = `
         <section class="page-panel military-recruitment-panel">
-            <header class="page-panel-heading"><div><h2>Сбор и содержание войск</h2><p>Квоты рассчитываются по сословным Дворам выбранного источника. После оплаты отряд появляется в Гарнизоне через один сезон и служит два сезона.</p></div></header>
+            <header class="page-panel-heading"><div><h2>Сбор и содержание войск</h2><p>Один приказ собирает весь доступный остаток квот всех сословий в выбранной провинции. Гарнизон назначается автоматически в ближайшем контролируемом поселении. Отряд появляется через сезон и служит два сезона.</p></div></header>
             ${levyPotential || ''}<div class="military-recruitment-controls">
-                <label>Источник сбора<select id="levy-kind"><option value="aristocracy">Служилые землевладельцы</option><option value="burghers">Горожане</option><option value="peasants">Крестьянство волостей</option></select></label>
-                <label>Поселение сбора<select id="levy-marker"><option value="">— выберите поселение —</option>${levyMarkerOptions}</select></label>
-                <label>Культура места сбора<input id="levy-culture" type="text" readonly value=""></label>
-                <label>Дворы сословия источника<input id="levy-yards" type="number" min="0" step="1" value="0" readonly></label>
+                <label>Провинция сбора<select id="levy-province"><option value="">— выберите провинцию —</option>${levyProvinceOptions}</select></label>
             </div>
             <div id="levy-estimate" class="military-recruitment-estimate" aria-live="polite"></div>
             ${state.userProfile?.role === 'player' ? `<button class="admin-btn" id="place-military-levy-order" type="button" ${!levyMarkerOptions ? 'disabled' : ''}>Заказать сбор</button><span id="levy-order-status" aria-live="polite"></span>` : '<p class="page-note">Приказ на сбор войск доступен игроку за государство.</p>'}
             ${levyDataError ? `<p class="page-error">${escapeHtml(levyDataError)}</p>` : ''}
-            <p class="page-note">Собирается весь остаток обычной квоты источника. Количество и состав отряда система определяет по культуре и сезону; вручную выбрать численность и типы юнитов нельзя. Казна и товары списываются со склада выбранного поселения сразу, приказ не создаётся при нехватке средств или снаряжения.</p>
+            <p class="page-note">Состав и численность по каждой квоте система определяет по культуре и сезону. Казна и товары списываются со склада ближайшего контролируемого поселения сразу; приказ не создаётся при нехватке средств или снаряжения.</p>
             <div class="page-table-wrap"><table class="page-table"><thead><tr><th>Отряд</th><th>Место сбора</th><th>Состояние</th><th>Оплачено</th></tr></thead><tbody>${levyOrderRows || '<tr><td colspan="4">Заказов на сбор пока нет.</td></tr>'}</tbody></table></div>
         </section>`;
     const mercenaryMarketRows = militaryMercenaryOffers.filter(offer => isAdmin || state.dbMarkers?.find(marker => Number(marker.id) === Number(offer.marker_id))?.owner === playerOwner).map(offer => {
@@ -3038,36 +3018,58 @@ async function renderMilitaryPlanner(spyOnly = false) {
             renderStoredBattle(opener.dataset.openMilitaryBattle);
         }
     });
-    const levyKind = elements.pageView.querySelector('#levy-kind');
-    const levyMarker = elements.pageView.querySelector('#levy-marker');
-    const levyCulture = elements.pageView.querySelector('#levy-culture');
-    const levyYards = elements.pageView.querySelector('#levy-yards');
+    const levyProvince = elements.pageView.querySelector('#levy-province');
     const levySeason = state.gameCalendar?.season || 'Весна';
     const getLevyContext = () => {
-        const marker = ownedLevyMarkers.find(item => Number(item.id) === Number(levyMarker?.value));
-        const province = marker && levySnapshot?.provinces?.find(item => Number(item.id) === Number(marker.province_id));
-        const ratio = marker && levySnapshot?.estateRatios?.find(item => item.settlement_type === marker.type);
+        const province = levyProvinces.find(item => Number(item.id) === Number(levyProvince?.value));
         const provinceRatio = levySnapshot?.estateRatios?.find(item => item.settlement_type === 'province');
-        const kind = levyKind?.value;
-        const culture = kind === 'peasants' ? (province?.main_culture || marker?.culture || '') : (marker?.culture || province?.main_culture || '');
-        const yards = kind === 'peasants'
-            ? (Number(province?.yards) || 0) * (Number(provinceRatio?.peasants) || 0.95)
-            : (Number(marker?.yards) || 0) * (Number(ratio?.[kind]) || 0);
-        const sourceId = kind === 'peasants' ? province?.id : marker?.id;
-        const usedForces = state.militaryForces.filter(force => force.is_militia && force.status === 'active' && force.levy_source_kind === kind && Number(force.levy_source_id) === Number(sourceId))
-            .reduce((sum, force) => sum + (force.unit_groups || []).reduce((subtotal, group) => subtotal + (Number(group.count) || 0), 0), 0);
-        const usedOrders = militaryLevyOrders.filter(order => order.status === 'training' && order.levy_kind === kind && Number(order.source_id) === Number(sourceId))
-            .reduce((sum, order) => sum + (Number(order.unit_count) || 0), 0);
-        return { marker, province, kind, culture, yards, sourceId, used: usedForces + usedOrders };
+        if (!province) return { province: null, sources: [], groups: [], capacity: 0, used: 0, availableQuota: 0 };
+        const markers = ownedLevyMarkers.filter(marker => Number(marker.province_id) === Number(province.id));
+        const sources = [{ kind: 'peasants', sourceId: province.id,
+            yards: (Number(province.yards) || 0) * (Number(provinceRatio?.peasants) || 0.95),
+            culture: province.main_culture || '', label: 'Крестьянство провинции' }];
+        markers.forEach(marker => {
+            const ratio = levySnapshot?.estateRatios?.find(item => item.settlement_type === marker.type) || {};
+            sources.push({ kind: 'aristocracy', sourceId: marker.id,
+                yards: (Number(marker.yards) || 0) * (Number(ratio.aristocracy) || 0),
+                culture: marker.culture || province.main_culture || '', label: `Служилые · ${marker.name || `поселение #${marker.id}`}` });
+            if (['city','large_city'].includes(marker.type)) sources.push({ kind: 'burghers', sourceId: marker.id,
+                yards: (Number(marker.yards) || 0) * (Number(ratio.burghers) || 0),
+                culture: marker.culture || province.main_culture || '', label: `Горожане · ${marker.name || `поселение #${marker.id}`}` });
+        });
+        const planned = sources.map(source => {
+            const capacity = calculateLevyCapacity(source.yards, source.kind);
+            const usedForces = state.militaryForces.filter(force => force.owner === playerOwner && force.is_militia && force.status === 'active' && force.levy_source_kind === source.kind && Number(force.levy_source_id) === Number(source.sourceId))
+                .reduce((sum, force) => sum + (force.unit_groups || []).reduce((subtotal, group) => subtotal + (Number(group.count) || 0), 0), 0);
+            const usedOrders = militaryLevyOrders.filter(order => order.status === 'training' && order.levy_kind === source.kind && Number(order.source_id) === Number(source.sourceId))
+                .reduce((sum, order) => sum + (Number(order.unit_count) || 0), 0);
+            const available = Math.max(0, capacity - usedForces - usedOrders);
+            return { ...source, capacity, used: usedForces + usedOrders, available,
+                groups: calculateLevyComposition(available, source.kind, source.culture, levySeason) };
+        });
+        const merged = planned.flatMap(source => source.groups).reduce((result, group) => {
+            result[group.type] = (result[group.type] || 0) + group.count;
+            return result;
+        }, {});
+        const groups = Object.entries(merged).map(([type, count]) => ({ type, count }));
+        const provinceCells = [...state.militaryGridCells.values()].filter(cell => Number(cell.province_id) === Number(province.id));
+        const center = provinceCells.length ? {
+            x: provinceCells.reduce((sum, cell) => sum + Number(cell.cell_x), 0) / provinceCells.length,
+            y: provinceCells.reduce((sum, cell) => sum + Number(cell.cell_y), 0) / provinceCells.length
+        } : null;
+        const destination = center ? ownedLevyMarkers.slice().sort((a, b) => {
+            const da = (Math.floor(Number(a.coord_1) / 24) - center.x) ** 2 + (Math.floor(Number(a.coord_2) / 24) - center.y) ** 2;
+            const db = (Math.floor(Number(b.coord_1) / 24) - center.x) ** 2 + (Math.floor(Number(b.coord_2) / 24) - center.y) ** 2;
+            return da - db || Number(a.id) - Number(b.id);
+        })[0] || null : null;
+        return { province, sources: planned, groups,
+            capacity: planned.reduce((sum, source) => sum + source.capacity, 0),
+            used: planned.reduce((sum, source) => sum + source.used, 0),
+            availableQuota: planned.reduce((sum, source) => sum + source.available, 0), destination };
     };
     const updateLevyEstimate = () => {
         const context = getLevyContext();
-        const { kind, yards, culture } = context;
-        levyCulture.value = culture;
-        levyYards.value = Math.floor(yards);
-        const capacity = calculateLevyCapacity(yards, kind);
-        const availableQuota = Math.max(0, capacity - context.used);
-        const groups = calculateLevyComposition(availableQuota, kind, culture, levySeason);
+        const { groups, availableQuota, capacity } = context;
         const ownerModifiers = getOwnerModifiers(playerOwner, levySnapshot || {}, levySnapshot?.calendar?.turn || state.gameCalendar?.turn || 1);
         const recruitmentFactor = Math.max(0, 1 + modifierValue(ownerModifiers,'military_recruitment_cost_pct') / 100);
         const cost = calculateLevyCosts(groups);
@@ -3077,21 +3079,15 @@ async function renderMilitaryPlanner(spyOnly = false) {
         const supplyFactor = Math.max(0, 1 + modifierValue(ownerModifiers,'supply_consumption_pct') / 100);
         upkeep.treasury = Math.round(upkeep.treasury * upkeepFactor * 100) / 100;
         for (const key of ['food','cloth','grain','fuel']) upkeep[key] = Math.round(upkeep[key] * upkeepFactor * supplyFactor * 100) / 100;
-        const inventory = levySnapshot?.inventories || [];
-        const armsAvailable = Number(inventory.find(row => Number(row.marker_id) === Number(context.marker?.id) && row.item_type === 'good' && row.item_name === 'Оружие и Доспехи')?.quantity) || 0;
-        const clothAvailable = Number(inventory.find(row => Number(row.marker_id) === Number(context.marker?.id) && row.item_type === 'good' && row.item_name === 'Сукно и Одежда')?.quantity) || 0;
-        const settings = levySnapshot?.mechanics?.find(row => row.owner === playerOwner)?.settings || {};
-        const treasuryAvailable = Number(settings.economy?.treasury) || 0;
-        const available = treasuryAvailable >= cost.treasury && armsAvailable >= cost.arms && clothAvailable >= cost.cloth;
-        const invalidSource = !context.marker || !context.province || availableQuota < 1
-            || kind === 'burghers' && !['city','large_city'].includes(context.marker?.type);
+        const invalidSource = !context.province || availableQuota < 1;
         const button = elements.pageView.querySelector('#place-military-levy-order');
-        if (button) button.disabled = invalidSource || !available;
+        if (button) button.disabled = invalidSource;
         const roster = groups.map(group => `${group.type} — ${formatNumber(group.count)}`).join('; ') || 'Нет доступного остатка квоты';
-        elements.pageView.querySelector('#levy-estimate').innerHTML = `<div><span>Остаток квоты</span><strong>${formatNumber(availableQuota)} бойцов из ${formatNumber(capacity)} · уже в службе или сборе ${formatNumber(context.used)}</strong></div><div><span>Автоматический состав</span><strong>${escapeHtml(roster)}</strong></div><div><span>Разовая стоимость</span><strong>${formatNumber(cost.treasury, 2)} z · ${formatNumber(cost.arms, 3)} оружия · ${formatNumber(cost.cloth, 3)} одежды</strong></div><div><span>Содержание за ход</span><strong>${formatNumber(upkeep.treasury, 2)} z · ${formatNumber(upkeep.food, 2)} продовольствия · ${formatNumber(upkeep.cloth, 3)} одежды${upkeep.grain ? ` · ${formatNumber(upkeep.grain, 2)} зерна` : ''}${upkeep.fuel ? ` · ${formatNumber(upkeep.fuel, 3)} топлива` : ''}</strong></div>${invalidSource ? '<p class="page-note">Выберите поселение с неиспользованной квотой.</p>' : ''}${!available ? `<p class="page-error">Не хватает средств или снаряжения на складе (казна ${formatNumber(treasuryAvailable,2)} z; оружие ${formatNumber(armsAvailable,3)}; одежда ${formatNumber(clothAvailable,3)}).</p>` : ''}`;
+        const sourceSummary = context.sources.map(source => `${escapeHtml(source.label)}: ${formatNumber(source.available)}`).join('; ');
+        const destinationName = context.destination?.name || 'ближайшее контролируемое поселение';
+        elements.pageView.querySelector('#levy-estimate').innerHTML = `<div><span>Доступные квоты</span><strong>${formatNumber(availableQuota)} бойцов из ${formatNumber(capacity)} · уже в службе или сборе ${formatNumber(context.used)}</strong></div><div><span>По источникам</span><strong>${sourceSummary || '—'}</strong></div><div><span>Общий автоматический состав</span><strong>${escapeHtml(roster)}</strong></div><div><span>Гарнизон после сбора</span><strong>${escapeHtml(destinationName)}</strong></div><div><span>Разовая стоимость</span><strong>${formatNumber(cost.treasury, 2)} z · ${formatNumber(cost.arms, 3)} оружия · ${formatNumber(cost.cloth, 3)} одежды</strong></div><div><span>Содержание за ход</span><strong>${formatNumber(upkeep.treasury, 2)} z · ${formatNumber(upkeep.food, 2)} продовольствия · ${formatNumber(upkeep.cloth, 3)} одежды${upkeep.grain ? ` · ${formatNumber(upkeep.grain, 2)} зерна` : ''}${upkeep.fuel ? ` · ${formatNumber(upkeep.fuel, 3)} топлива` : ''}</strong></div>${invalidSource ? '<p class="page-note">Выберите провинцию с доступной квотой.</p>' : ''}`;
     };
-    levyKind.addEventListener('change', updateLevyEstimate);
-    levyMarker?.addEventListener('change', updateLevyEstimate);
+    levyProvince?.addEventListener('change', updateLevyEstimate);
     updateLevyEstimate();
     elements.pageView.querySelectorAll('[data-hire-mercenary]').forEach(button => button.addEventListener('click', async () => {
         button.disabled = true;
@@ -3121,9 +3117,10 @@ async function renderMilitaryPlanner(spyOnly = false) {
         const button = event.currentTarget;
         button.disabled = true;
         try {
-            const order = await placeMilitaryLevyOrder({ levyKind: levyKind.value, destinationMarkerId: Number(levyMarker.value) });
+            const order = await placeMilitaryLevyOrder(Number(levyProvince.value));
             const roster = (order.unit_groups || []).map(group => `${group.type} ${group.count}`).join(', ');
-            showToast(`Сбор начат: ${order.unit_count} бойцов (${roster}). Гарнизон появится с хода ${order.due_turn}.`);
+            const destination = state.dbMarkers.find(marker => Number(marker.id) === Number(order.destination_marker_id))?.name || 'ближайшее контролируемое поселение';
+            showToast(`Сбор начат: ${order.unit_count} бойцов (${roster}). Гарнизон: ${destination}; появится с хода ${order.due_turn}.`);
             await renderMilitaryPlanner();
         } catch (error) {
             showToast(`Не удалось начать сбор: ${error.message}`, 7000);
