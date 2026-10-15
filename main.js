@@ -1,7 +1,7 @@
 import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=production-orders-20261015';
-import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryColonizationMap } from './api.js?v=militia-navy-ui-20261015';
-import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=production-orders-20261015';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=militia-navy-ui-20261015';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryConditionalOrders, fetchMilitaryColonizationMap } from './api.js?v=militia-navy-ui-20261015';
+import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=military-ui-rivers-fuel-20261015';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=military-ui-rivers-fuel-20261015';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -154,11 +154,13 @@ Promise.all([
                 state.militaryFleets = await fetchMilitaryFleets();
                 renderMilitaryGrid();
             } catch (err) { console.info('Постоянные военные силы пока не загружены:', err.message); }
-            const [structuresResult, siegesResult] = await Promise.allSettled([fetchMilitaryStructures(), fetchMilitarySieges()]);
+            const [structuresResult, siegesResult, conditionalOrdersResult] = await Promise.allSettled([fetchMilitaryStructures(), fetchMilitarySieges(), fetchMilitaryConditionalOrders()]);
             if (structuresResult.status === 'fulfilled') state.militaryStructures = structuresResult.value;
             else console.info('Полевые сооружения пока не загружены:', structuresResult.reason?.message);
             if (siegesResult.status === 'fulfilled') state.militarySieges = siegesResult.value;
             else console.info('Состояние осад пока не загружено:', siegesResult.reason?.message);
+            if (conditionalOrdersResult.status === 'fulfilled') state.militaryConditionalOrders = conditionalOrdersResult.value;
+            else console.info('Условные приказы пока не загружены:', conditionalOrdersResult.reason?.message);
             renderMilitaryGrid();
             if (state.userProfile?.owner) {
                 try {
@@ -172,6 +174,7 @@ Promise.all([
             state.userProfile = null;
             state.stateMechanics = {};
             state.militaryForces = [];
+            state.militaryConditionalOrders = [];
             state.militaryStructures = [];
             state.militarySieges = [];
             state.militaryVisibleCells = new Set();

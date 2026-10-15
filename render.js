@@ -144,7 +144,7 @@ function analyzeRiverCell(mask, x, y, cellWidth, cellHeight, width, height) {
     const right = Math.min(mask.width, Math.ceil((x + cellWidth) * mask.width / width));
     const bottom = Math.min(mask.height, Math.ceil((y + cellHeight) * mask.height / height));
     const pixelWidth = Math.max(1, right - left), pixelHeight = Math.max(1, bottom - top);
-    const edgeBand = Math.max(1, Math.ceil(Math.min(pixelWidth, pixelHeight) * .08));
+    const edgeBand = Math.max(1, Math.ceil(Math.min(pixelWidth, pixelHeight) * .04));
     const riverPixels = new Uint8Array(pixelWidth * pixelHeight);
     let count = 0;
     for (let py = top; py < bottom; py++) for (let px = left; px < right; px++) {
@@ -159,7 +159,10 @@ function analyzeRiverCell(mask, x, y, cellWidth, cellHeight, width, height) {
     const visited = new Uint8Array(riverPixels.length);
     const stack = [];
     let major = false;
-    const minimumMajorRiverPixels = Math.max(32, Math.ceil(pixelWidth * pixelHeight * .06));
+    // Rasters share the map's resolution (24px per grid cell). The former
+    // hard floor of 32 pixels exceeded the area of low-resolution cell masks,
+    // classifying every channel as fordable. Scale the threshold to the cell.
+    const minimumMajorRiverPixels = Math.max(10, Math.ceil(pixelWidth * pixelHeight * .035));
     for (let seed = 0; seed < riverPixels.length && !major; seed++) {
         if (!riverPixels[seed] || visited[seed]) continue;
         stack.length = 0;

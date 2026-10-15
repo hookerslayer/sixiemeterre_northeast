@@ -208,6 +208,7 @@ body.military-army-placement #visual-map {
     box-shadow: 0 8px 28px rgba(0,0,0,.38); font-size: 13px; pointer-events: auto; isolation: isolate;
 }
 .military-map-tools[hidden], .map-finance-badge[hidden] { display: none; }
+.military-map-tools [hidden] { display: none !important; }
 .military-map-tools details { display: grid; gap: 10px; }
 .military-map-tools summary { color: #e7dcc4; font-weight: 700; cursor: pointer; }
 .military-map-tools label { display: grid; gap: 5px; color: #b7b4a9; }
@@ -1414,7 +1415,7 @@ body.military-army-placement #visual-map {
 .military-form-grid label { display: grid; gap: 5px; min-width: 0; color: #aeb2a7; font-size: 12px; }
 .military-form-grid select { min-height: 36px; min-width: 0; width: 100%; }
 .military-form-grid [data-road-status] { grid-column: 1 / -1; color: #c8c8be; font-size: 12px; }
-.military-spy-panel h3 { margin: 18px 18px 8px; }
+.military-spy-panel h3 { margin: 18px 18px 8px; color: #eee5d4; font-family: Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: 500; line-height: 1.35; }
 .military-spy-controls { display: grid; gap: 8px; min-width: 280px; }
 .military-spy-controls form { display: flex; flex-wrap: wrap; align-items: end; gap: 6px; }
 .military-spy-controls label { display: grid; gap: 4px; color: #aeb2a7; font-size: 11px; }
@@ -1496,6 +1497,7 @@ body.military-army-placement #visual-map {
 /* Army detail and orders are grouped in one compact side-by-side inspector. */
 .military-order-panel { position: fixed; z-index: 1200; right: 18px; top: 50%; left: auto; bottom: auto; transform: translateY(-50%); display: grid; grid-template-columns: minmax(250px, 1.2fr) minmax(210px, .8fr); gap: 16px; width: min(720px, calc(100vw - 36px)); max-height: min(78vh, 680px); overflow: auto; padding: 16px; }
 .military-order-panel[hidden] { display: none; }
+.military-supply-status { display: block; margin-top: 3px; line-height: 1.35; }
 .army-inspector-info h3 { margin: 0 0 5px; font: 600 20px Georgia, serif; }
 .army-inspector-info > p, .army-inspector-columns p { margin: 5px 0; color: #c6c2b5; font-size: 12px; line-height: 1.5; }
 .army-inspector-columns { display: grid; grid-template-columns: 1fr 1.15fr; gap: 14px; margin-top: 14px; }
@@ -1503,6 +1505,14 @@ body.military-army-placement #visual-map {
 .army-inspector-columns ul { display: grid; gap: 5px; margin: 8px 0 0; padding-left: 18px; color: #d1cdbc; font-size: 12px; }
 .army-inspector-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; padding-left: 14px; border-left: 1px solid rgba(232,223,200,.16); }
 .army-inspector-actions > p { margin: 0 0 4px; color: #c6c2b5; font-size: 12px; line-height: 1.5; }
+.army-card-controls { padding: 7px 0; border-top: 1px solid rgba(232,223,200,.14); color: #c8c8be; font-size: 11px; }
+.army-card-controls summary { cursor: pointer; color: #d6cba8; }
+.army-card-controls form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
+.army-card-controls label { display: grid; gap: 4px; min-width: 0; color: #aeb2a7; font-size: 10px; }
+.army-card-controls input, .army-card-controls select { box-sizing: border-box; min-width: 0; width: 100%; min-height: 30px; }
+.army-card-controls .compact-add-btn { grid-column: 1 / -1; justify-self: start; width: auto; height: auto; min-height: 30px; padding: 6px 9px; font-size: 11px; line-height: 1.25; }
+.army-card-controls small { display: block; margin: 6px 0; color: #aeb2a7; line-height: 1.4; }
+.army-card-controls > p { margin: 7px 0; }
 .army-siege-control { display: grid; gap: 5px; color: #b9b5a6; font-size: 12px; }
 .enemy-army-popup { position: fixed; z-index: 1210; top: 18px; right: 18px; width: min(310px, calc(100vw - 36px)); padding: 14px; border: 1px solid rgba(232,223,200,.4); border-radius: 9px; background: rgba(22,25,23,.98); color: #e8dfc8; box-shadow: 0 8px 28px rgba(0,0,0,.45); }
 .enemy-army-popup[hidden] { display: none; }
