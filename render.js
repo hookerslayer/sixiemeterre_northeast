@@ -318,13 +318,13 @@ export function renderMilitaryGrid() {
         }
         ctx.restore();
     }
-    if (state.militarySelectedForceId && state.militaryMoveMode && state.militaryReachableCells?.size) {
+    if (state.militarySelectedForceId && state.militaryReachableCells?.size) {
         ctx.save();
         // Movement reach is intentionally drawn after fog: the player always sees
         // the range of their selected force, including cells not yet scouted.
-        ctx.fillStyle = 'rgba(255, 224, 125, .34)';
-        ctx.strokeStyle = 'rgba(75, 54, 15, .98)';
-        ctx.lineWidth = Math.max(3, size * .1);
+        ctx.fillStyle = 'rgba(255, 224, 125, .48)';
+        ctx.strokeStyle = 'rgba(43, 38, 24, 1)';
+        ctx.lineWidth = Math.max(3, size * .12);
         for (const key of state.militaryReachableCells) {
             const [cellX, cellY] = key.split(',').map(Number);
             const x = cellX * size + 2, y = cellY * size + 2, w = size - 4, h = size - 4;
@@ -332,8 +332,8 @@ export function renderMilitaryGrid() {
             ctx.strokeRect(x, y, w, h);
             ctx.save();
             ctx.beginPath(); ctx.rect(x + 2, y + 2, w - 4, h - 4); ctx.clip();
-            ctx.strokeStyle = 'rgba(255, 243, 190, .94)'; ctx.lineWidth = Math.max(1.5, size * .045);
-            for (let offset = -size; offset < size * 2; offset += Math.max(7, size * .28)) {
+            ctx.strokeStyle = 'rgba(255, 248, 218, 1)'; ctx.lineWidth = Math.max(2, size * .075);
+            for (let offset = -size; offset < size * 2; offset += Math.max(6, size * .24)) {
                 ctx.beginPath(); ctx.moveTo(x + offset, y); ctx.lineTo(x + offset + h, y + h); ctx.stroke();
             }
             ctx.restore();

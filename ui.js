@@ -55,7 +55,7 @@ function syncMilitaryMovePanel() {
     const cost = draft?.cost;
     const troopCount = (force?.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 0);
     panel.querySelector('[data-order-summary]').textContent = force
-        ? `${force.name} · Воевода ${force.commander_name || '—'} · ${formatNumber(troopCount)} бойцов · мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД${draft ? ` · путь ${draft.path.length - 1} кл. / ${formatNumber(cost)} ОД` : state.militaryMoveMode ? '. Выберите подсвеченную клетку для движения.' : '. Нажмите «Переместить», чтобы проложить маршрут.'}`
+        ? `${force.name} · Воевода ${force.commander_name || '—'} · ${formatNumber(troopCount)} бойцов · мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД${draft ? ` · путь ${draft.path.length - 1} кл. / ${formatNumber(cost)} ОД` : state.militaryMoveMode ? (state.militaryReachableCells?.size ? `. Доступно клеток: ${state.militaryReachableCells.size}. Выберите подсвеченную клетку.` : '. Нет доступных клеток: проверьте ОД и проходимость местности.') : '. Нажмите «Переместить», чтобы проложить маршрут.'}`
         : draft
             ? `${active.name}: ${draft.path.length - 1} кл. · ${formatNumber(cost)} из ${formatNumber(active.action_points)} ОД · маршрут флота`
             : `${active.name} выбрана · ${formatNumber(active.action_points)} ОД. Щёлкни по доступной водной клетке для прокладки пути.`;
