@@ -558,15 +558,6 @@ export async function setMilitarySiegeOrder(siegeId, action, { forceId = null, w
     return data;
 }
 
-export async function setMarkerFortification(markerId, level) {
-    const { data, error } = await supabaseClient.rpc('set_marker_fortification', {
-        p_marker_id: markerId,
-        p_level: level
-    });
-    if (error) throw error;
-    return data;
-}
-
 export async function saveMilitaryTerrainCell(cell) {
     const { error } = await supabaseClient.rpc('set_military_terrain_cell', {
         p_cell_x: cell.cell_x,
