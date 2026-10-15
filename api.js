@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js';
+import { supabaseClient, state } from './config.js?v=loading-optimization-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -743,6 +743,10 @@ export async function extendMilitaryMilitiaService(forceId) {
 }
 
 export async function fetchEconomySnapshot() {
+    const [{ data: sessionData }, calendar] = await Promise.all([
+        supabaseClient.auth.getSession(),
+        fetchGameCalendar()
+    ]);
     const queries = [
         supabaseClient.from('Provinces').select('*'),
         supabaseClient.from('markers').select('*'),
@@ -751,13 +755,14 @@ export async function fetchEconomySnapshot() {
         supabaseClient.from('settlement_estate_ratios').select('*'),
         supabaseClient.from('state_mechanics').select('owner,settings'),
         supabaseClient.from('marker_transport_routes').select('*'),
-        supabaseClient.from('turn_economy_reports').select('*').order('year', { ascending: false }).order('turn', { ascending: false }),
+        // The UI needs only the recent four reports per state for growth trends,
+        // plus the newest detailed report; fetching the full history grows every turn.
+        supabaseClient.from('turn_economy_reports').select('owner,year,season,turn,report').order('year', { ascending: false }).order('turn', { ascending: false }).limit(200),
         supabaseClient.from('state_trade_contracts').select('*'),
         supabaseClient.from('state_trade_transit_rules').select('*'),
         supabaseClient.from('territory_rebellions').select('*')
     ];
     const names = ['provinces', 'markers', 'inventories', 'consumptionRates', 'estateRatios', 'mechanics', 'transportRoutes', 'reports', 'tradeContracts', 'tradeTransitRules', 'rebellions'];
-    const { data: sessionData } = await supabaseClient.auth.getSession();
     if (sessionData?.session) {
         queries.push(supabaseClient.from('state_modifiers').select('*'));
         names.push('modifiers');
@@ -778,7 +783,7 @@ export async function fetchEconomySnapshot() {
         if (query.error) throw query.error;
         result[names[index]] = query.data || [];
     });
-    result.calendar = await fetchGameCalendar();
+    result.calendar = calendar;
     return result;
 }
 

@@ -1,6 +1,6 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js';
-import { signUpUser, signInUser, signOutUser, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, createMilitaryBattle, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, saveMilitaryFleets, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=automatic-weather-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=loading-optimization-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=loading-optimization-20261015';
+import { signUpUser, signInUser, signOutUser, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, createMilitaryBattle, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, saveMilitaryFleets, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=loading-optimization-20261015';
 import { calculateArmyMobility, calculateLandCommandLoad, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ruler-succession-20261013b';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
@@ -1274,6 +1274,7 @@ function simulateEconomySnapshot(snapshot) {
 
 export function refreshTradeRouteOverlay() {
     const snapshot = state.economySnapshot;
+    if (!state.showTradeRoutes && !state.tradeRouteDraft) { state.tradeRouteOverlay = []; renderTradeRoutes([]); return; }
     if (!snapshot || !state.provinceAdjacency.size) { state.tradeRouteOverlay = []; renderTradeRoutes([]); return; }
     try {
         state.tradeRouteOverlay = processTurnSimulation({
@@ -1374,9 +1375,8 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
         const snapshot = await fetchEconomySnapshot();
         state.economySnapshot = snapshot;
         refreshTradeRouteOverlay();
-        const preview = simulateEconomySnapshot(snapshot);
         const actualRow = snapshot.reports.find(row => row.owner === owner);
-        const report = actualRow?.report || preview.ownerReports[owner] || { production: {}, consumption: {}, shortages: {}, markerReports: {}, provinceReports: {} };
+        const report = actualRow?.report || simulateEconomySnapshot(snapshot).ownerReports[owner] || { production: {}, consumption: {}, shortages: {}, markerReports: {}, provinceReports: {} };
         const isPreview = !actualRow;
         const markersById = new Map(snapshot.markers.map(row => [Number(row.id), row]));
         const ownerProvinces = snapshot.provinces.filter(row => row.owner === owner);
@@ -1922,49 +1922,72 @@ async function renderMilitaryPlanner(spyOnly = false) {
     let militaryMercenaryOffers = [];
     let mercenaryMarketError = '';
     let battleHeaders = [], militaryProfiles = [], militaryFleets = [], militaryPrisoners = [], militaryPorts = [], shipBuildOrders = [], militaryLevyOrders = [], militarySieges = [], militaryRaids = [], colonizationMissions = [], epidemicEvents = [], conditionalOrders = [], spyRecords = { spies:[], networks:[], orders:[], intel:[], alerts:[] }, spyDataError = '', levySnapshot = null, militaryDataError = '', forceDataError = '', fleetDataError = '', prisonerDataError = '', portDataError = '', shipBuildDataError = '', levyDataError = '', structureDataError = '', siegeDataError = '', raidDataError = '', colonizationDataError = '';
-    try {
-        battleHeaders = await fetchMilitaryBattles();
-    } catch (error) { militaryDataError = error.message || 'Таблицы военных событий ещё не созданы.'; }
-    if (isAdmin) {
-        try { militaryProfiles = (await fetchStateProfiles()).filter(profile => profile.owner); }
-        catch (error) { forceDataError ||= error.message || 'Не удалось загрузить список государств.'; }
-    }
-    try {
-        state.militaryForces = await fetchMilitaryForces();
-        renderMilitaryGrid();
-    } catch (error) { forceDataError = error.message || 'Реестр войск ещё не создан.'; }
     let militaryCommanders = [], commanderDataError = '';
-    try { militaryCommanders = await fetchMilitaryCommanders(); state.militaryCommanders = militaryCommanders; }
-    catch(error) { commanderDataError = error.message || 'Реестр воевод ещё не создан.'; }
-    if (state.userProfile?.role === 'player' || isAdmin) {
-        try { conditionalOrders = await fetchMilitaryConditionalOrders(); }
-        catch (error) { forceDataError ||= error.message || 'Не удалось загрузить условные приказы.'; }
-        try { spyRecords = await fetchMilitarySpyRecords(); }
-        catch (error) { spyDataError = error.message || 'Не удалось загрузить шпионскую систему.'; }
-    }
-    try { epidemicEvents = await fetchMilitaryEpidemicEvents(); }
-    catch (error) { if (isAdmin) forceDataError ||= error.message || 'Таблица эпидемических событий ещё не создана.'; }
-    try { militaryFleets = await fetchMilitaryFleets(); state.militaryFleets = militaryFleets; }
-    catch (error) { fleetDataError = error.message || 'Реестр флотов ещё не создан.'; }
-    try { militaryPrisoners = await fetchMilitaryPrisoners(); }
-    catch (error) { prisonerDataError = error.message || 'Реестр пленных ещё не создан.'; }
-    try { militaryPorts = await fetchMilitaryPorts(); state.militaryPorts = militaryPorts; }
-    catch (error) { portDataError = error.message || 'Реестр портов ещё не создан.'; }
-    try { shipBuildOrders = await fetchMilitaryShipBuildOrders(); }
-    catch (error) { shipBuildDataError = error.message || 'Реестр строительства судов ещё не создан.'; }
-    try { state.militaryStructures = await fetchMilitaryStructures(); renderMilitaryGrid(); }
-    catch (error) { structureDataError = error.message || 'Реестр полевых сооружений ещё не создан.'; }
-    try { militarySieges = await fetchMilitarySieges(); }
-    catch (error) { siegeDataError = error.message || 'Реестр осад ещё не создан.'; }
-    try { militaryRaids = await fetchMilitaryRaids(); }
-    catch (error) { raidDataError = error.message || 'Реестр набегов ещё не создан.'; }
-    try { colonizationMissions = await fetchMilitaryColonizationMissions(); }
-    catch (error) { colonizationDataError = error.message || 'Реестр колонизационных миссий ещё не создан.'; }
-    try { militaryMercenaryOffers = await fetchMilitaryMercenaryOffers(); }
-    catch (error) { mercenaryMarketError = error.message || 'Рынок наёмников ещё не создан.'; }
-    if (state.userProfile?.role === 'player' && state.userProfile.owner) {
-        try { [levySnapshot, militaryLevyOrders] = await Promise.all([fetchEconomySnapshot(), fetchMilitaryLevyOrders()]); }
-        catch (error) { levyDataError = error.message || 'Не удалось загрузить данные для сбора ополчения.'; }
+    const canUseSpySystem = state.userProfile?.role === 'player' || isAdmin;
+    const loadResult = async loader => {
+        try { return { data: await loader() }; }
+        catch (error) { return { error }; }
+    };
+    if (spyOnly) {
+        const [profilesResult, spyResult] = await Promise.all([
+            isAdmin ? loadResult(fetchStateProfiles) : Promise.resolve({ data: [] }),
+            canUseSpySystem ? loadResult(fetchMilitarySpyRecords) : Promise.resolve({ data: spyRecords })
+        ]);
+        militaryProfiles = profilesResult.data?.filter(profile => profile.owner) || [];
+        if (profilesResult.error) forceDataError = profilesResult.error.message || 'Не удалось загрузить список государств.';
+        spyRecords = spyResult.data || spyRecords;
+        if (spyResult.error) spyDataError = spyResult.error.message || 'Не удалось загрузить шпионскую систему.';
+    } else {
+        const loaders = [
+            ['battles', fetchMilitaryBattles], ['profiles', isAdmin ? fetchStateProfiles : null],
+            ['forces', fetchMilitaryForces], ['commanders', fetchMilitaryCommanders],
+            ['conditional', canUseSpySystem ? fetchMilitaryConditionalOrders : null],
+            ['spies', canUseSpySystem ? fetchMilitarySpyRecords : null], ['epidemics', fetchMilitaryEpidemicEvents],
+            ['fleets', fetchMilitaryFleets], ['prisoners', fetchMilitaryPrisoners], ['ports', fetchMilitaryPorts],
+            ['shipOrders', fetchMilitaryShipBuildOrders], ['structures', fetchMilitaryStructures],
+            ['sieges', fetchMilitarySieges], ['raids', fetchMilitaryRaids], ['colonization', fetchMilitaryColonizationMissions],
+            ['mercenaries', fetchMilitaryMercenaryOffers],
+            ['levy', state.userProfile?.role === 'player' && state.userProfile.owner ? () => Promise.all([fetchEconomySnapshot(), fetchMilitaryLevyOrders()]) : null]
+        ];
+        const results = Object.fromEntries(await Promise.all(loaders.map(async ([key, loader]) => [key, loader ? await loadResult(loader) : { data: null }])));
+        const read = key => results[key]?.data;
+        const error = key => results[key]?.error;
+        battleHeaders = read('battles') || [];
+        militaryProfiles = (read('profiles') || []).filter(profile => profile.owner);
+        state.militaryForces = read('forces') || [];
+        militaryCommanders = read('commanders') || [];
+        if (militaryCommanders.length || !error('commanders')) state.militaryCommanders = militaryCommanders;
+        conditionalOrders = read('conditional') || [];
+        spyRecords = read('spies') || spyRecords;
+        epidemicEvents = read('epidemics') || [];
+        militaryFleets = read('fleets') || []; state.militaryFleets = militaryFleets;
+        militaryPrisoners = read('prisoners') || [];
+        militaryPorts = read('ports') || []; state.militaryPorts = militaryPorts;
+        shipBuildOrders = read('shipOrders') || [];
+        state.militaryStructures = read('structures') || [];
+        militarySieges = read('sieges') || [];
+        militaryRaids = read('raids') || [];
+        colonizationMissions = read('colonization') || [];
+        militaryMercenaryOffers = read('mercenaries') || [];
+        if (read('levy')) [levySnapshot, militaryLevyOrders] = read('levy');
+        if (error('battles')) militaryDataError = error('battles').message || 'Таблицы военных событий ещё не созданы.';
+        if (error('profiles')) forceDataError = error('profiles').message || 'Не удалось загрузить список государств.';
+        if (error('forces')) forceDataError = error('forces').message || 'Реестр войск ещё не создан.';
+        if (error('commanders')) commanderDataError = error('commanders').message || 'Реестр воевод ещё не создан.';
+        if (error('conditional')) forceDataError ||= error('conditional').message || 'Не удалось загрузить условные приказы.';
+        if (error('spies')) spyDataError = error('spies').message || 'Не удалось загрузить шпионскую систему.';
+        if (error('epidemics') && isAdmin) forceDataError ||= error('epidemics').message || 'Таблица эпидемических событий ещё не создана.';
+        if (error('fleets')) fleetDataError = error('fleets').message || 'Реестр флотов ещё не создан.';
+        if (error('prisoners')) prisonerDataError = error('prisoners').message || 'Реестр пленных ещё не создан.';
+        if (error('ports')) portDataError = error('ports').message || 'Реестр портов ещё не создан.';
+        if (error('shipOrders')) shipBuildDataError = error('shipOrders').message || 'Реестр строительства судов ещё не создан.';
+        if (error('structures')) structureDataError = error('structures').message || 'Реестр полевых сооружений ещё не создан.';
+        if (error('sieges')) siegeDataError = error('sieges').message || 'Реестр осад ещё не создан.';
+        if (error('raids')) raidDataError = error('raids').message || 'Реестр набегов ещё не создан.';
+        if (error('colonization')) colonizationDataError = error('colonization').message || 'Реестр колонизационных миссий ещё не создан.';
+        if (error('mercenaries')) mercenaryMarketError = error('mercenaries').message || 'Рынок наёмников ещё не создан.';
+        if (error('levy')) levyDataError = error('levy').message || 'Не удалось загрузить данные для сбора ополчения.';
+        renderMilitaryGrid();
     }
     const unitNames = Object.keys(LAND_UNIT_PROFILES);
     const footUnits = unitNames.filter(name => !['cavalry','scout'].includes(LAND_UNIT_PROFILES[name].role));
@@ -3816,12 +3839,14 @@ export function initEventListeners() {
                 return;
             }
             const cellLeft = cellX * MILITARY_GRID_CELL_SIZE, cellTop = cellY * MILITARY_GRID_CELL_SIZE;
-            const provincePixels = state.provinceMapImageData?.data;
+            const cellWidth = Math.max(1, Math.min(elements.hiddenCanvas.width - cellLeft, MILITARY_GRID_CELL_SIZE));
+            const cellHeight = Math.max(1, Math.min(elements.hiddenCanvas.height - cellTop, MILITARY_GRID_CELL_SIZE));
+            const provincePixels = elements.hiddenCtx.getImageData(cellLeft, cellTop, cellWidth, cellHeight).data;
             const provinceVotes = new Map();
-            for (let py = cellTop + 1; py < Math.min(elements.hiddenCanvas.height, cellTop + MILITARY_GRID_CELL_SIZE - 1); py += 3) {
-                for (let px = cellLeft + 1; px < Math.min(elements.hiddenCanvas.width, cellLeft + MILITARY_GRID_CELL_SIZE - 1); px += 3) {
-                    const index = (py * elements.hiddenCanvas.width + px) * 4;
-                    const id = provincePixels ? state.provinceRgbToId[(provincePixels[index] << 16) | (provincePixels[index + 1] << 8) | provincePixels[index + 2]] : null;
+            for (let py = 1; py < cellHeight - 1; py += 3) {
+                for (let px = 1; px < cellWidth - 1; px += 3) {
+                    const index = (py * cellWidth + px) * 4;
+                    const id = state.provinceRgbToId[(provincePixels[index] << 16) | (provincePixels[index + 1] << 8) | provincePixels[index + 2]];
                     if (id) provinceVotes.set(id, (provinceVotes.get(id) || 0) + 1);
                 }
             }

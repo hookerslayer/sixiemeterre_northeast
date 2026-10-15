@@ -1,18 +1,7 @@
-import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js';
-import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=automatic-weather-20261015';
-import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay } from './ui.js?v=military-ui-layout-20261015-modifier-nav';
-import { buildProvinceAdjacency, buildProvinceCentroids, buildWaterMarkerComponents } from './economyEngine.js';
-
-const loadMapImage = src => new Promise(resolve => { const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=src; });
-const mapMaskToComponents = (image,kind) => {
-    if(!image)return new Map();
-    const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
-    const ctx=canvas.getContext('2d',{willReadFrequently:true});ctx.drawImage(image,0,0);
-    const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
-    state[`${kind}MaskImageData`]=imageData;
-    return buildWaterMarkerComponents(imageData,canvas.width,canvas.height,state.dbMarkers,{kind,provinceMapImageData:state.provinceMapImageData,provinceMeta:state.provincesMeta});
-};
+import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=loading-optimization-20261015';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=loading-optimization-20261015';
+import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=loading-optimization-20261015';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay } from './ui.js?v=loading-optimization-20261015';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -20,11 +9,8 @@ Promise.all([
         elements.colorMapImage.onload = resolve;
         elements.colorMapImage.src = COLOR_MAP_SRC;
     }),
-    loadSupabaseData(),
-    loadMapImage(RIVERS_MAP_SRC),
-    loadMapImage(LAKES_MAP_SRC),
-    loadMapImage(SEAS_MAP_SRC)
-]).then(([data, , , riversImage, lakesImage, seasImage]) => {
+    loadSupabaseData()
+]).then(([data]) => {
     state.provincesMeta = data;
 
     for (const [hex, info] of Object.entries(state.provincesMeta)) {
@@ -38,15 +24,6 @@ Promise.all([
     elements.hiddenCanvas.width = width;
     elements.hiddenCanvas.height = height;
     elements.hiddenCtx.drawImage(elements.colorMapImage, 0, 0);
-    const mapImageData = elements.hiddenCtx.getImageData(0, 0, width, height);
-    state.provinceMapImageData = mapImageData;
-    state.provinceAdjacency = buildProvinceAdjacency(mapImageData, width, height, state.provincesMeta);
-    state.provinceCentroids = buildProvinceCentroids(mapImageData, width, height, state.provincesMeta);
-    state.riverComponents = mapMaskToComponents(riversImage,'river');
-    state.lakeComponents = mapMaskToComponents(lakesImage,'lake');
-    state.seaComponents = mapMaskToComponents(seasImage,'sea');
-    state.militaryWaterCoverage.clear();
-
     elements.layerCanvas.width = width;
     elements.layerCanvas.height = height;
     elements.militaryGridCanvas.width = width;
@@ -73,6 +50,38 @@ Promise.all([
     renderMilitaryGrid();
     renderMarkers();
     initEventListeners();
+    const topologyWorker = new Worker(new URL('./map-data.worker.js', import.meta.url), { type: 'module' });
+    topologyWorker.onmessage = ({ data: result }) => {
+        topologyWorker.terminate();
+        if (result.type === 'error') {
+            console.error('Не удалось подготовить данные маршрутов:', result.message);
+            return;
+        }
+        state.provinceAdjacency = new Map(result.adjacency.map(([id, neighbors]) => [id, new Set(neighbors)]));
+        state.provinceCentroids = new Map(result.centroids);
+        for (const kind of ['river', 'lake', 'sea']) {
+            const serialized = result.components[kind];
+            const components = new Map(serialized.entries);
+            components.network = serialized.network;
+            state[`${kind}Components`] = components;
+        }
+        state.militaryWaterCoverage.clear();
+        if (state.showTradeRoutes || state.tradeRouteDraft) refreshTradeRouteOverlay();
+    };
+    topologyWorker.onerror = error => {
+        topologyWorker.terminate();
+        console.error('Ошибка фоновой подготовки данных карты:', error.message || error);
+    };
+    topologyWorker.postMessage({
+        colorMapUrl: new URL(COLOR_MAP_SRC, document.baseURI).href,
+        waterUrls: {
+            river: new URL(RIVERS_MAP_SRC, document.baseURI).href,
+            lake: new URL(LAKES_MAP_SRC, document.baseURI).href,
+            sea: new URL(SEAS_MAP_SRC, document.baseURI).href
+        },
+        provincesMeta: state.provincesMeta,
+        markers: state.dbMarkers
+    });
     fetchMilitaryTerrainCells().then(rows => {
         state.militaryTerrainCells = new Map(rows.map(row => [`${row.cell_x},${row.cell_y}`, row]));
         renderMilitaryGrid();
@@ -84,10 +93,9 @@ Promise.all([
     fetchGameCalendar().then(calendar => {
         state.gameCalendar = calendar;
         renderGameCalendar();
-        renderActiveLayer();
         return fetchRegionalWeather(calendar.turn).then(rows => { state.regionalWeather = rows; });
     }).catch(err => console.error('Ошибка загрузки игрового календаря:', err));
-    fetchEconomySnapshot().then(snapshot => { state.economySnapshot = snapshot; renderActiveLayer(); refreshTradeRouteOverlay(); })
+    fetchEconomySnapshot().then(snapshot => { state.economySnapshot = snapshot; renderActiveLayer(); if (state.showTradeRoutes) refreshTradeRouteOverlay(); })
         .catch(err => console.error('Ошибка загрузки данных производства:', err));
     fetchMilitaryColonizationMap().then(missions => {
         state.militaryColonizationMap = missions;

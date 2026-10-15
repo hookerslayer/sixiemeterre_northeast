@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js?v=loading-optimization-20261015';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
@@ -140,9 +140,9 @@ function isRiverPixel(mask, px, py, width, height) {
 
 export function buildMilitaryGridMetadata() {
     const width = elements.hiddenCanvas.width, height = elements.hiddenCanvas.height;
-    const mapData = state.provinceMapImageData?.data;
-    if (!mapData || !width || !height) throw new Error('Карта провинций ещё не загружена.');
-    const masks = [state.riverMaskImageData, state.lakeMaskImageData, state.seaMaskImageData];
+    if (!width || !height) throw new Error('Карта провинций ещё не загружена.');
+    const mapData = elements.hiddenCtx.getImageData(0, 0, width, height).data;
+    const masks = [];
     const cellSize = MILITARY_GRID_CELL_SIZE;
     const cells = [];
     const directions = [[1,0,1], [1,1,2], [0,1,4], [-1,1,8], [-1,0,16], [-1,-1,32], [0,-1,64], [1,-1,128]];
@@ -226,8 +226,8 @@ export function renderMilitaryGrid() {
 
     const size = MILITARY_GRID_CELL_SIZE;
     ctx.save();
-    const mapData = state.provinceMapImageData?.data;
-    const waterMasks = [state.riverMaskImageData, state.lakeMaskImageData, state.seaMaskImageData];
+    const mapData = null;
+    const waterMasks = [];
     if (state.showMilitaryGrid || state.editingMilitaryTerrain) {
         for (let y = 0; y < canvas.height; y += size) {
             for (let x = 0; x < canvas.width; x += size) {
@@ -764,4 +764,3 @@ export function updateLegend() {
         elements.legendContent.appendChild(row);
     }
 }
-
