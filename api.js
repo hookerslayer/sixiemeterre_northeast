@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=raid-river-grid-20261015';
+import { supabaseClient, state } from './config.js?v=river-crossing-features-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([

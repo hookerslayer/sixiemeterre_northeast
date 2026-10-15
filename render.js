@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=raid-river-grid-20261015';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=river-crossing-features-20261015';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
@@ -77,7 +77,7 @@ function drawTerrainMark(ctx, terrain, x, y, size, bridge = false) {
     ctx.restore();
 }
 
-function sampleCellWaterCoverage(mapData, masks, width, height, x, y, size, cellKey) {
+function sampleCellWaterCoverage(mapData, masks, width, height, x, y, cellWidth, cellHeight, cellKey) {
     if (state.militaryWaterCoverage.has(cellKey)) return state.militaryWaterCoverage.get(cellKey);
     const samples = 12;
     let water = 0;
@@ -92,8 +92,8 @@ function sampleCellWaterCoverage(mapData, masks, width, height, x, y, size, cell
     };
     for (let row = 0; row < samples; row++) {
         for (let column = 0; column < samples; column++) {
-            const px = Math.min(width - 1, x + Math.floor((column + .5) * size / samples));
-            const py = Math.min(height - 1, y + Math.floor((row + .5) * size / samples));
+            const px = Math.min(width - 1, x + Math.floor((column + .5) * cellWidth / samples));
+            const py = Math.min(height - 1, y + Math.floor((row + .5) * cellHeight / samples));
             if (hasWaterMasks) {
                 if (waterAt(masks[0], px, py, 'river') || waterAt(masks[1], px, py, 'lake') || waterAt(masks[2], px, py, 'sea')) water++;
             } else if (mapData) {
@@ -108,12 +108,12 @@ function sampleCellWaterCoverage(mapData, masks, width, height, x, y, size, cell
     return coverage;
 }
 
-function sampleCellWaterTypes(masks, width, height, x, y, size) {
+function sampleCellWaterTypes(masks, width, height, x, y, cellWidth, cellHeight) {
     if (!masks.some(mask => !!mask?.data)) return 0;
     const samples = 12, hits = [0, 0, 0];
     for (let row = 0; row < samples; row++) for (let column = 0; column < samples; column++) {
-        const px = Math.min(width - 1, x + Math.floor((column + .5) * size / samples));
-        const py = Math.min(height - 1, y + Math.floor((row + .5) * size / samples));
+        const px = Math.min(width - 1, x + Math.floor((column + .5) * cellWidth / samples));
+        const py = Math.min(height - 1, y + Math.floor((row + .5) * cellHeight / samples));
         for (let index = 0; index < masks.length; index++) {
             const mask = masks[index];
             if (!mask?.data) continue;
@@ -138,17 +138,70 @@ function isRiverPixel(mask, px, py, width, height) {
         && mask.data[index + 1] > mask.data[index] + 5 && mask.data[index + 2] > 60;
 }
 
-function cellContainsRiver(mask, x, y, size, width, height) {
-    if (!mask?.data) return false;
+function analyzeRiverCell(mask, x, y, cellWidth, cellHeight, width, height) {
+    if (!mask?.data) return { contains: false, major: false };
     const left = Math.floor(x * mask.width / width), top = Math.floor(y * mask.height / height);
-    const right = Math.min(mask.width, Math.ceil((x + size) * mask.width / width));
-    const bottom = Math.min(mask.height, Math.ceil((y + size) * mask.height / height));
+    const right = Math.min(mask.width, Math.ceil((x + cellWidth) * mask.width / width));
+    const bottom = Math.min(mask.height, Math.ceil((y + cellHeight) * mask.height / height));
+    const pixelWidth = Math.max(1, right - left), pixelHeight = Math.max(1, bottom - top);
+    const edgeBand = Math.max(1, Math.ceil(Math.min(pixelWidth, pixelHeight) * .08));
+    const riverPixels = new Uint8Array(pixelWidth * pixelHeight);
+    let count = 0;
     for (let py = top; py < bottom; py++) for (let px = left; px < right; px++) {
         const index = (py * mask.width + px) * 4;
-        if (mask.data[index + 3] >= 16 && mask.data[index + 2] > mask.data[index] + 15
-            && mask.data[index + 1] > mask.data[index] + 5 && mask.data[index + 2] > 60) return true;
+        if (mask.data[index + 3] < 16 || mask.data[index + 2] <= mask.data[index] + 15
+            || mask.data[index + 1] <= mask.data[index] + 5 || mask.data[index + 2] <= 60) continue;
+        riverPixels[(py - top) * pixelWidth + px - left] = 1;
+        count++;
     }
-    return false;
+    // Require one connected channel to pass through opposite sides; separate
+    // river fragments in the same cell cannot combine to form a major crossing.
+    const visited = new Uint8Array(riverPixels.length);
+    const stack = [];
+    let major = false;
+    const minimumMajorRiverPixels = Math.max(32, Math.ceil(pixelWidth * pixelHeight * .06));
+    for (let seed = 0; seed < riverPixels.length && !major; seed++) {
+        if (!riverPixels[seed] || visited[seed]) continue;
+        stack.length = 0;
+        stack.push(seed);
+        visited[seed] = 1;
+        let componentSize = 0;
+        const sides = { north: false, east: false, south: false, west: false };
+        while (stack.length) {
+            const index = stack.pop();
+            const px = index % pixelWidth, py = Math.floor(index / pixelWidth);
+            componentSize++;
+            if (py < edgeBand) sides.north = true;
+            if (pixelWidth - 1 - px < edgeBand) sides.east = true;
+            if (pixelHeight - 1 - py < edgeBand) sides.south = true;
+            if (px < edgeBand) sides.west = true;
+            for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+                if (!dx && !dy) continue;
+                const nx = px + dx, ny = py + dy;
+                if (nx < 0 || ny < 0 || nx >= pixelWidth || ny >= pixelHeight) continue;
+                const next = ny * pixelWidth + nx;
+                if (riverPixels[next] && !visited[next]) { visited[next] = 1; stack.push(next); }
+            }
+        }
+        const crossesOppositeSides = (sides.north && sides.south) || (sides.east && sides.west);
+        major = componentSize >= minimumMajorRiverPixels && crossesOppositeSides;
+    }
+    return { contains: count > 0, major };
+}
+
+function riverPixelsAlongCellEdge(mask, fromX, fromY, toX, toY, width, height) {
+    if (!mask?.data) return 0;
+    const x1 = fromX * MILITARY_GRID_CELL_SIZE + MILITARY_GRID_CELL_SIZE / 2;
+    const y1 = fromY * MILITARY_GRID_CELL_SIZE + MILITARY_GRID_CELL_SIZE / 2;
+    const x2 = toX * MILITARY_GRID_CELL_SIZE + MILITARY_GRID_CELL_SIZE / 2;
+    const y2 = toY * MILITARY_GRID_CELL_SIZE + MILITARY_GRID_CELL_SIZE / 2;
+    const steps = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1));
+    let hits = 0;
+    for (let step = 1; step < steps; step++) {
+        const t = step / steps;
+        if (isRiverPixel(mask, Math.round(x1 + (x2 - x1) * t), Math.round(y1 + (y2 - y1) * t), width, height)) hits++;
+    }
+    return hits;
 }
 
 async function readWaterMask(src) {
@@ -173,6 +226,12 @@ export async function buildMilitaryGridMetadata() {
     const cells = [];
     const directions = [[1,0,1], [1,1,2], [0,1,4], [-1,1,8], [-1,0,16], [-1,-1,32], [0,-1,64], [1,-1,128]];
     const cellRows = Math.ceil(height / cellSize), cellColumns = Math.ceil(width / cellSize);
+    const riverCells = new Map();
+    for (let cellY = 0; cellY < cellRows; cellY++) for (let cellX = 0; cellX < cellColumns; cellX++) {
+        const x = cellX * cellSize, y = cellY * cellSize;
+        riverCells.set(`${cellX},${cellY}`, analyzeRiverCell(masks[0], x, y,
+            Math.min(cellSize, width - x), Math.min(cellSize, height - y), width, height));
+    }
     for (let cellY = 0; cellY < cellRows; cellY++) {
         for (let cellX = 0; cellX < cellColumns; cellX++) {
             const x = cellX * cellSize, y = cellY * cellSize;
@@ -183,28 +242,39 @@ export async function buildMilitaryGridMetadata() {
             const rgb = (mapData[index] << 16) | (mapData[index + 1] << 8) | mapData[index + 2];
             const provinceId = state.provinceRgbToId[rgb] || null;
             const key = `${cellX},${cellY}`;
-            const coverage = sampleCellWaterCoverage(mapData, masks, width, height, x, y, Math.min(actualWidth, actualHeight), key);
-            const containsRiver = cellContainsRiver(masks[0], x, y, Math.min(actualWidth, actualHeight), width, height);
-            let waterTypes = sampleCellWaterTypes(masks, width, height, x, y, Math.min(actualWidth, actualHeight));
+            const coverage = sampleCellWaterCoverage(mapData, masks, width, height, x, y, actualWidth, actualHeight, key);
+            const riverCell = riverCells.get(key);
+            const containsRiver = !!riverCell?.contains;
+            let waterTypes = sampleCellWaterTypes(masks, width, height, x, y, actualWidth, actualHeight);
             if (containsRiver) waterTypes |= 1;
             let riverEdges = 0;
+            let fordEdges = 0;
             for (const [dx, dy, edgeFlag] of directions) {
-                if (cellX + dx < 0 || cellY + dy < 0 || cellX + dx >= cellColumns || cellY + dy >= cellRows) continue;
-                const nextX = Math.min(width - 1, (cellX + dx) * cellSize + Math.floor(cellSize / 2));
-                const nextY = Math.min(height - 1, (cellY + dy) * cellSize + Math.floor(cellSize / 2));
-                const distance = Math.max(Math.abs(nextX - centerX), Math.abs(nextY - centerY));
-                let crossesRiver = false;
-                for (let step = 1; step < distance; step += 2) {
-                    const t = step / distance;
-                    if (isRiverPixel(masks[0], Math.round(centerX + (nextX - centerX) * t), Math.round(centerY + (nextY - centerY) * t), width, height)) {
-                        crossesRiver = true;
-                        break;
-                    }
+                const nextX = cellX + dx, nextY = cellY + dy;
+                if (nextX < 0 || nextY < 0 || nextX >= cellColumns || nextY >= cellRows) continue;
+                const oppositeEdge = {1:16, 2:32, 4:64, 8:128, 16:1, 32:2, 64:4, 128:8}[edgeFlag];
+                if (edgeFlag > oppositeEdge) continue;
+                if (!riverPixelsAlongCellEdge(masks[0], cellX, cellY, nextX, nextY, width, height)) continue;
+                const isMajor = riverCells.get(`${cellX},${cellY}`)?.major || riverCells.get(`${nextX},${nextY}`)?.major;
+                if (isMajor) {
+                    riverEdges |= edgeFlag;
+                } else {
+                    fordEdges |= edgeFlag;
                 }
-                if (crossesRiver) riverEdges |= edgeFlag;
             }
-            const riverCoverage = containsRiver ? Math.max(coverage, .0001) : coverage;
-            cells.push({ cell_x: cellX, cell_y: cellY, province_id: provinceId, base_terrain: coverage > .5 || containsRiver ? 'water' : 'plain', river_edges: riverEdges, water_coverage: Number(riverCoverage.toFixed(4)), water_types: waterTypes });
+            cells.push({ cell_x: cellX, cell_y: cellY, province_id: provinceId, base_terrain: coverage > .5 ? 'water' : 'plain', river_edges: riverEdges, ford_edges: fordEdges, water_coverage: Number(coverage.toFixed(4)), water_types: waterTypes });
+        }
+    }
+    const cellsByKey = new Map(cells.map(cell => [`${cell.cell_x},${cell.cell_y}`, cell]));
+    const oppositeBits = {1:16, 2:32, 4:64, 8:128, 16:1, 32:2, 64:4, 128:8};
+    for (const cell of cells) for (const [dx, dy, bit] of directions) {
+        if (cell.river_edges & bit) {
+            const neighbor = cellsByKey.get(`${cell.cell_x + dx},${cell.cell_y + dy}`);
+            if (neighbor) neighbor.river_edges |= oppositeBits[bit];
+        }
+        if (cell.ford_edges & bit) {
+            const neighbor = cellsByKey.get(`${cell.cell_x + dx},${cell.cell_y + dy}`);
+            if (neighbor) neighbor.ford_edges |= oppositeBits[bit];
         }
     }
     return cells;

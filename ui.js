@@ -1,6 +1,6 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=raid-river-grid-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=raid-river-grid-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=raid-river-grid-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=river-crossing-features-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=river-crossing-features-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=river-crossing-features-20261015';
 import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=extended-land-cycles-20261015';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
@@ -126,6 +126,18 @@ function showEnemyArmyPopup(enemy) {
     popup.querySelector('[data-enemy-close]')?.addEventListener('click', () => { popup.hidden = true; });
 }
 
+const MILITARY_DIRECTION_BITS = new Map([['1,0',1],['1,1',2],['0,1',4],['-1,1',8],['-1,0',16],['-1,-1',32],['0,-1',64],['1,-1',128]]);
+const MILITARY_OPPOSITE_BITS = {1:16,2:32,4:64,8:128,16:1,32:2,64:4,128:8};
+
+function getMilitaryRiverStep(from, to, dx, dy) {
+    const bit = MILITARY_DIRECTION_BITS.get(`${dx},${dy}`);
+    const opposite = MILITARY_OPPOSITE_BITS[bit];
+    const major = ((Number(from?.river_edges) || 0) & bit) || ((Number(to?.river_edges) || 0) & opposite);
+    const ford = ((Number(from?.ford_edges) || 0) & bit) || ((Number(to?.ford_edges) || 0) & opposite);
+    const bridged = !!from?.bridge || !!to?.bridge;
+    return { blocked: !!major && !bridged, surcharge: !bridged && ford ? 1 : 0 };
+}
+
 function getReachableMilitaryCells(force) {
     const cellAt = (x, y) => {
         const key = `${x},${y}`;
@@ -137,8 +149,6 @@ function getReachableMilitaryCells(force) {
         return geometry ? { ...geometry, ...override, terrain: override?.terrain || geometry.base_terrain, bridge } : null;
     };
     const directions = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
-    const directionBits = new Map([['1,0',1],['1,1',2],['0,1',4],['-1,1',8],['-1,0',16],['-1,-1',32],['0,-1',64],['1,-1',128]]);
-    const oppositeBit = {1:16,2:32,4:64,8:128,16:1,32:2,64:4,128:8};
     const mobility = calculateArmyMobility(force.unit_groups || [], force.siege_equipment || {});
     const budget = Number(force.action_points) || 0;
     const origin = `${force.cell_x},${force.cell_y}`;
@@ -162,10 +172,9 @@ function getReachableMilitaryCells(force) {
                 const a = cellAt(x + dx, y), b = cellAt(x, y + dy);
                 if ((!a || a.terrain === 'water' && !a.bridge) && (!b || b.terrain === 'water' && !b.bridge)) continue;
             }
-            const bit = directionBits.get(`${dx},${dy}`);
-            const crossing = !from?.bridge && !to.bridge && (((Number(from?.river_edges) || 0) & bit)
-                || ((Number(to.river_edges) || 0) & oppositeBit[bit])) ? 1 : 0;
-            const candidate = best + movementStepCost(to.terrain, diagonal, mobility, crossing);
+            const crossing = getMilitaryRiverStep(from, to, dx, dy);
+            if (crossing.blocked) continue;
+            const candidate = best + movementStepCost(to.terrain, diagonal, mobility, crossing.surcharge);
             if (candidate > budget || candidate >= (costs.get(key) ?? Infinity)) continue;
             costs.set(key, candidate);
             open.add(key);
@@ -215,8 +224,9 @@ function planMilitaryMove(force, cellX, cellY) {
             const dx = nextX - x, dy = nextY - y;
             const bit = directionBits.get(`${dx},${dy}`);
             const from = cellAt(x, y), to = cellAt(nextX, nextY);
-            if (!bit || from?.bridge || to?.bridge) return 0;
-            return ((Number(from?.river_edges) & bit) || (Number(to?.river_edges) & oppositeBit(bit))) ? 1 : 0;
+            if (!bit) return 0;
+            const crossing = getMilitaryRiverStep(from, to, dx, dy);
+            return crossing.blocked ? Infinity : crossing.surcharge;
         }
     });
     if (!result.reachable) return null;
@@ -252,8 +262,9 @@ function planMilitaryTransferPath(force, selectedUnits, target) {
         },
         getRiverCrossings:(x,y,nextX,nextY) => {
             const dx=nextX-x,dy=nextY-y,bit=directionBits.get(`${dx},${dy}`),from=cellAt(x,y),to=cellAt(nextX,nextY);
-            if (!bit || from?.bridge || to?.bridge) return 0;
-            return ((Number(from?.river_edges)&bit)||(Number(to?.river_edges)&oppositeBit(bit)))?1:0;
+            if (!bit) return 0;
+            const crossing=getMilitaryRiverStep(from,to,dx,dy);
+            return crossing.blocked ? Infinity : crossing.surcharge;
         }
     });
 }
