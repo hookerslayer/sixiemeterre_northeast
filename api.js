@@ -109,6 +109,17 @@ export async function fetchStateMechanics(owner) {
 }
 
 export async function saveStateMechanics(owner, settings) {
+    if (state.userProfile?.role !== 'admin') {
+        const protectedKeys = ['crime_rate', 'corruption_rate', 'government_form', 'titular_culture', 'titular_religion', 'estate_loyalty', 'culture_loyalty', 'religion_loyalty'];
+        const { data: current, error: currentError } = await supabaseClient.from('state_mechanics').select('settings').eq('owner', owner).maybeSingle();
+        if (currentError) throw currentError;
+        const merged = { ...settings };
+        for (const key of protectedKeys) {
+            if (Object.prototype.hasOwnProperty.call(current?.settings || {}, key)) merged[key] = current.settings[key];
+            else delete merged[key];
+        }
+        settings = merged;
+    }
     const { data, error } = await supabaseClient.from('state_mechanics').upsert({ owner, settings, updated_at: new Date().toISOString() }, { onConflict: 'owner' }).select('settings').single();
     if (error) throw error;
     return data.settings;

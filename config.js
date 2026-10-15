@@ -84,6 +84,7 @@ export const state = {
     economySnapshot: null,
     showTradeRoutes: false,
     tradeRouteOverlay: [],
+    hoveredTradeRouteIndex: null,
     tradeRouteDraft: null,
     isAddingMarkerMode: false,
     movingMarkerId: null,

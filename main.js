@@ -1,7 +1,7 @@
 import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=loading-optimization-20261015';
-import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=loading-optimization-20261015';
-import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=loading-optimization-20261015';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay } from './ui.js?v=battle-weather-fix-20261015';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitaryColonizationMap } from './api.js?v=military-tactics-trade-20261015';
+import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=military-tactics-trade-20261015';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay } from './ui.js?v=military-tactics-trade-20261015';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),

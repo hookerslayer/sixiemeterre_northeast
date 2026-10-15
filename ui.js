@@ -1,7 +1,7 @@
 import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=loading-optimization-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=loading-optimization-20261015';
-import { signUpUser, signInUser, signOutUser, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, createMilitaryBattle, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, saveMilitaryFleets, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=loading-optimization-20261015';
-import { calculateArmyMobility, calculateLandCommandLoad, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ruler-succession-20261013b';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, highlightProvince, renderIDs, renderMilitaryGrid } from './render.js?v=military-tactics-trade-20261015';
+import { signUpUser, signInUser, signOutUser, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=military-tactics-trade-20261015';
+import { calculateArmyMobility, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=auto-cycle-tactics-20261015';
 import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -2149,9 +2149,6 @@ async function renderMilitaryPlanner(spyOnly = false) {
         return `<tr><td>${escapeHtml(marker?.name || `Поселение #${offer.marker_id}`)} · место ${formatNumber(offer.slot)}</td><td>${escapeHtml(offer.culture || 'Местный профиль')}</td><td>${escapeHtml(offer.commander_name)}, ${formatNumber(offer.commander_age)} лет</td><td>${roster}</td><td>${offer.available ? `2 z за человека · контракт 2 хода` : `Следующее предложение с хода ${formatNumber(offer.refresh_turn)}`}</td><td>${canHire ? `<button type="button" class="compact-add-btn" data-hire-mercenary="${offer.id}">Нанять группу</button>` : ''}</td></tr>`;
     }).join('');
     const mercenaryPanel = `<section class="page-panel military-recruitment-panel"><header class="page-panel-heading"><div><h2>Наёмники городского рынка</h2><p>В Городах есть одно предложение, в Крупных городах — два. Группа нанимается целиком, появляется в Гарнизоне и служит два хода. Первый сезон оплачен при найме; далее содержание — 2 z за каждого бойца и Воеводу, а также обычное снабжение. Предложение обновляется через два хода после найма.</p></div></header>${mercenaryMarketError ? `<p class="page-error">Не удалось загрузить рынок: ${escapeHtml(mercenaryMarketError)}</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Город</th><th>Культура</th><th>Воевода</th><th>Отряд</th><th>Контракт</th><th></th></tr></thead><tbody>${mercenaryMarketRows || '<tr><td colspan="6">Доступных предложений наёмников пока нет.</td></tr>'}</tbody></table></div></section>`;
-    const rows = unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td><input class="military-unit-count" type="number" min="0" max="100000" step="1" value="${name === 'Пешие ратники' ? 500 : 0}" data-unit="${escapeHtml(name)}" aria-label="Численность: ${escapeHtml(name)}"></td><td>${LAND_UNIT_PROFILES[name].mobility.toLocaleString('ru-RU')}</td></tr>`).join('');
-    const movementRows = [['Равнина','plain',10,14],['Возвышенность','hill',15,21],['Лес','forest',15,21],['Болото','marsh',20,28]].map(([label,terrain,direct,diagonal]) => `<tr><td>${label}</td><td data-terrain="${terrain}" data-diagonal="false">${direct} ОД</td><td data-terrain="${terrain}" data-diagonal="true">${diagonal} ОД</td></tr>`).join('');
-    const battleTactics = Object.entries(LAND_TACTICS).filter(([value]) => value !== 'feigned_retreat').map(([value, label]) => `<option value="${escapeHtml(value)}">${escapeHtml(label)}</option>`).join('');
     const battleOwnerOptions = militaryProfiles.map(profile => `<option value="${escapeHtml(profile.owner)}">${escapeHtml(profile.owner)} · ${escapeHtml(profile.nickname || 'игрок')}</option>`).join('');
     const portName = id => state.dbMarkers?.find(marker => Number(marker.id) === Number(id))?.name || `Поселение #${id}`;
     const activeOwnedPorts = militaryPorts.filter(port => port.owner === playerOwner && port.status === 'active');
@@ -2190,16 +2187,8 @@ async function renderMilitaryPlanner(spyOnly = false) {
     }).join('');
     const prisonerRows = militaryPrisoners.filter(row => isAdmin || row.captor_owner === playerOwner || row.original_owner === playerOwner)
         .map(row => `<tr><td>${escapeHtml(row.force_name)}</td><td>${escapeHtml(row.original_owner)}</td><td>${escapeHtml(row.captor_owner)}</td><td>${row.commander_name ? `${escapeHtml(row.commander_name)}${row.commander_age ? ` · ${formatNumber(row.commander_age)} лет` : ''}` : '—'}</td><td>${(row.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ') || '—'}</td><td>${row.status === 'held' ? 'Удерживаются в плену' : row.status === 'released' ? 'Освобождены' : row.status === 'ransomed' ? 'Выкуплены' : 'Бежали'}</td></tr>`).join('');
-    const fleetSourceOptions = side => militaryFleets.filter(fleet => isAdmin || fleet.owner === state.userProfile?.owner).map(fleet => `<option value="${fleet.id}">${escapeHtml(fleet.name)} · ${escapeHtml(fleet.owner)}</option>`).join('');
     const embarkShipOptions = militaryFleets.filter(fleet => fleet.owner === playerOwner && fleet.status === 'active' && !fleet.in_pending_battle)
         .flatMap(fleet => (fleet.ships || []).map((ship, index) => `<option value="${fleet.id}:${index + 1}">${escapeHtml(fleet.name)} · ${escapeHtml(ship.type)} #${index + 1}</option>`)).join('');
-    const battleForceOptions = state.militaryForces.filter(force => force.force_kind === 'land_army' && force.status === 'active').map(force => `<option value="${force.id}">${escapeHtml(force.name)} · ${escapeHtml(force.owner)}</option>`).join('');
-    const navalShipTypes = Object.keys(NAVAL_SHIP_PROFILES);
-    const navalShipRow = (side, index) => {
-        const defaultType = index === 0 ? (side === 'attacker' ? 'Ушкуй' : 'Ладья') : '';
-        const profile = NAVAL_SHIP_PROFILES[defaultType] || { crew: 0, hull: 0 };
-        return `<tr data-naval-ship-row><td><select data-naval-type><option value="">— нет судна —</option>${navalShipTypes.map(type => `<option value="${escapeHtml(type)}" ${type === defaultType ? 'selected' : ''}>${escapeHtml(type)}</option>`).join('')}</select></td><td><input data-naval-crew type="number" min="0" max="30" value="${profile.crew}" aria-label="Экипаж"></td><td><input data-naval-hull type="number" min="0" max="5" value="${profile.hull}" aria-label="Прочность корпуса"></td><td><select data-naval-weapon>${Object.entries(NAVAL_WEAPONS).map(([value, label]) => `<option value="${value}">${escapeHtml(label)}</option>`).join('')}</select></td><td><input data-naval-boarding type="number" min="0" max="10000" value="0" aria-label="Ушкуйники на борту"></td></tr>`;
-    };
     const commanderSkills = fleetCommanderSkills;
     const forceRows = state.militaryForces.map(force => {
         const composition = (force.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ') || 'нет отрядов';
@@ -2256,47 +2245,14 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const visibleEpidemicProvinceNames = epidemicEvents.filter(item => Number(item.active_turn) === Number(state.gameCalendar?.turn)).map(item => state.dbProvinces?.[Number(item.province_id)]?.province_name || `Провинция ${item.province_id}`);
     const epidemicWarning = !isAdmin && visibleEpidemicProvinceNames.length ? `<p class="page-warning">Эпидемический очаг в провинции: ${visibleEpidemicProvinceNames.map(escapeHtml).join(', ')}. В этом ходу повышен риск небоевых потерь войск.</p>` : '';
     const forcePanel = `<section class="page-panel military-forces-panel"><header class="page-panel-heading"><div><h2>Армии и гарнизоны</h2><p>Полевые армии отображаются на карте в режиме военной сетки. Выберите армию, чтобы открыть её управление на карте и увидеть доступные клетки хода. Игрок может вывести собственный гарнизон в полевую армию в той же провинции.</p></div></header>${epidemicWarning}${forceDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр войск: ${escapeHtml(forceDataError)}. Примените supabase/military_forces.sql.</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Положение</th><th>Воевода</th><th>Состав</th><th>Мораль</th><th>ОД</th><th>Опыт и навыки</th><th>Приказы</th></tr></thead><tbody>${forceRows || '<tr><td colspan="9">Армии пока не созданы.</td></tr>'}</tbody></table></div>${isAdmin ? `<form id="create-military-force" class="military-force-create"><h3>Создать полевую армию</h3><div class="military-force-controls"><label>Государство<select name="owner" required>${battleOwnerOptions}</select></label><label>Название<input name="name" maxlength="80" value="Новая армия" required></label><label>Имя Воеводы<input name="commander_name" maxlength="80" required></label><label>Возраст Воеводы<input name="commander_age" type="number" min="16" max="100" value="35" required></label><label>Управление<input name="skill_management" type="number" min="0" max="5" value="0"></label><label>Лидерство<input name="skill_leadership" type="number" min="0" max="5" value="0"></label><label>Тактика<input name="skill_tactics" type="number" min="0" max="5" value="0"></label><label>Планирование<input name="skill_planning" type="number" min="0" max="5" value="0"></label><label>Инженерия<input name="skill_engineering" type="number" min="0" max="5" value="0"></label></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Численность</th></tr></thead><tbody>${unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td><input type="number" min="0" max="100000" step="1" value="${name === 'Пешие ратники' ? 100 : 0}" data-force-unit="${escapeHtml(name)}"></td></tr>`).join('')}</tbody></table></div><button class="admin-btn" type="submit">Выбрать клетку и создать армию</button></form>` : ''}</section>`;
-    const battleArmyCard = (side, index) => `<article class="battle-army-card" data-side="${side}" data-army-index="${index}">
-        <header><label>Название армии<input class="battle-army-name" value="${side === 'attacker' ? 'Армия атакующих' : 'Армия защитников'} ${index + 1}" maxlength="60"></label><button class="page-back-btn battle-remove-army" type="button" aria-label="Удалить армию" ${index === 0 ? 'disabled' : ''}>Удалить</button></header>
-        ${battleForceOptions ? `<label class="battle-force-source-label">Загрузить постоянную армию<select class="battle-force-source"><option value="">Ввести состав вручную</option>${battleForceOptions}</select></label>` : ''}
-        ${isAdmin ? `<div class="battle-army-controls"><label>Государство<select class="battle-army-owner">${battleOwnerOptions}</select></label></div>` : ''}
-        <div class="battle-army-controls"><label>Приказ<select class="battle-army-order"><option value="обычный">Обычный</option><option value="решительный">Решительный</option><option value="осторожный">Осторожный</option></select></label><label>Тактика<select class="battle-army-tactic">${battleTactics}</select></label><label>Управление<input class="battle-army-management-level" type="number" min="0" max="5" step="1" value="0"></label><label>Лидерство<input class="battle-army-leadership-level" type="number" min="0" max="5" step="1" value="0"></label><label>Навык тактики<input class="battle-army-tactics-level" type="number" min="0" max="5" step="1" value="0"></label><label>Планирование<input class="battle-army-planning-level" type="number" min="0" max="5" step="1" value="0"></label><label>Мораль, %<input class="battle-army-morale" type="number" min="0" max="100" step="1" value="100"></label></div>
-        ${side === 'defender' ? `<div class="battle-army-controls"><label>Решение<select class="battle-army-decision"><option value="fight">Вступить в бой</option><option value="withdraw">Попытаться отойти</option></select></label><label>Маршрут отхода, шаги<input class="battle-withdrawal-steps" type="number" min="1" max="20" value="1"></label><label>Труднопроходимые клетки<input class="battle-withdrawal-difficult" type="number" min="0" max="20" value="0"></label><label class="military-check"><input class="battle-withdrawal-friendly" type="checkbox"> Конец маршрута — дружественное поселение</label></div>` : ''}
-        <div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Удар</th><th>Защита</th><th>Численность</th></tr></thead><tbody>${unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td>${LAND_UNIT_PROFILES[name].strike}</td><td>${LAND_UNIT_PROFILES[name].defense}</td><td><input class="battle-unit-count" data-unit="${escapeHtml(name)}" type="number" min="0" max="100000" step="1" value="${index === 0 && name === 'Пешие ратники' ? 500 : 0}" aria-label="${escapeHtml(name)}"></td></tr>`).join('')}</tbody></table></div>
-    </article>`;
     const statusLabels = { pending: 'Ожидает решения и подтверждения', confirmed: 'Завершено', cancelled: 'Отменено' };
     const eventCards = battleHeaders.map(battle => `<article class="military-event-card"><div><strong>${battle.battle_type === 'naval' ? 'Морское сражение' : 'Сухопутное сражение'} · ${escapeHtml(battle.terrain)}</strong><span>${escapeHtml((battle.participant_owners || []).join(' · '))}</span><small>${statusLabels[battle.status] || battle.status}${battle.public_outcome ? ` · исход: ${battle.public_outcome === 'attacker' ? 'атакующие' : battle.public_outcome === 'defender' ? 'защитники' : 'ничья'}` : ''}</small></div><button class="page-back-btn" type="button" data-open-military-battle="${battle.id}">Открыть</button></article>`).join('');
-    const eventPanel = `<section class="page-panel military-events-panel"><header class="page-panel-heading"><div><h2>Боевые события</h2><p>Приказы участников скрыты друг от друга. Полный предварительный расчёт виден только администратору.</p></div></header><p class="page-note">Событие хранит снимок состава. После подтверждения Администратором потери и мораль выбранных армий и флотилий записываются в соответствующий реестр.</p>${militaryDataError ? `<p class="page-error military-db-warning">Не удалось загрузить боевые события: ${escapeHtml(militaryDataError)}. Проверьте, что применены файлы боевых событий и синхронизации сил.</p>` : ''}<div id="military-event-list" class="military-event-list">${eventCards || '<p class="page-note">Активных и завершённых боевых событий пока нет.</p>'}</div><div id="military-battle-details" class="military-battle-details" aria-live="polite"></div></section>`;
+    const eventPanel = `<section class="page-panel military-events-panel"><header class="page-panel-heading"><div><h2>Боевые события</h2><p>Приказы участников скрыты друг от друга. Полный предварительный расчёт виден только администратору.</p></div></header><p class="page-note">Событие хранит снимок состава. После подтверждения Администратором потери и мораль выбранных армий и флотилий записываются в соответствующий реестр. Предпочитаемая тактика влияет на автоматический выбор тактики в каждом цикле боя.</p>${militaryDataError ? `<p class="page-error military-db-warning">Не удалось загрузить боевые события: ${escapeHtml(militaryDataError)}. Проверьте, что применены файлы боевых событий и синхронизации сил.</p>` : ''}<div id="military-event-list" class="military-event-list">${eventCards || '<p class="page-note">Активных и завершённых боевых событий пока нет.</p>'}</div><div id="military-battle-details" class="military-battle-details" aria-live="polite"></div></section>`;
     const fleetPanel = `<section class="page-panel military-fleets-panel"><header class="page-panel-heading"><div><h2>Флотилии</h2><p>Маршрут прокладывается по рекам, озёрам и морям, доступным всем судам в составе. В зиму внутренние воды закрыты; для использования карты после обновления водоёмов нужна синхронизация сетки.</p></div></header>${fleetDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр флотов: ${escapeHtml(fleetDataError)}. Примените supabase/military_fleets.sql.</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Корабли и экипажи</th><th>Положение</th><th>Мораль</th><th>ОД</th><th>Приказы</th></tr></thead><tbody>${fleetRows || '<tr><td colspan="7">Сохранённых флотилий пока нет.</td></tr>'}</tbody></table></div></section>`;
     const prisonerPanel = militaryPrisoners.length || prisonerDataError ? `<section class="page-panel military-prisoners-panel"><header class="page-panel-heading"><div><h2>Пленные после морских сражений</h2><p>Захваченные пассажиры учитываются отдельно от корабельных экипажей и не возвращаются в состав исходной армии.</p></div></header>${prisonerDataError ? `<p class="page-error military-db-warning">Не удалось загрузить список пленных: ${escapeHtml(prisonerDataError)}</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Отряд</th><th>Исходное государство</th><th>Пленители</th><th>Командир</th><th>Состав</th><th>Статус</th></tr></thead><tbody>${prisonerRows || '<tr><td colspan="6">Записей о пленных нет.</td></tr>'}</tbody></table></div></section>` : '';
     const shipServicePanel = state.userProfile?.role === 'player' ? `<section class="page-panel"><header class="page-panel-heading"><div><h2>Обслуживание кораблей</h2><p>Ремонт: до 4 очков корпуса за сезон, 1 z, 1 Древесина и 0,1 Инструмента за очко. Экипаж: 0,5 z, 0,05 оружия и 0,025 сукна за человека. Переоснащение доступно один раз; судно остаётся в порту до следующего хода.</p></div></header><form id="military-ship-service" class="military-form-grid"><label>Судно<select name="fleet_ship" required><option value="">Выбрать судно в порту</option>${cargoShipOptions}</select></label><label>Действие<select name="action"><option value="repair">Ремонт корпуса</option><option value="recruit">Пополнить экипаж</option><option value="refit">Переоснастить один раз</option></select></label><label>Очки корпуса / моряки<input name="quantity" type="number" min="1" max="100" step="1" value="1"></label><label>Вооружение<select name="weapon"><option value="deck">Палубное метательное оружие</option><option value="light_gun">Лёгкое корабельное орудие</option></select></label><button class="admin-btn" type="submit" ${!cargoShipOptions ? 'disabled' : ''}>Выполнить обслуживание</button></form></section>` : '';
-    const content = spyOnly ? spyPanel : `${commanderPanel}${forcePanel}${isAdmin ? siegePanel : ''}${isAdmin ? raidPanel : ''}${isAdmin ? colonizationPanel : ''}${portPanel}${shipServicePanel}${fleetPanel}${prisonerPanel}${eventPanel}${recruitmentPanel}${mercenaryPanel}
-        <section class="page-panel military-preview-panel">
-            <header class="page-panel-heading"><div><h2>Расчёт состава и передвижения</h2><p>Предварительный расчёт по текущим правилам военной карты.</p></div></header>
-            <p class="page-note military-preview-note">Этот блок — отдельный предварительный расчёт. Постоянные армии создаются в реестре выше.</p>
-            <div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Мобильность</th><th>Численность</th></tr></thead><tbody>${rows}</tbody></table></div>
-            <div class="military-preview-summary"><div><span>Общая нагрузка</span><strong id="military-load">—</strong></div><div><span>Мобильность армии</span><strong id="military-mobility">—</strong></div><div><span>Снабжение за сезон</span><strong id="military-supply">—</strong></div><div><span>ОД на ход</span><strong>100</strong></div><div><span>Вместимость Воеводы</span><strong>1 000</strong></div></div>
-            <section class="military-step-costs"><h3>Цена шага по местности</h3><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Местность</th><th>Прямой шаг</th><th>Диагональный шаг</th></tr></thead><tbody>${movementRows}</tbody></table></div><p class="page-note">Стоимость зависит от состава армии. Перегрузка снижает бонусы командования, но сама по себе не запрещает движение. Клетка Воды недоступна сухопутной армии без подходящего моста.</p></section>
-        </section>
-        <section class="page-panel military-battle-panel">
-            <header class="page-panel-heading"><div><h2>Предварительный расчёт сухопутного боя</h2><p>Характеристики ударной силы и защищённости взяты из таблицы правил.</p></div></header>
-            <div class="military-battle-controls"><label>Местность<select id="battle-terrain"><option value="plain">Равнина</option><option value="hill">Возвышенность</option><option value="forest">Лес</option><option value="marsh">Болото</option><option value="bridge">Мост</option></select></label><label class="military-check"><input id="battle-ranged" type="checkbox" checked> Сохраняется дистанция для стрелков</label><label class="military-check"><input id="battle-charge" type="checkbox"> Конная атака с разгона</label><label class="military-check"><input id="battle-flank" type="checkbox"> Фланговый обход достиг цели</label><label class="military-check"><input id="battle-surprise" type="checkbox"> Цель не заметила засаду</label><label class="military-check"><input id="battle-snow" type="checkbox"> Установлен снег</label><label class="military-check"><input id="battle-ski-maneuver" type="checkbox"> Лыжники выполняют манёвр</label><label class="military-check"><input id="battle-field-camp" type="checkbox"> У защитников есть полевой лагерь</label><label class="military-check"><input id="battle-attacker-pursuit" type="checkbox"> Атакующие преследуют при победе</label><label class="military-check"><input id="battle-defender-pursuit" type="checkbox"> Защитники преследуют при победе</label></div>
-            <details class="military-siege-input"><summary>Параметры штурма укреплённого поселения</summary><div class="military-battle-controls"><label>Уровень укреплений<select id="battle-siege-level"><option value="1">Острог / I</option><option value="2">II</option><option value="3">III</option></select></label><label>Осадные работы<input id="battle-siege-works" type="number" min="0" max="100" value="0"></label><label>Путь штурма<select id="battle-siege-route"><option value="ladders">Лестницы</option><option value="tower">Осадная башня</option><option value="breach">Пролом</option><option value="ram">Ворота с тараном</option></select></label><label class="military-check"><input id="battle-siege-enabled" type="checkbox"> Это штурм укреплённого поселения</label></div><p class="page-note">Множители применяются к каждому этапу боя согласно состоянию укреплений и выбранному пути.</p></details>
-            <div class="battle-side-grid"><section><header><h3>Атакующие</h3><button class="page-back-btn" id="battle-add-attacker" type="button">+ Добавить армию</button></header><div id="battle-attacker-armies" class="battle-army-list">${battleArmyCard('attacker', 0)}</div></section><section><header><h3>Защитники</h3><button class="page-back-btn" id="battle-add-defender" type="button">+ Добавить армию</button></header><div id="battle-defender-armies" class="battle-army-list">${battleArmyCard('defender', 0)}</div></section></div>
-            <button class="admin-btn" id="calculate-land-battle" type="button">Рассчитать бой</button>${isAdmin ? '<button class="page-back-btn" id="save-land-battle" type="button">Создать событие из расчёта</button>' : ''}<div id="land-battle-result" class="military-battle-result" aria-live="polite"></div>
-            <p class="page-note">Каждая армия сохраняет собственные мораль, приказ, тактику и навыки Воеводы. Предпросмотр не меняет реестр; после подтверждения Администратором потери и мораль выбранных постоянных армий сохраняются.</p>
-        </section>
-        <section class="page-panel military-battle-panel naval-battle-panel">
-            <header class="page-panel-heading"><div><h2>Предварительный расчёт морского боя</h2><p>Три боевых цикла; экипаж, манёвренность, корпус, вооружение, абордаж и пожар.</p></div></header>
-            <div class="battle-side-grid">${['attacker','defender'].map((side, index) => `<section data-naval-side="${side}"><header><h3>${side === 'attacker' ? 'Атакующие' : 'Защитники'}</h3></header>${isAdmin ? `<label>Государство<select data-naval-owner>${battleOwnerOptions}</select></label>` : ''}<label>Мораль флотилии, %<input data-naval-fleet-morale="${side}" type="number" min="0" max="100" value="100"></label><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Судно</th><th>Экипаж</th><th>Корпус</th><th>Вооружение</th><th>Ушкуйники</th></tr></thead><tbody>${Array.from({ length: 12 }, (_, row) => navalShipRow(side, row)).join('')}</tbody></table></div></section>`).join('')}</div>
-            <div class="military-battle-controls"><label class="military-check"><input id="naval-poor-visibility" type="checkbox"> Плохая видимость</label><label class="military-check"><input data-naval-retreat="attacker" type="checkbox"> Атакующие пытаются отойти до боя</label><label class="military-check"><input data-naval-retreat="defender" type="checkbox"> Защитники пытаются отойти до боя</label><label class="military-check"><input data-naval-safe-retreat="attacker" type="checkbox"> У атакующих есть безопасный маршрут</label><label class="military-check"><input data-naval-safe-retreat="defender" type="checkbox"> У защитников есть безопасный маршрут</label><label class="military-check"><input data-naval-adverse="attacker" type="checkbox"> Неблагоприятные условия для атакующих</label><label class="military-check"><input data-naval-adverse="defender" type="checkbox"> Неблагоприятные условия для защитников</label></div>
-            <button class="admin-btn" id="calculate-naval-battle" type="button">Рассчитать морской бой</button>${isAdmin ? '<button class="page-back-btn" id="save-naval-battle" type="button">Создать событие из состава</button>' : ''}<div id="naval-battle-result" class="military-battle-result" aria-live="polite"></div>
-            <p class="page-note">Это предварительный расчёт, он не меняет постоянный реестр флота. Дальнобойный залп и абордаж рассчитываются одновременно по состоянию судов в начале цикла.</p>
-        </section>`;
-    const playerMilitaryContent = !isAdmin && !spyOnly
-        ? content.slice(0, content.indexOf('<section class="page-panel military-preview-panel">'))
-        : content;
-    showPageView(spyOnly ? 'Шпионаж и Саботаж' : 'Военное дело', playerMilitaryContent, { navId: spyOnly ? 'nav-spy' : 'nav-military', subtitle: state.userProfile?.owner || '' });
+    const content = spyOnly ? spyPanel : `${commanderPanel}${forcePanel}${isAdmin ? siegePanel : ""}${isAdmin ? raidPanel : ""}${isAdmin ? colonizationPanel : ""}${portPanel}${shipServicePanel}${fleetPanel}${prisonerPanel}${eventPanel}${recruitmentPanel}${mercenaryPanel}`;
+    showPageView(spyOnly ? 'Шпионаж и Саботаж' : 'Военное дело', content, { navId: spyOnly ? 'nav-spy' : 'nav-military', subtitle: state.userProfile?.owner || '' });
     elements.pageView.querySelector('#military-commander-hire')?.addEventListener('submit', async event => {
         event.preventDefault(); const form=event.currentTarget,button=form.querySelector('button[type="submit"]'); button.disabled=true;
         const age = 30 + Math.floor(Math.random() * 31);
@@ -2562,13 +2518,6 @@ async function renderMilitaryPlanner(spyOnly = false) {
             await renderMilitaryPlanner();
         } catch (error) { showToast(`Не удалось обновить очаг эпидемии: ${error.message}`, 7000); form.querySelectorAll('button').forEach(button => { button.disabled = false; }); }
     });
-    if (isAdmin) {
-        for (const side of ['attacker','defender']) {
-            const fleetSection = elements.pageView.querySelector(`[data-naval-side="${side}"]`);
-            fleetSection?.querySelector('header')?.insertAdjacentHTML('afterend', `<div class="military-battle-controls"><label>Загрузить постоянный флот<select data-naval-fleet-source><option value="">Новый состав</option>${fleetSourceOptions(side)}</select></label><label>Название флотилии<input data-naval-fleet-name maxlength="80" value="${side === 'attacker' ? 'Флот атакующих' : 'Флот защитников'}"></label><label class="military-check"><input type="checkbox" data-naval-pursue> Преследовать отходящий флот при победе</label></div>`);
-        }
-        elements.pageView.querySelector('#calculate-naval-battle')?.insertAdjacentHTML('afterend', '<button class="page-back-btn" id="save-naval-fleets" type="button">Сохранить флотилии</button>');
-    }
     elements.pageView.querySelector('.military-forces-panel')?.addEventListener('click', async event => {
         const cancelConditional = event.target.closest('[data-cancel-conditional-order]');
         if (cancelConditional) {
@@ -2796,7 +2745,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 const tacticOptions = isNaval
                     ? [['none', 'Обычный бой'], ['naval_pursuit', 'Преследовать отходящий флот']]
                     : Object.entries(LAND_TACTICS).filter(([value]) => value !== 'feigned_retreat');
-                return `<article class="military-event-army"><header><strong>${escapeHtml(army.name)}</strong><span>${escapeHtml(army.owner)} · ${army.side === 'attacker' ? 'атакующие' : 'защитники'}</span></header><p>${troops}</p><small>Мораль ${formatNumber(army.morale)}% · ${escapeHtml(army.order_name)} · ${escapeHtml(army.tactic)}</small>${mine && battle.status === 'pending' ? `<div class="battle-event-decision" data-army-id="${army.id}"><label>Моё решение<select class="event-decision"><option value="pending" ${army.decision === 'pending' ? 'selected' : ''}>Ожидает решения</option><option value="fight" ${army.decision === 'fight' ? 'selected' : ''}>Вступить в бой</option><option value="withdraw" ${army.decision === 'withdraw' ? 'selected' : ''}>Попытаться отойти</option></select></label><label>Приказ<select class="event-order"><option value="обычный" ${army.order_name === 'обычный' ? 'selected' : ''}>Обычный</option><option value="решительный" ${army.order_name === 'решительный' ? 'selected' : ''}>Решительный</option><option value="осторожный" ${army.order_name === 'осторожный' ? 'selected' : ''}>Осторожный</option></select></label><label>Тактика<select class="event-tactic">${tacticOptions.map(([value,label]) => `<option value="${escapeHtml(value)}" ${army.tactic === value ? 'selected' : ''}>${escapeHtml(label)}</option>`).join('')}</select></label><label>Длина маршрута, шаги<input class="event-route-steps" type="number" min="1" max="20" value="${Number(savedRoute.steps) || 1}"></label><label>Труднопроходимые клетки<input class="event-route-difficult" type="number" min="0" max="20" value="${Number(savedRoute.difficultCells) || 0}"></label><label class="military-check"><input class="event-route-friendly" type="checkbox" ${savedRoute.friendlyDestination ? 'checked' : ''}> ${isNaval ? 'Есть безопасный маршрут отхода' : 'Дружественное поселение в конце'}</label><button class="page-back-btn" type="button" data-save-army-decision="${army.id}">Сохранить решение</button></div>` : `<p>Решение: ${army.decision === 'pending' ? 'ожидает' : army.decision === 'fight' ? 'вступить в бой' : 'отход'}${army.withdrawal_route ? ` · маршрут ${Number(army.withdrawal_route.steps) || 0} шаг.` : ''}</p>`}</article>`;
+                return `<article class="military-event-army"><header><strong>${escapeHtml(army.name)}</strong><span>${escapeHtml(army.owner)} · ${army.side === 'attacker' ? 'атакующие' : 'защитники'}</span></header><p>${troops}</p><small>Мораль ${formatNumber(army.morale)}% · ${escapeHtml(army.order_name)} · предпочтение: ${escapeHtml(army.tactic)}</small>${mine && battle.status === 'pending' ? `<div class="battle-event-decision" data-army-id="${army.id}"><label>Моё решение<select class="event-decision"><option value="pending" ${army.decision === 'pending' ? 'selected' : ''}>Ожидает решения</option><option value="fight" ${army.decision === 'fight' ? 'selected' : ''}>Вступить в бой</option><option value="withdraw" ${army.decision === 'withdraw' ? 'selected' : ''}>Попытаться отойти</option></select></label><label>Приказ<select class="event-order"><option value="обычный" ${army.order_name === 'обычный' ? 'selected' : ''}>Обычный</option><option value="решительный" ${army.order_name === 'решительный' ? 'selected' : ''}>Решительный</option><option value="осторожный" ${army.order_name === 'осторожный' ? 'selected' : ''}>Осторожный</option></select></label><label>${isNaval ? 'Морской приказ' : 'Предпочитаемая тактика'}<select class="event-tactic">${tacticOptions.map(([value,label]) => `<option value="${escapeHtml(value)}" ${army.tactic === value ? 'selected' : ''}>${escapeHtml(label)}</option>`).join('')}</select></label><label>Длина маршрута, шаги<input class="event-route-steps" type="number" min="1" max="20" value="${Number(savedRoute.steps) || 1}"></label><label>Труднопроходимые клетки<input class="event-route-difficult" type="number" min="0" max="20" value="${Number(savedRoute.difficultCells) || 0}"></label><label class="military-check"><input class="event-route-friendly" type="checkbox" ${savedRoute.friendlyDestination ? 'checked' : ''}> ${isNaval ? 'Есть безопасный маршрут отхода' : 'Дружественное поселение в конце'}</label><button class="page-back-btn" type="button" data-save-army-decision="${army.id}">Сохранить решение</button></div>` : `<p>Решение: ${army.decision === 'pending' ? 'ожидает' : army.decision === 'fight' ? 'вступить в бой' : 'отход'}${army.withdrawal_route ? ` · маршрут ${Number(army.withdrawal_route.steps) || 0} шаг.` : ''}</p>`}</article>`;
             }).join('');
             let completedReport = '';
             if (battle.status === 'confirmed') {
@@ -2859,12 +2808,17 @@ async function renderMilitaryPlanner(spyOnly = false) {
                     : '';
                 const casualties = battle.battle_type === 'naval' ? [] : ['attacker','defender'].flatMap(side => calculation.phases.flatMap(phase => phase.casualties[side].map(row => ({ ...row, side, phase: phase.phase }))));
                 const lossesSummary = casualties.map(row => `<li>${escapeHtml(details.armies.find(army => army.id === row.armyId)?.name || row.armyId)}: −${formatNumber(row.losses)} чел. · Мораль ${formatNumber(row.morale)}%</li>`).join('');
+                const tacticsSummary = battle.battle_type === 'naval' ? '' : calculation.phases.map((phase, index) => {
+                    const sideNames = { attacker: 'Атакующие', defender: 'Защитники' };
+                    const rows = ['attacker', 'defender'].flatMap(side => (phase.tactics?.[side] || []).map(item => `${escapeHtml(item.name)} (${sideNames[side]}) — ${escapeHtml(LAND_TACTICS[item.tactic] || item.tactic)}`));
+                    return `<li>${index === 0 ? 'Первое столкновение' : `Цикл ${phase.cycle}`} · ${rows.join('; ')}</li>`;
+                }).join('');
                 const ownerReports = [...new Set(details.armies.map(army => army.owner))].map(reportOwner => ({ owner: reportOwner, report: battle.battle_type === 'naval'
                     ? { outcome: calculation.outcome, pursuit: calculation.pursuit && details.armies.some(army => army.owner === reportOwner && [calculation.pursuit.pursuerSide, calculation.pursuit.retreatingSide].includes(army.side)) ? calculation.pursuit : null, fleets: details.armies.filter(army => army.owner === reportOwner).map(army => ({ id: army.id, name: army.name, side: army.side, decision: army.decision, result: calculation.fleets[army.side] })) }
                     : { outcome: calculation.outcome, noBattle: calculation.noBattle, armies: details.armies.filter(army => army.owner === reportOwner).map(army => ({ id: army.id, name: army.name, side: army.side, decision: army.decision, withdrawal: calculation.withdrawals.find(item => item.armyId === army.id) ? { success: calculation.withdrawals.find(item => item.armyId === army.id).success } : null, result: calculation.armies[army.side].find(item => item.id === army.id) })) } }));
                 previewHost.innerHTML = battle.battle_type === 'naval'
                     ? `<section class="military-event-calculation"><h4>${label}</h4><p>Боевых циклов: ${calculation.cycles.length}. Итоговый состав флотов и отчёты будут сохранены при подтверждении.</p>${withdrawalSummary ? `<h5>Проверки отхода</h5><ul>${withdrawalSummary}</ul>` : ''}${pursuitSummary}<pre class="military-event-report">${escapeHtml(JSON.stringify(calculation, null, 2))}</pre><button class="admin-btn" type="button" data-confirm-stored-battle="${battleId}" data-preview-version="${battle.version}">Подтвердить эту версию</button></section>`
-                    : `<section class="military-event-calculation"><h4>${label}</h4>${withdrawalSummary ? `<h5>Проверки отхода</h5><ul>${withdrawalSummary}</ul>` : ''}${lossesSummary ? `<h5>Потери по армиям и циклам</h5><ul>${lossesSummary}</ul>` : '<p>Активных фаз боя не было.</p>'}<button class="admin-btn" type="button" data-confirm-stored-battle="${battleId}" data-preview-version="${battle.version}">Подтвердить эту версию</button></section>`;
+                    : `<section class="military-event-calculation"><h4>${label}</h4>${withdrawalSummary ? `<h5>Проверки отхода</h5><ul>${withdrawalSummary}</ul>` : ''}${tacticsSummary ? `<h5>Тактики по циклам</h5><ul>${tacticsSummary}</ul>` : ''}${lossesSummary ? `<h5>Потери по армиям и циклам</h5><ul>${lossesSummary}</ul>` : '<p>Активных фаз боя не было.</p>'}<button class="admin-btn" type="button" data-confirm-stored-battle="${battleId}" data-preview-version="${battle.version}">Подтвердить эту версию</button></section>`;
                 previewButton._militaryPayload = { calculation, ownerReports, version: battle.version };
                 previewButton.dataset.previewReady = 'true';
                 previewButton.dataset.outcome = calculation.outcome;
@@ -3017,234 +2971,6 @@ async function renderMilitaryPlanner(spyOnly = false) {
             refreshLevyUnits();
             updateLevyEstimate();
         }
-    });
-    const update = () => {
-        const groups = [...elements.pageView.querySelectorAll('.military-unit-count')].map(input => ({ type: input.dataset.unit, count: Number(input.value) || 0 }));
-        const load = calculateLandCommandLoad(groups);
-        const mobility = calculateArmyMobility(groups);
-        elements.pageView.querySelector('#military-load').textContent = `${formatNumber(load.total)} / 1 000 пунктов`;
-        elements.pageView.querySelector('#military-mobility').textContent = mobility.toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2});
-        elements.pageView.querySelector('#military-supply').textContent = `${formatNumber(calculateArmySupplyPoints(groups, state.gameCalendar?.season))} пунктов · ${state.gameCalendar?.season || 'сезон не задан'}`;
-        elements.pageView.querySelectorAll('[data-terrain]').forEach(cell => { cell.textContent = `${movementStepCost(cell.dataset.terrain, cell.dataset.diagonal === 'true', mobility)} ОД`; });
-    };
-    elements.pageView.querySelectorAll('.military-unit-count').forEach(input => input.addEventListener('input', update));
-    update();
-    const armyLists = { attacker: elements.pageView.querySelector('#battle-attacker-armies'), defender: elements.pageView.querySelector('#battle-defender-armies') };
-    for (const side of ['attacker', 'defender']) {
-        elements.pageView.querySelector(`#battle-add-${side}`)?.addEventListener('click', () => {
-            const index = armyLists[side].querySelectorAll('.battle-army-card').length;
-            armyLists[side].insertAdjacentHTML('beforeend', battleArmyCard(side, index));
-        });
-        armyLists[side]?.addEventListener('click', event => {
-            if (!event.target.closest('.battle-remove-army')) return;
-            event.target.closest('.battle-army-card')?.remove();
-        });
-        armyLists[side]?.addEventListener('change', event => {
-            const source = event.target.closest('.battle-force-source');
-            if (!source) {
-                const editedCard = event.target.closest('.battle-army-card');
-                if (editedCard) delete editedCard.dataset.persistentForceId;
-                return;
-            }
-            const force = state.militaryForces.find(item => item.id === source.value);
-            const card = source.closest('.battle-army-card');
-            if (!force || !card) { if (card) delete card.dataset.persistentForceId; return; }
-            card.dataset.persistentForceId = force.id;
-            card.querySelector('.battle-army-name').value = force.name;
-            const owner = card.querySelector('.battle-army-owner');
-            if (owner) owner.value = force.owner;
-            card.querySelector('.battle-army-morale').value = force.morale;
-            card.querySelector('.battle-army-order').value = force.order_name;
-            card.querySelector('.battle-army-tactic').value = force.tactic;
-            const skills = force.commander_skills || {};
-            card.querySelector('.battle-army-management-level').value = skills.management || 0;
-            card.querySelector('.battle-army-leadership-level').value = skills.leadership || 0;
-            card.querySelector('.battle-army-tactics-level').value = skills.tactics || 0;
-            card.querySelector('.battle-army-planning-level').value = skills.planning || 0;
-            const counts = Object.fromEntries((force.unit_groups || []).map(group => [group.type, group.count]));
-            card.querySelectorAll('.battle-unit-count').forEach(input => { input.value = counts[input.dataset.unit] || 0; });
-        });
-        armyLists[side]?.addEventListener('input', event => {
-            const card = event.target.closest('.battle-army-card');
-            if (card && !event.target.closest('.battle-force-source')) delete card.dataset.persistentForceId;
-        });
-    }
-    const collectBattleArmies = side => [...armyLists[side].querySelectorAll('.battle-army-card')].map((card, index) => ({
-        id: `${side}-${index}`,
-        persistentForceId: card.dataset.persistentForceId || '',
-        name: card.querySelector('.battle-army-name').value.trim() || `${side === 'attacker' ? 'Армия атакующих' : 'Армия защитников'} ${index + 1}`,
-        owner: card.querySelector('.battle-army-owner')?.value || '',
-        order: card.querySelector('.battle-army-order').value,
-        tactic: card.querySelector('.battle-army-tactic').value,
-        skills: { management: Number(card.querySelector('.battle-army-management-level').value) || 0, leadership: Number(card.querySelector('.battle-army-leadership-level').value) || 0, tactics: Number(card.querySelector('.battle-army-tactics-level').value) || 0, planning: Number(card.querySelector('.battle-army-planning-level').value) || 0 },
-        morale: Number(card.querySelector('.battle-army-morale').value) || 0,
-        decision: card.querySelector('.battle-army-decision')?.value || 'fight',
-        withdrawalRoute: card.querySelector('.battle-army-decision')?.value === 'withdraw' ? { steps: Number(card.querySelector('.battle-withdrawal-steps').value) || 0, difficultCells: Number(card.querySelector('.battle-withdrawal-difficult').value) || 0, friendlyDestination: card.querySelector('.battle-withdrawal-friendly').checked } : null,
-        conditions: { ranged: elements.pageView.querySelector('#battle-ranged').checked, snow: elements.pageView.querySelector('#battle-snow').checked, maneuver: elements.pageView.querySelector('#battle-ski-maneuver').checked, charge: side === 'attacker' && elements.pageView.querySelector('#battle-charge').checked, flank: side === 'attacker' && elements.pageView.querySelector('#battle-flank').checked, surprise: side === 'attacker' && elements.pageView.querySelector('#battle-surprise').checked, fieldCamp: side === 'defender' && elements.pageView.querySelector('#battle-field-camp').checked, flanked: side === 'defender' && elements.pageView.querySelector('#battle-flank').checked, pursue: elements.pageView.querySelector(`#battle-${side}-pursuit`).checked },
-        units: [...card.querySelectorAll('.battle-unit-count')].map(input => ({ type: input.dataset.unit, count: Number(input.value) || 0 })).filter(group => group.count > 0)
-    }));
-    const readSiegeConfig = () => elements.pageView.querySelector('#battle-siege-enabled')?.checked ? {
-        level: Number(elements.pageView.querySelector('#battle-siege-level').value) || 1,
-        works: Number(elements.pageView.querySelector('#battle-siege-works').value) || 0,
-        route: elements.pageView.querySelector('#battle-siege-route').value
-    } : null;
-    elements.pageView.querySelector('#calculate-land-battle')?.addEventListener('click', () => {
-        const result = elements.pageView.querySelector('#land-battle-result');
-        const attackerArmies = collectBattleArmies('attacker').filter(army => army.units.length), defenderArmies = collectBattleArmies('defender').filter(army => army.units.length);
-        if (!attackerArmies.length || !defenderArmies.length) { result.innerHTML = '<p class="page-error">Укажите хотя бы одну армию с войсками для каждой стороны.</p>'; return; }
-        try {
-            const terrain = elements.pageView.querySelector('#battle-terrain').value;
-            const siege = readSiegeConfig();
-            const weather = state.regionalWeather?.find(row => row.region === 'Общая зона') || null;
-            const battle = simulateLandBattle({ battleId: `preview-${terrain}`, attackerArmies, defenderArmies, terrain, siege, weather });
-            const outcomeLabels = { attacker: battle.noBattle ? 'Все защитники успешно отошли · боя нет' : 'Преимущество у атакующих', defender: 'Преимущество у защитников', draw: 'Ничья' };
-            const withdrawalRows = (battle.withdrawals || []).map(check => {
-                const armyName = battle.armies.defender.find(army => army.id === check.armyId)?.name || check.armyId;
-                const factors = Object.entries(check.factors).map(([name, value]) => `${escapeHtml(name)} ${value > 0 ? '+' : ''}${formatNumber(value, 1)} п.п.`).join(' · ');
-                return `<article class="military-phase-result"><strong>Отход · ${escapeHtml(String(armyName))}: ${check.success ? 'успешен' : 'не удался'}</strong><span>Шанс ${formatNumber(check.chance, 1)}% · закреплённый бросок ${formatNumber(check.roll * 100, 1)} · маршрут ${check.routeSteps} шаг.</span><small>${factors}</small></article>`;
-            }).join('');
-            const phaseRows = battle.phases.map(phase => {
-                const sideText = side => {
-                    const armies = phase.casualties[side];
-                    const byType = {};
-                    armies.forEach(army => Object.entries(army.lossesByType).forEach(([type, count]) => { byType[type] = (byType[type] || 0) + count; }));
-                    const detail = Object.entries(byType).filter(([, count]) => count > 0).map(([type, count]) => `${escapeHtml(type)} −${formatNumber(count)}`).join(', ') || 'без потерь';
-                    const armyNames = Object.fromEntries(battle.armies[side].map(army => [army.id, army.name || army.id]));
-                    const armyDetails = armies.map(army => `${escapeHtml(String(armyNames[army.armyId] || army.armyId))}: −${formatNumber(army.losses)} чел., мораль ${formatNumber(army.morale)}%${army.broke ? ', отступила' : ''}`).join('; ');
-                    return `<span>${side === 'attacker' ? 'Атакующие' : 'Защитники'}: −${formatNumber(armies.total)} чел.</span><small>${armyDetails}</small><small>${detail}</small>`;
-                };
-                return `<article class="military-phase-result"><strong>${phase.phase === 'first' ? 'Первое столкновение' : `Перелом боя · цикл ${phase.cycle}`}</strong>${sideText('attacker')}${sideText('defender')}</article>`;
-            }).join('');
-            const pursuitReport = battle.pursuit ? `<article class="military-phase-result"><strong>Преследование · ${battle.pursuit.pursuerSide === 'attacker' ? 'атакующие' : 'защитники'}</strong><span>Потери отступающих: ${formatNumber(battle.pursuit.casualties.reduce((sum, row) => sum + row.losses, 0))} чел. (${formatNumber(battle.pursuit.lossRatio * 100, 1)}%)</span><small>${battle.pursuit.casualties.map(row => `${escapeHtml(String(battle.armies[battle.pursuit.retreatingSide]?.find(army => army.id === row.armyId)?.name || row.armyId))}: ${Object.entries(row.lossesByType).map(([type, count]) => `${escapeHtml(type)} −${formatNumber(count)}`).join(', ') || 'без потерь'}`).join('; ')}</small></article>` : '';
-            const siegeModifiers = battle.phases[0]?.siege;
-            const siegeSummary = siegeModifiers ? `<p class="page-note">Штурм: ${siegeModifiers.state === 'intact' ? 'укрепления целы' : siegeModifiers.state === 'weakened' ? 'укрепления ослаблены' : 'в укреплениях пролом'} · удар атакующих ×${formatNumber(siegeModifiers.attackMultiplier, 2)} · защита гарнизона ×${formatNumber(siegeModifiers.defenseMultiplier, 2)}.</p>` : '';
-            const weatherNames = { clear: 'ясно', rain: 'дождь', mud: 'распутица', snow: 'снег', frost: 'мороз', heat: 'жара' };
-            const weatherNote = weather ? `<p class="page-note">Автоматическая погода · ${weatherNames[weather.land_condition] || weather.land_condition}. Дождь ослабляет стрельбу на 10%, распутица и снег — удар конницы на 10%, жара — силу всех войск на 5%. Обзор не меняется.</p>` : '';
-            result.innerHTML = `<h3>${outcomeLabels[battle.outcome]}</h3>${weatherNote}${siegeSummary}${withdrawalRows}${phaseRows}${pursuitReport}<p class="page-note">Вероятность отхода: 50% базово; сила −12…+12 п.п.; мобильность ±6; мораль ±10; Планирование до +15; длина маршрута до −12; трудная местность до −9; дружественный пункт +5; конница противника −5. Итог 10–80%. Предпросмотр не сохраняется.</p>`;
-        } catch (error) { result.innerHTML = `<p class="page-error">${escapeHtml(error.message)}</p>`; }
-    });
-    elements.pageView.querySelectorAll('[data-naval-type]').forEach(select => select.addEventListener('change', () => {
-        const row = select.closest('[data-naval-ship-row]');
-        const profile = NAVAL_SHIP_PROFILES[select.value];
-        row.querySelector('[data-naval-crew]').value = profile?.crew ?? 0;
-        row.querySelector('[data-naval-hull]').value = profile?.hull ?? 0;
-    }));
-    const collectNavalFleet = side => {
-        const section = elements.pageView.querySelector(`[data-naval-side="${side}"]`);
-        return {
-            owner: section.querySelector('[data-naval-owner]')?.value || state.userProfile?.owner || '',
-            name: section.querySelector('[data-naval-fleet-name]')?.value.trim() || (side === 'attacker' ? 'Флот атакующих' : 'Флот защитников'),
-            persistentFleetId: section.querySelector('[data-naval-fleet-source]')?.value || null,
-            pursue: Boolean(section.querySelector('[data-naval-pursue]')?.checked),
-            commanderSkills: militaryFleets.find(fleet => fleet.id === section.querySelector('[data-naval-fleet-source]')?.value)?.commander_skills || {},
-            morale: Number(section.querySelector(`[data-naval-fleet-morale="${side}"]`).value),
-            ships: [...section.querySelectorAll('[data-naval-ship-row]')].map((row, index) => ({
-                id: row.dataset.shipId || `${side}-${index + 1}`, type: row.querySelector('[data-naval-type]').value,
-                crew: Number(row.querySelector('[data-naval-crew]').value), hull: Number(row.querySelector('[data-naval-hull]').value),
-                weapon: row.querySelector('[data-naval-weapon]').value, boardingMen: Number(row.querySelector('[data-naval-boarding]').value)
-            })).filter(ship => ship.type)
-        };
-    };
-    elements.pageView.querySelectorAll('[data-naval-fleet-source]').forEach(select => select.addEventListener('change', () => {
-        const section = select.closest('[data-naval-side]');
-        const fleet = militaryFleets.find(item => item.id === select.value);
-        if (!fleet || !section) return;
-        section.querySelector('[data-naval-owner]').value = fleet.owner;
-        section.querySelector('[data-naval-fleet-name]').value = fleet.name;
-        section.querySelector(`[data-naval-fleet-morale="${section.dataset.navalSide}"]`).value = fleet.morale;
-        const rows = [...section.querySelectorAll('[data-naval-ship-row]')];
-        rows.forEach((row, index) => {
-            const ship = fleet.ships[index];
-            row.dataset.shipId = ship?.id || '';
-            row.querySelector('[data-naval-type]').value = ship?.type || '';
-            row.querySelector('[data-naval-crew]').value = ship?.crew || 0;
-            row.querySelector('[data-naval-hull]').value = ship?.hull || 0;
-            row.querySelector('[data-naval-weapon]').value = ship?.weapon || 'none';
-            row.querySelector('[data-naval-boarding]').value = ship?.boardingMen || 0;
-        });
-        if (fleet.ships.length > rows.length) showToast(`В форме доступно ${rows.length} судов; в этой флотилии больше, проверьте, что состав не будет обрезан.`, 6000);
-    }));
-    elements.pageView.querySelector('#calculate-naval-battle')?.addEventListener('click', () => {
-        const result = elements.pageView.querySelector('#naval-battle-result');
-        try {
-            const weather = state.regionalWeather?.find(row => row.region === 'Общая зона') || null;
-            const battle = simulateNavalBattle({ battleId: `naval-preview-${state.gameCalendar?.turn || 0}`, attacker: collectNavalFleet('attacker'), defender: collectNavalFleet('defender'), weather, pursue: Object.fromEntries(['attacker','defender'].map(side => [side, collectNavalFleet(side).pursue])), poorVisibility: elements.pageView.querySelector('#naval-poor-visibility').checked,
-                requestWithdrawal: Object.fromEntries(['attacker','defender'].map(side => [side, elements.pageView.querySelector(`[data-naval-retreat="${side}"]`).checked])),
-                safeRetreat: Object.fromEntries(['attacker','defender'].map(side => [side, elements.pageView.querySelector(`[data-naval-safe-retreat="${side}"]`).checked])),
-                adverseConditions: Object.fromEntries(['attacker','defender'].map(side => [side, elements.pageView.querySelector(`[data-naval-adverse="${side}"]`).checked])) });
-            const outcome = { attacker: 'Преимущество у атакующих', defender: 'Преимущество у защитников', draw: 'Ничья' }[battle.outcome];
-            const withdrawals = battle.withdrawals.map(check => `<article class="military-phase-result"><strong>${check.side === 'attacker' ? 'Атакующие' : 'Защитники'} · отход ${check.cycle === 0 ? 'до боя' : `после цикла ${check.cycle}`}: ${check.unavailable ? 'невозможен — нет управляемого судна с экипажем от 75%' : check.success ? 'успешен' : 'не удался'}</strong><span>${check.unavailable ? '' : `Шанс ${formatNumber(check.chance, 1)}% · закреплённый бросок ${formatNumber(check.roll * 100, 1)}.`}</span></article>`).join('');
-            const navalPursuit = battle.pursuit ? `<article class="military-phase-result"><strong>Преследование · ${battle.pursuit.pursuerSide === 'attacker' ? 'атакующие' : 'защитники'}</strong><span>${battle.pursuit.success ? battle.pursuit.captured ? `Захвачено судно ${escapeHtml(battle.pursuit.targetShipId)}.` : `Судно ${escapeHtml(battle.pursuit.targetShipId)} потеряло ${formatNumber(battle.pursuit.crewLoss)} чел. экипажа и 1 пункт корпуса.` : escapeHtml(battle.pursuit.reason || 'Перехват не удался')} ${battle.pursuit.chance ? `· шанс ${formatNumber(battle.pursuit.chance, 1)}%, бросок ${formatNumber(battle.pursuit.roll * 100, 1)}.` : ''}</span></article>` : '';
-            const cycleRows = battle.cycles.map(cycle => {
-                const rangedRows = cycle.ranged.map(attack => `<small>${attack.attacker} → ${attack.target}: ${attack.hit ? 'попадание' : 'промах'} (${attack.chance}%); ${attack.crewLoss ? `экипаж −${formatNumber(attack.crewLoss)}` : ''}${attack.damage ? `корпус −${attack.damage}` : ''}${attack.fire ? '; пожар' : ''}</small>`).join('') || '<small>Дальнобойных атак не было.</small>';
-                const boardingRows = cycle.boarding.filter(row => typeof row.target === 'string').map(row => `<small>Абордаж ${row.attackerShips.join(', ')} → ${row.target}: экипаж цели −${formatNumber(row.targetLoss)}.</small>`).join('') || '<small>Абордажей не было.</small>';
-                const losses = ['attacker','defender'].map(side => {
-                    const ships = cycle.casualties[side].map(row => `${row.shipId}: экипаж −${formatNumber(row.crewLost)}, корпус ${formatNumber(row.hull)}, мораль ${formatNumber(row.morale)}%${row.crewRescued ? `, спасены ${formatNumber(row.crewRescued)}` : ''}${row.crewPrisoners ? `, в плену ${formatNumber(row.crewPrisoners)}` : ''}${row.crewMissing ? `, пропали ${formatNumber(row.crewMissing)}` : ''}${row.fire ? ', пожар' : ''}${row.captured ? ', сдалось/захвачено' : ''}${row.sunk ? ', затонуло' : ''}${row.disabled ? ', обездвижено' : ''}`).join('; ');
-                    return `<small>${side === 'attacker' ? 'Атакующие' : 'Защитники'} — ${ships || 'без изменений'}</small>`;
-                }).join('');
-                return `<article class="military-phase-result"><strong>Боевой цикл ${cycle.cycle}</strong>${rangedRows}${boardingRows}${losses}</article>`;
-            }).join('');
-            const finalRows = ['attacker','defender'].map(side => `<p><strong>${side === 'attacker' ? 'Атакующие' : 'Защитники'} · мораль ${formatNumber(battle.fleets[side].morale)}%:</strong> ${battle.fleets[side].ships.map(ship => `${escapeHtml(ship.id)} (${escapeHtml(ship.type)}) — ${ship.sunk ? 'затонуло' : ship.captured ? `захвачено стороной ${ship.capturedBy === 'attacker' ? 'атакующих' : 'защитников'}` : `${formatNumber(ship.crew)} чел., корпус ${formatNumber(ship.hull)}/${NAVAL_SHIP_PROFILES[ship.type].hull}${ship.fire ? ', пожар' : ''}${ship.disabled ? ', обездвижено' : ''}${ship.weapon !== 'none' ? `, залпов осталось ${battle.drawsRemaining[side][ship.id]}` : ''}`}`).join('; ')}</p>`).join('');
-            const seaWeatherLabels = { calm: 'штиль', rough: 'волнение', storm: 'шторм' };
-            const weatherNote = weather ? `<p class="page-note">Автоматическая погода · ${seaWeatherLabels[weather.sea_condition] || weather.sea_condition}. Волнение снижает шанс попадания на 5 п.п., шторм — на 10 п.п.; обзор не меняется.</p>` : '';
-            result.innerHTML = `<h3>${outcome}</h3>${weatherNote}${withdrawals}${navalPursuit}${cycleRows}${finalRows}<p class="page-note">Предпросмотр закрепляет случайные значения по идентификатору расчёта; обновите страницу или измените состав, чтобы получить новый расчёт.</p>`;
-        } catch (error) { result.innerHTML = `<p class="page-error">${escapeHtml(error.message)}</p>`; }
-    });
-    elements.pageView.querySelector('#save-naval-fleets')?.addEventListener('click', async event => {
-        const button = event.currentTarget;
-        const fleets = ['attacker','defender'].map(collectNavalFleet);
-        if (fleets.some(fleet => !fleet.owner || !fleet.name || !fleet.ships.length) || fleets.some(fleet => fleet.persistentFleetId && fleet.persistentFleetId === fleets.find(other => other !== fleet)?.persistentFleetId)) {
-            showToast('Для каждой флотилии укажите государство, название и хотя бы одно судно; одну флотилию нельзя назначить обеим сторонам.', 6000);
-            return;
-        }
-        button.disabled = true;
-        try {
-            await saveMilitaryFleets(fleets.map(fleet => ({ ...(fleet.persistentFleetId ? { id: fleet.persistentFleetId } : {}), owner: fleet.owner, name: fleet.name, morale: fleet.morale, ships: fleet.ships, status: 'active' })));
-            militaryFleets = await fetchMilitaryFleets();
-            showToast('Флотилии сохранены');
-            await renderMilitaryPlanner();
-        } catch (error) { showToast(`Не удалось сохранить флотилии: ${error.message}`, 7000); }
-        finally { button.disabled = false; }
-    });
-    elements.pageView.querySelector('#save-naval-battle')?.addEventListener('click', async event => {
-        const button = event.currentTarget;
-        const result = elements.pageView.querySelector('#naval-battle-result');
-        const fleets = { attacker: collectNavalFleet('attacker'), defender: collectNavalFleet('defender') };
-        if (!fleets.attacker.owner || !fleets.defender.owner || fleets.attacker.owner === fleets.defender.owner || !fleets.attacker.ships.length || !fleets.defender.ships.length) {
-            result.innerHTML = '<p class="page-error">Для каждой стороны выберите разные государства и укажите хотя бы одно судно.</p>';
-            return;
-        }
-        button.disabled = true;
-        try {
-            const linkedFleets = ['attacker','defender'].map(side => fleets[side]).filter(fleet => fleet.persistentFleetId);
-            if (linkedFleets.length) {
-                await saveMilitaryFleets(linkedFleets.map(fleet => ({ id: fleet.persistentFleetId, owner: fleet.owner, name: fleet.name, morale: fleet.morale, ships: fleet.ships, status: 'active' })));
-            }
-            const adverseConditions = Object.fromEntries(['attacker','defender'].map(side => [side, elements.pageView.querySelector(`[data-naval-adverse="${side}"]`).checked]));
-            const location = { source: 'admin_naval_preview', poorVisibility: elements.pageView.querySelector('#naval-poor-visibility').checked, adverseConditions };
-            const payload = ['attacker','defender'].map(side => ({ owner: fleets[side].owner, side, name: fleets[side].name, morale: fleets[side].morale, order_name: 'обычный', tactic: fleets[side].pursue ? 'naval_pursuit' : 'none', decision: 'pending', withdrawal_route: null, unit_data: { ships: fleets[side].ships, commander_skills: fleets[side].commanderSkills, persistent_fleet_id: fleets[side].persistentFleetId } }));
-            const battleId = await createMilitaryBattle({ battle_type: 'naval', terrain: 'sea', location }, payload);
-            showToast(`Создано морское событие ${String(battleId).slice(0, 8)}`);
-            await renderMilitaryPlanner();
-        } catch (error) { result.innerHTML = `<p class="page-error">Не удалось создать морское событие: ${escapeHtml(error.message)}</p>`; }
-        finally { button.disabled = false; }
-    });
-    elements.pageView.querySelector('#save-land-battle')?.addEventListener('click', async event => {
-        const button = event.currentTarget, result = elements.pageView.querySelector('#land-battle-result');
-        const armies = [...collectBattleArmies('attacker').map(army => ({ ...army, side: 'attacker' })), ...collectBattleArmies('defender').map(army => ({ ...army, side: 'defender' }))].filter(army => army.units.length);
-        if (armies.some(army => !army.owner) || new Set(armies.map(army => army.owner)).size < 2 || !armies.some(army => army.side === 'attacker') || !armies.some(army => army.side === 'defender')) {
-            result.innerHTML = '<p class="page-error">Для каждой армии укажите государство; нужны участники от двух государств и армии на обеих сторонах.</p>'; return;
-        }
-        button.disabled = true;
-        try {
-            const terrain = elements.pageView.querySelector('#battle-terrain').value;
-            const payload = armies.map(army => ({ owner: army.owner, side: army.side, name: army.name, morale: army.morale, order_name: army.order, tactic: army.tactic, decision: army.side === 'defender' ? 'pending' : 'fight', withdrawal_route: null, unit_data: { units: army.units, skills: army.skills, conditions: army.conditions, persistent_force_id: army.persistentForceId || null } }));
-            const siege = readSiegeConfig();
-            const battleId = await createMilitaryBattle({ battle_type: 'land', terrain, location: { source: 'admin_preview', ...(siege ? { siege } : {}) } }, payload);
-            showToast(`Создано боевое событие ${String(battleId).slice(0, 8)}`);
-            await renderMilitaryPlanner();
-        } catch (error) { result.innerHTML = `<p class="page-error">Не удалось создать событие: ${escapeHtml(error.message)}</p>`; }
-        finally { button.disabled = false; }
     });
 }
 
@@ -3823,7 +3549,10 @@ export function initEventListeners() {
             return;
         }
 
-        if (!state.isDragging) return;
+        if (!state.isDragging) {
+            setTradeRouteHoverAt(imgX, imgY);
+            return;
+        }
         const newTx = e.clientX - state.startX;
         const newTy = e.clientY - state.startY;
         state.dragDistance += Math.hypot(newTx - state.tx, newTy - state.ty);
@@ -3831,6 +3560,7 @@ export function initEventListeners() {
         state.ty = newTy;
         updateTransform();
     });
+    elements.viewport?.addEventListener('mouseleave', () => setTradeRouteHoverAt(Number.NaN, Number.NaN));
 
     window.addEventListener('mouseup', async () => {
         if (state.isDraggingMarker && state.movingMarkerId !== null) {

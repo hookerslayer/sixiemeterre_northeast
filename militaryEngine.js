@@ -1310,6 +1310,39 @@ function assignLosses(groups, lossBudget, fractionalCarry = []) {
   return { losses, carry };
 }
 
+function chooseLandTactic(army, side, phase, terrain, randomSeed) {
+  const groups = (army.units || []).filter(group => integer(group.count) > 0);
+  const roles = new Set(groups.map(group => LAND_UNIT_PROFILES[group.type]?.role).filter(Boolean));
+  const hasCavalry = roles.has('cavalry');
+  const hasRanged = roles.has('ranged');
+  const hasInfantry = roles.has('infantry');
+  const candidates = [{ tactic: 'none', score: 0.25 }];
+  if (phase === 'first' && hasRanged && army.conditions.ranged !== false) candidates.push({ tactic: 'archery', score: 0.5 + groups.filter(group => LAND_UNIT_PROFILES[group.type]?.role === 'ranged').reduce((sum, group) => sum + integer(group.count), 0) / Math.max(1, groups.reduce((sum, group) => sum + integer(group.count), 0)) });
+  if (phase === 'first' && hasCavalry && ['plain', 'hill'].includes(terrain)) candidates.push({ tactic: 'cavalry_alarm', score: 0.7 });
+  if (['plain', 'hill', 'forest'].includes(terrain) && army.conditions.flank && side === 'attacker') candidates.push({ tactic: 'flank', score: phase === 'first' ? 0.95 : 0.8 });
+  if (phase === 'first' && terrain === 'forest' && army.conditions.surprise && side === 'attacker') candidates.push({ tactic: 'ambush', score: 1 });
+  if (side === 'defender' && (LAND_TERRAIN_COMBAT[terrain]?.defender || 1) > 1) candidates.push({ tactic: 'hold', score: 0.7 });
+  if (side === 'defender' && hasInfantry && !army.conditions.flanked) candidates.push({ tactic: 'tight_formation', score: 0.6 });
+  if (phase === 'break' && (hasInfantry || hasCavalry)) candidates.push({ tactic: 'reserve', score: 0.65 });
+  if (side === 'attacker') candidates.push({ tactic: 'focused_strike', score: 0.55 });
+
+  // These first-pass weights make tactics respond to phase, terrain, force composition,
+  // the commander's preferred approach, order and current morale. They are balance values.
+  const preference = army.preferredTactic || 'none';
+  const preferenceBonus = 0.18 + clamp(army.skills?.tactics, 0, 5) * 0.035;
+  for (const candidate of candidates) {
+    if (army.order === 'осторожный' && ['hold', 'tight_formation', 'archery'].includes(candidate.tactic)) candidate.score += 0.12;
+    if (army.order === 'осторожный' && ['flank', 'ambush', 'focused_strike'].includes(candidate.tactic)) candidate.score -= 0.08;
+    if (army.order === 'решительный' && ['flank', 'ambush', 'focused_strike', 'cavalry_alarm'].includes(candidate.tactic)) candidate.score += 0.1;
+    if (army.morale < 40 && ['hold', 'tight_formation', 'reserve'].includes(candidate.tactic)) candidate.score += 0.08;
+    if (army.morale < 40 && ['flank', 'ambush', 'focused_strike'].includes(candidate.tactic)) candidate.score -= 0.1;
+    candidate.score += candidate.tactic === preference ? preferenceBonus : 0;
+    candidate.score += stableRoll(randomSeed, `${army.id}:tactic:${phase}:${candidate.tactic}`) * 0.025;
+  }
+  candidates.sort((a, b) => b.score - a.score || a.tactic.localeCompare(b.tactic));
+  return candidates[0].tactic;
+}
+
 /**
  * Resolve a deterministic first-pass land battle using the fixed unit, phase,
  * terrain, order, morale, loss-budget and formation-break rules in the rules file.
@@ -1327,7 +1360,7 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
       const infected = isInfectedArmy({ ...army, conditions });
       if (infected) conditions.infected = true;
       if (terrain === 'bridge') conditions.charge = false;
-      return { ...structuredClone(army), id, conditions, tactic: infected ? 'focused_strike' : army.tactic, order: infected ? 'решительный' : army.order, decision: infected ? 'fight' : army.decision, withdrawal: infected ? null : army.withdrawal, withdrawalRoute: infected ? null : army.withdrawalRoute, morale: infected ? 100 : clamp(army.morale ?? 100, 0, 100), active: true, lossCarry: [], breakRoll: stableRoll(randomSeed, `${id}:break`) };
+      return { ...structuredClone(army), id, conditions, preferredTactic: infected ? 'focused_strike' : (army.preferredTactic || army.tactic || 'none'), tactic: infected ? 'focused_strike' : 'none', order: infected ? 'решительный' : army.order, decision: infected ? 'fight' : army.decision, withdrawal: infected ? null : army.withdrawal, withdrawalRoute: infected ? null : army.withdrawalRoute, morale: infected ? 100 : clamp(army.morale ?? 100, 0, 100), active: true, lossCarry: [], breakRoll: stableRoll(randomSeed, `${id}:break`) };
     }),
     defender: inputArmies(defenderArmies, defender).map((army, index) => {
       const id = army.id ?? `defender-${index}`;
@@ -1335,7 +1368,7 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
       const infected = isInfectedArmy({ ...army, conditions });
       if (infected) conditions.infected = true;
       if (terrain === 'bridge') conditions.charge = false;
-      return { ...structuredClone(army), id, conditions, tactic: infected ? 'focused_strike' : army.tactic, order: infected ? 'решительный' : army.order, decision: infected ? 'fight' : army.decision, withdrawal: infected ? null : army.withdrawal, withdrawalRoute: infected ? null : army.withdrawalRoute, morale: infected ? 100 : clamp(army.morale ?? 100, 0, 100), active: true, lossCarry: [], breakRoll: stableRoll(randomSeed, `${id}:break`) };
+      return { ...structuredClone(army), id, conditions, preferredTactic: infected ? 'focused_strike' : (army.preferredTactic || army.tactic || 'none'), tactic: infected ? 'focused_strike' : 'none', order: infected ? 'решительный' : army.order, decision: infected ? 'fight' : army.decision, withdrawal: infected ? null : army.withdrawal, withdrawalRoute: infected ? null : army.withdrawalRoute, morale: infected ? 100 : clamp(army.morale ?? 100, 0, 100), active: true, lossCarry: [], breakRoll: stableRoll(randomSeed, `${id}:break`) };
     })
   };
   if (!sides.attacker.length || !sides.defender.length) throw new Error('Для расчёта нужны армии обеих сторон.');
@@ -1362,23 +1395,28 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
       outcome: 'attacker', pursuit: null, withdrawals, withdrawalDisrupted, noBattle: true, armies: sides
     };
   }
-  if (terrain === 'plain' || terrain === 'hill') {
-    const alarmSourceSide = ['attacker', 'defender'].find(side => sides[side].some(army => army.active && army.tactic === 'cavalry_alarm' && army.units.some(group => integer(group.count) && LAND_UNIT_PROFILES[group.type]?.role === 'cavalry')));
-    if (alarmSourceSide) {
-      const source = sides[alarmSourceSide].find(army => army.active && army.tactic === 'cavalry_alarm' && army.units.some(group => integer(group.count) && LAND_UNIT_PROFILES[group.type]?.role === 'cavalry'));
-      const penalty = 2 * (0.5 + clamp(source.skills?.tactics, 0, 5) * 0.1) * armyCommandState(source).efficiency;
-      const opposingSide = alarmSourceSide === 'attacker' ? 'defender' : 'attacker';
-      sides[opposingSide].forEach(army => { if (!army.conditions.infected) army.morale = clamp(army.morale - penalty, 0, 100); });
-    }
-  }
-  if (sides.attacker.some(army => army.active && army.conditions.flank && army.tactic === 'flank')) {
-    const source = sides.attacker.find(army => army.active && army.conditions.flank && army.tactic === 'flank');
-    const penalty = 2 * (0.5 + clamp(source.skills?.tactics, 0, 5) * 0.1) * armyCommandState(source).efficiency;
-    sides.defender.forEach(army => { if (!army.conditions.infected) army.morale = clamp(army.morale - penalty, 0, 100); });
-  }
   const report = [];
   const applyPhase = (phase, cycle = 0) => {
     const phaseDef = LAND_COMBAT_PHASES[phase];
+    for (const side of ['attacker', 'defender']) {
+      for (const army of sides[side].filter(item => item.active)) {
+        army.tactic = army.conditions.infected ? 'focused_strike' : chooseLandTactic(army, side, phase, terrain, `${randomSeed}:${cycle}`);
+      }
+    }
+    if (phase === 'first') {
+      for (const side of ['attacker', 'defender']) {
+        const source = sides[side].find(army => army.active && army.tactic === 'cavalry_alarm');
+        if (source && ['plain', 'hill'].includes(terrain)) {
+          const penalty = 2 * (0.5 + clamp(source.skills?.tactics, 0, 5) * 0.1) * armyCommandState(source).efficiency;
+          sides[side === 'attacker' ? 'defender' : 'attacker'].forEach(army => { if (!army.conditions.infected) army.morale = clamp(army.morale - penalty, 0, 100); });
+        }
+      }
+      const flankSource = sides.attacker.find(army => army.active && army.tactic === 'flank');
+      if (flankSource) {
+        const penalty = 2 * (0.5 + clamp(flankSource.skills?.tactics, 0, 5) * 0.1) * armyCommandState(flankSource).efficiency;
+        sides.defender.forEach(army => { if (!army.conditions.infected) army.morale = clamp(army.morale - penalty, 0, 100); });
+      }
+    }
     const startSnapshot = {};
     for (const side of ['attacker','defender']) {
       startSnapshot[side] = sides[side].filter(army => army.active).map(army => {
@@ -1454,7 +1492,8 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
       }
       casualties[side].total = totalSideLosses;
     }
-    report.push({ phase, cycle, totals, adjustedStrike, random, casualties, withdrawalInterception: phase === 'first' && withdrawalDisrupted, ...(siegeModifiers ? { siege: siegeModifiers } : {}) });
+    const tactics = Object.fromEntries(['attacker', 'defender'].map(side => [side, startSnapshot[side].map(row => ({ armyId: row.army.id, name: row.army.name || row.army.id, tactic: row.army.tactic }))]));
+    report.push({ phase, cycle, totals, adjustedStrike, random, tactics, casualties, withdrawalInterception: phase === 'first' && withdrawalDisrupted, ...(siegeModifiers ? { siege: siegeModifiers } : {}) });
   };
   applyPhase('first');
   for (let cycle = 1; cycle <= 3; cycle++) {
@@ -1510,4 +1549,3 @@ export function simulateLandBattle({ battleId = 'preview', attacker, defender, a
   }
   return { battleId, terrain, phases: report, residual, outcome, pursuit, withdrawals, withdrawalDisrupted, armies: sides };
 }
-

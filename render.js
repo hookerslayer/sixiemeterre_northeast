@@ -596,8 +596,10 @@ function drawTradeRouteLabel(ctx, route, points, routeIndex = 0) {
     const labelWidth = ctx.measureText(labelText()).width, labelHeight = fontSize + paddingY * 2;
     ctx.translate(x - Math.sin(angle) * offset, y + Math.cos(angle) * offset);
     ctx.rotate(angle);
-    ctx.fillStyle = 'rgba(18, 22, 20, .88)';
-    ctx.strokeStyle = 'rgba(236, 220, 180, .65)';
+    const hovered = state.hoveredTradeRouteIndex === routeIndex;
+    ctx.globalAlpha = hovered ? 1 : 0.62;
+    ctx.fillStyle = 'rgba(18, 22, 20, .82)';
+    ctx.strokeStyle = 'rgba(236, 220, 180, .45)';
     ctx.lineWidth = 1 / scale;
     ctx.beginPath();
     ctx.rect(-labelWidth / 2 - paddingX, -labelHeight / 2, labelWidth + paddingX * 2, labelHeight);
@@ -610,6 +612,36 @@ function drawTradeRouteLabel(ctx, route, points, routeIndex = 0) {
     ctx.restore();
 }
 
+function drawTradeRouteArrow(ctx, points, scale) {
+    if (points.length < 2) return;
+    const segments = [];
+    let total = 0;
+    for (let index = 1; index < points.length; index++) {
+        const from = points[index - 1], to = points[index];
+        const length = Math.hypot(Number(to.x) - Number(from.x), Number(to.y) - Number(from.y));
+        if (length) { segments.push({ from, to, length }); total += length; }
+    }
+    if (!total) return;
+    let remaining = total * 0.82;
+    const segment = segments.find(item => (remaining -= item.length) <= 0) || segments.at(-1);
+    const before = Math.max(0, remaining + segment.length);
+    const ratio = Math.max(0, Math.min(1, 1 - before / segment.length));
+    const x = Number(segment.from.x) + (Number(segment.to.x) - Number(segment.from.x)) * ratio;
+    const y = Number(segment.from.y) + (Number(segment.to.y) - Number(segment.from.y)) * ratio;
+    const angle = Math.atan2(Number(segment.to.y) - Number(segment.from.y), Number(segment.to.x) - Number(segment.from.x));
+    const size = 13 / Math.max(0.1, scale);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    ctx.beginPath();
+    ctx.moveTo(size, 0);
+    ctx.lineTo(-size * 0.8, size * 0.72);
+    ctx.lineTo(-size * 0.8, -size * 0.72);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+}
+
 export function renderTradeRoutes(routes = []) {
     const ctx = elements.tradeRoutesCtx;
     if (!ctx || !elements.tradeRoutesCanvas) return;
@@ -619,10 +651,11 @@ export function renderTradeRoutes(routes = []) {
         const points = route.map_points || [];
         if (points.length < 2 || points.some(point => !Number.isFinite(Number(point.x)) || !Number.isFinite(Number(point.y)))) continue;
         ctx.save();
-        ctx.globalAlpha = .78;
+        const hovered = state.hoveredTradeRouteIndex === routeIndex;
+        ctx.globalAlpha = hovered ? 1 : .82;
         ctx.strokeStyle = route.mode === 'land' ? (state.dbOwnerColors[route.seller_owner] || '#cfac6d') : '#76b8c4';
         ctx.fillStyle = ctx.strokeStyle;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 7 / Math.max(.1, Number(state.scale) || 1);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.setLineDash(route.mode === 'land' ? [] : [9, 7]);
@@ -631,6 +664,7 @@ export function renderTradeRoutes(routes = []) {
         for (const point of points.slice(1)) ctx.lineTo(Number(point.x), Number(point.y));
         ctx.stroke();
         ctx.setLineDash([]);
+        drawTradeRouteArrow(ctx, points, state.scale);
         for (const point of [points[0], points.at(-1)]) {
             ctx.beginPath();
             ctx.arc(Number(point.x), Number(point.y), 4, 0, Math.PI * 2);
@@ -661,6 +695,27 @@ export function renderTradeRoutes(routes = []) {
             ctx.restore();
         }
     }
+}
+
+export function setTradeRouteHoverAt(x, y) {
+    const routes = state.showTradeRoutes ? state.tradeRouteOverlay || [] : [];
+    const tolerance = 12 / Math.max(.1, Number(state.scale) || 1);
+    let hoveredIndex = null;
+    let nearest = Infinity;
+    for (const [index, route] of routes.entries()) {
+        const points = route.map_points || [];
+        for (let point = 1; point < points.length; point++) {
+            const a = points[point - 1], b = points[point];
+            const dx = Number(b.x) - Number(a.x), dy = Number(b.y) - Number(a.y);
+            const lengthSquared = dx * dx + dy * dy;
+            const ratio = lengthSquared ? Math.max(0, Math.min(1, ((x - Number(a.x)) * dx + (y - Number(a.y)) * dy) / lengthSquared)) : 0;
+            const distance = Math.hypot(x - (Number(a.x) + dx * ratio), y - (Number(a.y) + dy * ratio));
+            if (distance <= tolerance && distance < nearest) { nearest = distance; hoveredIndex = index; }
+        }
+    }
+    if (state.hoveredTradeRouteIndex === hoveredIndex) return;
+    state.hoveredTradeRouteIndex = hoveredIndex;
+    renderTradeRoutes(routes);
 }
 
 export function drawMarkerLabel(ctx, text, x, y) {
