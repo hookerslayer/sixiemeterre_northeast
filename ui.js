@@ -1,8 +1,8 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=state-prestige-limits-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=state-prestige-limits-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionDirective, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=state-prestige-limits-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=production-orders-20261015';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=production-orders-20261015';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, serviceMilitaryShip, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, setMarkerFortification, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=production-orders-20261015';
 import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, NAVAL_WEAPONS, calculateLevyCapacity, calculateRecruitmentCost, calculateSeasonalUpkeep, calculateArmySupplyPoints, simulateMilitaryMaintenance } from './militaryEngine.js?v=extended-land-cycles-20261015';
-import { GOODS, RESOURCES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=military-ruler-succession-20261013b';
+import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-20261015';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
 let toastTimeout = null;
@@ -1592,22 +1592,26 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
             const markerReports = report.markerReports || {};
             const freeSurplus = preview.ownerReports[owner]?.free_surplus || [];
             const canEdit = state.userProfile?.role === 'admin' || state.userProfile?.owner === owner;
-            const directiveOptions = { civilian: 'Гражданское', military: 'Военное', market: 'Рынок' };
-            const goodOptions = GOODS.map(good => `<option value="${safe(good)}">${safe(good)}</option>`).join('');
             const settlementRows = ownerMarkers.map(marker => {
                 const detail = markerReports[marker.id] || {};
                 const goods = Object.entries(detail.goods_produced || {}).map(([name, quantity]) => `${safe(name)} — ${number(quantity)}`).join('<br>') || '—';
-                const directive = marker.production_directive || 'civilian';
+                const forecast = preview.ownerReports[owner]?.markerReports?.[marker.id] || {};
+                const storedOrders = Array.isArray(marker.production_orders) ? marker.production_orders : [];
+                const orderRows = storedOrders.map(order => `<div class="production-order-row"><select name="good" aria-label="Товар для производства">${Object.keys(PRODUCTION_RECIPES).map(good => `<option value="${safe(good)}" ${good === order.good ? 'selected' : ''}>${safe(good)}</option>`).join('')}</select><input name="quantity" type="number" min="0" max="1000000" step="0.1" value="${Number(order.quantity) || 0}" aria-label="Желаемое количество за ход"><button type="button" data-order-up title="Выше в очереди" aria-label="Поднять в очереди">↑</button><button type="button" data-order-down title="Ниже в очереди" aria-label="Опустить в очереди">↓</button><button type="button" class="one-off-remove" data-order-remove aria-label="Удалить заказ">×</button></div>`).join('');
+                const availableGoods = Object.entries(PRODUCTION_RECIPES).map(([good, recipe]) => {
+                    const option = forecast.production_options?.[good] || { max_this_turn: 0, inputs: [] };
+                    const inputs = (option.inputs || []).map(input => `${safe(input.resource)}: ${number(input.available)} на складе · ${number(input.per_unit)} на единицу`).join('; ') || 'нет данных о сырье';
+                    return `<li class="${Number(option.max_this_turn) > 0 ? 'is-available' : 'is-unavailable'}"><strong>${safe(good)} · максимум ${number(option.max_this_turn)} за ход</strong><small>${inputs} · мощность ${number(recipe.cost)} на единицу</small></li>`;
+                }).join('');
+                const orderResults = (forecast.production_order_results || []).map(order => `${safe(order.good)}: ${number(order.produced)} из ${number(order.requested)}`).join(' · ');
                 const config = canEdit && ['city', 'large_city'].includes(marker.type)
-                    ? `<form class="production-directive-form" data-production-marker="${marker.id}"><select name="directive" aria-label="Направление производства">${Object.entries(directiveOptions).map(([value, label]) => `<option value="${value}" ${value === directive ? 'selected' : ''}>${label}</option>`).join('')}</select><select name="good" aria-label="Товар госзаказа"><option value="">Без госзаказа</option>${goodOptions}</select><input name="quantity" type="number" min="0" step="0.1" value="${Number(marker.state_order_qty) || 0}" aria-label="Количество госзаказа"><button type="submit" class="compact-add-btn" aria-label="Сохранить директиву">✓</button></form>`
-                    : safe(directiveOptions[directive] || directive);
-                const selectedGood = marker.state_order_good;
-                return [safe(marker.name || `Поселение #${marker.id}`), safe(markerTypeLabels[marker.type] || marker.type), goods, config + (canEdit && ['city', 'large_city'].includes(marker.type) && selectedGood ? `<span class="production-order-current">Заказ: ${safe(selectedGood)}</span>` : '')];
+                    ? `<form class="production-orders-form" data-production-orders="${marker.id}"><div class="production-orders-list">${orderRows}</div><div class="production-orders-actions"><button type="button" class="page-back-btn" data-order-add>Добавить товар</button><button type="submit" class="compact-add-btn">Сохранить заказы</button></div><small>Мощность: ${number(forecast.capacity_used)} из ${number(forecast.guild_capacity)} · осталось ${number(forecast.capacity_remaining)}${orderResults ? ` · ${orderResults}` : ''}</small><details><summary>Товары, доступные из текущих запасов и поступлений</summary><p>Максимум рассчитан отдельно для каждого товара до исполнения очереди; фактический объём зависит от заказов выше в списке.</p><ul class="production-availability-list">${availableGoods}</ul></details></form>`
+                    : storedOrders.length ? storedOrders.map(order => `${safe(order.good)} — ${number(order.quantity)}/ход`).join('<br>') : 'Нет заказов';
+                return [safe(marker.name || `Поселение #${marker.id}`), safe(markerTypeLabels[marker.type] || marker.type), `${goods}${orderResults ? `<small class="production-order-current">Прогноз по заказам: ${orderResults}</small>` : ''}`, ['city','large_city'].includes(marker.type) ? config : '—'];
             });
             if (tab === 'production') {
-              // Select a saved state-order item without relying on user-facing names as attributes.
               content += productionReportTable('Производство ресурсов в провинциях', ['Провинция', 'Ресурс', 'Прогноз за ход', 'Поставка на склады'], provinceRows, 'Нет производственных данных.');
-              content += productionReportTable('Производство товаров в поселениях', ['Поселение', 'Тип', 'Товары за ход', 'Директива и госзаказ'], settlementRows, 'В государстве пока нет поселений.');
+              content += productionReportTable('Производство товаров в поселениях', ['Поселение', 'Тип', 'Выпуск', 'Заказы и производственные возможности'], settlementRows, 'В государстве пока нет поселений.');
             const surplusRows = freeSurplus.map(item => [safe(item.marker_name), `${safe(item.item_name)} (${item.item_type === 'good' ? 'товар' : 'ресурс'})`, number(item.quantity)]);
             content += '<p class="page-intro">Свободные остатки показаны по поселениям после местных потребностей и заданных перевозок. Это прогноз следующего расчётного хода.</p>';
             content += productionReportTable('Свободный избыток', ['Поселение', 'Груз', 'Свободно'], surplusRows, 'После покрытия местных потребностей свободных запасов не прогнозируется.');
@@ -1707,22 +1711,39 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
         }
         showPageView(pageTitle, content, { navId: pageNavId, subtitle: `${owner}${playerName ? ` · игрок ${playerName}` : ''}` });
         elements.pageView.querySelectorAll('[data-economy-tab]').forEach(button => button.addEventListener('click', () => renderProductionConsumption(owner, button.dataset.economyTab, playerName)));
-        elements.pageView.querySelectorAll('[data-production-marker]').forEach(form => {
-            const marker = markersById.get(Number(form.dataset.productionMarker));
-            const goodSelect = form.elements.good;
-            if (marker?.state_order_good) goodSelect.value = marker.state_order_good;
+        elements.pageView.querySelectorAll('[data-production-orders]').forEach(form => {
+            const orderList = form.querySelector('.production-orders-list');
+            const createOrderRow = () => {
+                const row = document.createElement('div');
+                row.className = 'production-order-row';
+                row.innerHTML = `<select name="good" aria-label="Товар для производства">${Object.keys(PRODUCTION_RECIPES).map(good => `<option value="${escapeHtml(good)}">${escapeHtml(good)}</option>`).join('')}</select><input name="quantity" type="number" min="0" max="1000000" step="0.1" value="1" aria-label="Желаемое количество за ход"><button type="button" data-order-up title="Выше в очереди" aria-label="Поднять в очереди">↑</button><button type="button" data-order-down title="Ниже в очереди" aria-label="Опустить в очереди">↓</button><button type="button" class="one-off-remove" data-order-remove aria-label="Удалить заказ">×</button>`;
+                return row;
+            };
+            form.querySelector('[data-order-add]')?.addEventListener('click', () => {
+                if (orderList.children.length >= Object.keys(PRODUCTION_RECIPES).length) { showToast('В очереди уже указаны все возможные товары.'); return; }
+                orderList.append(createOrderRow());
+            });
+            orderList.addEventListener('click', event => {
+                const row = event.target.closest('.production-order-row');
+                if (!row) return;
+                if (event.target.closest('[data-order-remove]')) row.remove();
+                if (event.target.closest('[data-order-up]') && row.previousElementSibling) orderList.insertBefore(row,row.previousElementSibling);
+                if (event.target.closest('[data-order-down]') && row.nextElementSibling) orderList.insertBefore(row.nextElementSibling,row);
+            });
             form.addEventListener('submit', async event => {
                 event.preventDefault();
                 const submit = form.querySelector('button[type="submit"]');
+                const orders = [...orderList.querySelectorAll('.production-order-row')].map(row => ({good:row.querySelector('[name="good"]').value,quantity:Number(row.querySelector('[name="quantity"]').value)||0}));
+                if (new Set(orders.map(order => order.good)).size !== orders.length) { showToast('Каждый товар можно добавить в очередь только один раз.'); return; }
                 submit.disabled = true;
                 try {
-                    const saved = await saveProductionDirective(Number(form.dataset.productionMarker), form.elements.directive.value, form.elements.good.value, Number(form.elements.quantity.value) || 0);
-                    const local = state.dbMarkers.find(row => Number(row.id) === Number(form.dataset.productionMarker));
+                    const saved = await saveProductionOrders(Number(form.dataset.productionOrders), orders);
+                    const local = state.dbMarkers.find(row => Number(row.id) === Number(form.dataset.productionOrders));
                     if (local) Object.assign(local, saved);
-                    showToast('Производственная директива сохранена');
+                    showToast('Очередь производства сохранена');
                     await renderProductionConsumption(owner, tab, playerName);
                 } catch (error) {
-                    showToast(`Не удалось сохранить директиву: ${error.message}`);
+                    showToast(`Не удалось сохранить заказы: ${error.message}`);
                     submit.disabled = false;
                 }
             });

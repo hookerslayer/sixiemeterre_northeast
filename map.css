@@ -911,9 +911,19 @@ body.military-army-placement #visual-map {
 .production-tabs { display: flex; gap: 8px; margin: 0 0 14px; border-bottom: 1px solid rgba(222, 210, 183, .15); }
 .production-tabs button { padding: 9px 13px; border: 1px solid transparent; border-bottom: 0; border-radius: 6px 6px 0 0; color: #b6b8ae; background: transparent; font: inherit; cursor: pointer; }
 .production-tabs button.active { border-color: rgba(222, 210, 183, .18); color: #f0e4c7; background: rgba(255, 255, 255, .045); }
-.production-directive-form { display: flex; flex-wrap: wrap; gap: 5px; min-width: 240px; }
-.production-directive-form select, .production-directive-form input { min-width: 0; max-width: 145px; padding: 5px 6px; border: 1px solid rgba(222, 210, 183, .18); border-radius: 4px; color: #eee8da; background: #171b19; font: inherit; font-size: 11px; }
-.production-directive-form input { width: 72px; }
+.production-orders-form { display: grid; gap: 7px; min-width: 290px; max-width: 480px; }
+.production-orders-list { display: grid; gap: 5px; }
+.production-order-row { display: grid; grid-template-columns: minmax(120px, 1fr) 92px 26px 26px 26px; gap: 4px; align-items: center; }
+.production-order-row select, .production-order-row input { min-width: 0; padding: 5px 6px; border: 1px solid rgba(222, 210, 183, .18); border-radius: 4px; color: #eee8da; background: #171b19; font: inherit; font-size: 11px; }
+.production-order-row button { padding: 4px; border: 1px solid rgba(222, 210, 183, .18); border-radius: 4px; color: #eee8da; background: #242a26; cursor: pointer; }
+.production-orders-actions { display: flex; flex-wrap: wrap; gap: 5px; }
+.production-orders-form > small { color: #b9b3a5; font-size: 10px; }
+.production-orders-form details { max-width: 100%; color: #cbc4b4; font-size: 11px; }
+.production-orders-form details summary { cursor: pointer; }
+.production-availability-list { display: grid; gap: 5px; padding-left: 18px; }
+.production-availability-list li strong, .production-availability-list li small { display: block; }
+.production-availability-list li small { margin-top: 2px; color: #a9a99f; }
+.production-availability-list li.is-unavailable { opacity: .65; }
 .production-order-current { display: block; margin-top: 4px; color: #aeb2a7; font-size: 10px; }
 .popup-economy-info { margin: 8px 0; padding: 7px 9px; border-left: 2px solid rgba(212, 178, 112, .55); color: #bdc0b6; background: rgba(255, 255, 255, .035); font-size: 11px; }
 .popup-economy-info strong { color: #eee2c5; }

@@ -22,11 +22,11 @@ const PEASANT_FOOD_SEASONS = {
   'Скот':[.85,1.05,1.15,.95]
 };
 const NORTHERN_CATTLE_REGIONS = new Set(['лапландия','югорская земля','мезенская земля','поморье']);
-const RECIPES = {
+export const PRODUCTION_RECIPES = Object.freeze({
   'Топливо':{alternatives:[[['Древесина',1]],[['Ворвань',.8]]],cost:1,spend:'one'}, 'Сукно и Одежда':{inputs:[['Скот',.5],['Лён',.5]],cost:2},
   'Инструменты':{inputs:[['Железная руда',1],['Древесина',.5]],cost:3}, 'Оружие и Доспехи':{inputs:[['Железная руда',2],['Древесина',1]],cost:5},
   'Обработанный камень':{inputs:[['Камень',1],['Древесина',.5]],cost:2}, 'Оловина':{inputs:[['Зерно',1],['Древесина',.2]],cost:2}, 'Бумага':{inputs:[['Древесина',1],['Мёд и Воск',.2]],cost:3}
-};
+});
 const NEED_GOODS = [
   {name:'Продовольствие',choices:[['Зерно',1],['Скот',1],['Морепродукты',1],['Мёд и Воск',1]],basket:[['Зерно',.6],['Скот',.2],['Морепродукты',.15],['Мёд и Воск',.05]]},
   {name:'Топливо',choices:[['Топливо',1],['Древесина',1],['Ворвань',1]],basket:[['Топливо',.7],['Древесина',.2],['Ворвань',.1]]},
@@ -324,58 +324,68 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},m
     const contributions=[{owner,territoryType:'marker',territoryId:Number(marker.id),needs:calculateNeeds(religion,estates,owner,culture,'marker',marker.id,type)},...(demandByMarker.get(Number(marker.id))||[])];
     demandsByMarker.set(Number(marker.id),contributions);
   }
-  for(const marker of markers){const owner=marker.owner;if(!owner||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;const inv=invByMarker.get(Number(marker.id)),setting=settingsFor(owner);
-    const province=provincesById.get(Number(marker.province_id))||{}, culture=marker.culture||province.main_culture,religion=marker.religion||province.main_religion;
-    const cultureM=statusMultiplier(getStatus(setting,'culture',culture)),religionM=statusMultiplier(getStatus(setting,'religion',religion));
-    const crime=effectiveRate(owner,'crime_rate','crime_rate_pp'), corruption=effectiveRate(owner,'corruption_rate','corruption_rate_pp');
-    const yards=Number(marker.yards)||0,type=marker.type;
-    if(['city','large_city','monastery'].includes(type)){
-      const isMonastery=type==='monastery',ratios=estateRatios[type]||{},workforce=Math.round(yards*(Number(ratios[isMonastery?'clergy':'burghers'])||0));
-      const developmentBase=type==='large_city'?200:50;
-      const developmentMultiplier=isMonastery?1:Math.max(0,1+(Number(marker.development??developmentBase)-developmentBase)*.01);
-      const craftModifier=modifierPct(owner,'guild_capacity_pct',{marker:String(marker.id),culture,religion,territory_type:type});
-      let capacity=workforce*(isMonastery?5:10)*(1-crime/100)*cultureM*religionM*developmentMultiplier*Math.max(0,1+craftModifier/100);
-      const totalCapacity=capacity;
-      let directive=['civilian','military','market'].includes(marker.production_directive)?marker.production_directive:'civilian';
-      let orderGood=marker.state_order_good||'', orderQty=Math.min(Number(marker.state_order_qty)||0,Math.max(0,capacity*.5));
-      const priority=['Топливо','Сукно и Одежда'];
-      const directiveOrders=directive==='military'?['Оружие и Доспехи','Инструменты','Топливо','Сукно и Одежда']:directive==='civilian'?['Инструменты','Обработанный камень','Бумага','Оловина','Топливо','Сукно и Одежда']:[];
-      const reserveCost=orderGood&&RECIPES[orderGood]&&orderQty>0?Math.min(capacity*.5,orderQty*RECIPES[orderGood].cost):0;
-      const goodsProduced={};
-      const produce=(good,limit=Infinity,capacityLimit=Infinity)=>{
-        const recipe=RECIPES[good];
-        if(!recipe||capacity<=0)return 0;
-        const outputLimit=Math.min(limit,capacity/recipe.cost,capacityLimit/recipe.cost);
-        const alternatives=recipe.alternatives||[recipe.inputs];
-        const selected=alternatives.map(inputs=>({inputs,inputLimit:Math.min(...inputs.map(([input,qty])=>readInv(inv,'resource',input)/qty))}))
-          .sort((a,b)=>b.inputLimit-a.inputLimit)[0];
-        const sabotage=spySabotageEffects.filter(effect=>Number(effect.marker_id)===Number(marker.id)&&effect.item_name===good&&Number(effect.starts_turn)<=Number(calendar.turn)&&Number(effect.ends_turn)>=Number(calendar.turn))
-          .reduce((current,effect)=>Math.max(current,Number(effect.reduction)||0),0);
-        const outputModifier=modifierPct(owner,'good_production_pct',{marker:String(marker.id),culture,religion,territory_type:type,good,item_name:good});
-        const productionFactor=Math.max(0,1+outputModifier/100);
-        const plannedOutput=Math.floor(Math.min(outputLimit,selected.inputLimit*productionFactor)*100)/100;
-        const output=Math.floor(plannedOutput*(1-sabotage)*100)/100;
-        if(plannedOutput<=0||output<=0||productionFactor<=0)return 0;
-        const inputUsed=plannedOutput/productionFactor;
-        for(const [input,qty] of selected.inputs)inv.set(invKey('resource',input),Math.max(0,readInv(inv,'resource',input)-inputUsed*qty));
-        addInv(inv,'good',good,output);
-        capacity-=plannedOutput*recipe.cost;
-        addBalance(production,good,output);
-        goodsProduced[good]=(goodsProduced[good]||0)+output;
-        ownerProduction[owner]??={};
-        addBalance(ownerProduction[owner],good,output);
-        return output;
-      };
-      priority.forEach(g=>produce(g,Infinity,Math.max(0,capacity-reserveCost)));
-      let producedOrder=0;if(orderGood&&RECIPES[orderGood]&&orderQty>0){const unitCost=RECIPES[orderGood].cost;const e=setting.economy||{};const fundedLimit=Math.max(0,Number(e.treasury)||0)/unitCost;producedOrder=produce(orderGood,Math.min(orderQty,fundedLimit));e.treasury=Math.max(0,(Number(e.treasury)||0)-round(producedOrder*unitCost));setting.economy=e;}
-      if(directive==='market'){
-        const candidates=Object.keys(RECIPES).filter(g=>!priority.includes(g)&&g!==orderGood).map(g=>({good:g,potential:Math.max(...(RECIPES[g].alternatives||[RECIPES[g].inputs]).map(inputs=>Math.min(...inputs.map(([input,qty])=>readInv(inv,'resource',input)/qty))))/RECIPES[g].cost})).sort((a,b)=>b.potential-a.potential||a.good.localeCompare(b.good,'ru'));
-        if(candidates[0]?.potential>0)produce(candidates[0].good);
-      } else for(const g of directiveOrders)if(!priority.includes(g)&&g!==orderGood)produce(g);
-      for(const g of Object.keys(RECIPES).sort())if(!priority.includes(g)&&g!==orderGood)produce(g);
-      markerReports[marker.id]={guild_capacity:round(totalCapacity),directive,state_order_good:orderGood,state_order_qty:orderQty,state_order_produced:producedOrder,goods_produced:goodsProduced,max_storage:0};
+  const productionCapacityFor=marker=>{
+    const owner=marker.owner,province=provincesById.get(Number(marker.province_id))||{},culture=marker.culture||province.main_culture,religion=marker.religion||province.main_religion;
+    if(!owner||!['city','large_city'].includes(marker.type))return 0;
+    const setting=settingsFor(owner),cultureM=statusMultiplier(getStatus(setting,'culture',culture)),religionM=statusMultiplier(getStatus(setting,'religion',religion));
+    const crime=effectiveRate(owner,'crime_rate','crime_rate_pp'),yards=Number(marker.yards)||0,type=marker.type;
+    const ratios=estateRatios[type]||{},workforce=Math.round(yards*(Number(ratios.burghers)||0)),developmentBase=type==='large_city'?200:50;
+    const developmentMultiplier=Math.max(0,1+(Number(marker.development??developmentBase)-developmentBase)*.01);
+    const craftModifier=modifierPct(owner,'guild_capacity_pct',{marker:String(marker.id),culture,religion,territory_type:type});
+    return workforce*10*(1-crime/100)*cultureM*religionM*developmentMultiplier*Math.max(0,1+craftModifier/100);
+  };
+  const reserveProductionInputs=(marker,inventory)=>{
+    let capacity=productionCapacityFor(marker);
+    if(capacity<=0)return;
+    const province=provincesById.get(Number(marker.province_id))||{},owner=marker.owner,culture=marker.culture||province.main_culture,religion=marker.religion||province.main_religion;
+    const orders=Array.isArray(marker.production_orders)?marker.production_orders:[];
+    for(const order of orders){
+      const good=String(order?.good||''),recipe=PRODUCTION_RECIPES[good],quantity=Math.max(0,Number(order?.quantity??order?.qty)||0);
+      if(!recipe||quantity<=0)continue;
+      const factor=Math.max(0,1+modifierPct(owner,'good_production_pct',{marker:String(marker.id),culture,religion,territory_type:marker.type,good,item_name:good})/100);
+      if(factor<=0)continue;
+      const alternatives=(recipe.alternatives||[recipe.inputs]).map(inputs=>({inputs,maxByInputs:Math.min(...inputs.map(([name,qty])=>readInv(inventory,'resource',name)/qty))})).sort((a,b)=>b.maxByInputs-a.maxByInputs);
+      const selected=alternatives[0],plannedOutput=Math.floor(Math.min(quantity,capacity/recipe.cost,selected.maxByInputs*factor)*100)/100;
+      if(plannedOutput<=0)continue;
+      for(const [name,qty] of selected.inputs)inventory.set(invKey('resource',name),Math.max(0,readInv(inventory,'resource',name)-(plannedOutput/factor)*qty));
+      capacity-=plannedOutput*recipe.cost;
     }
-  }
+  };
+  const produceCityGoods=()=>{
+    for(const marker of markers){const owner=marker.owner;if(!owner||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;const inv=invByMarker.get(Number(marker.id));
+      const province=provincesById.get(Number(marker.province_id))||{},culture=marker.culture||province.main_culture,religion=marker.religion||province.main_religion;
+      const type=marker.type;
+      if(!['city','large_city'].includes(type))continue;
+      const totalCapacity=productionCapacityFor(marker);
+      let capacity=totalCapacity;
+      const orders=Array.isArray(marker.production_orders)?marker.production_orders:[];
+      const goodsProduced={},productionOptions={};
+      const recipeInputs=recipe=>recipe.alternatives||[recipe.inputs];
+      const outputModifierFor=good=>modifierPct(owner,'good_production_pct',{marker:String(marker.id),culture,religion,territory_type:type,good,item_name:good});
+      for(const [good,recipe] of Object.entries(PRODUCTION_RECIPES)){
+        const factor=Math.max(0,1+outputModifierFor(good)/100);
+        const alternatives=recipeInputs(recipe).map(inputs=>({inputs,maxByInputs:Math.min(...inputs.map(([name,qty])=>readInv(inv,'resource',name)/qty))})).sort((a,b)=>b.maxByInputs-a.maxByInputs);
+        const selected=alternatives[0];
+        productionOptions[good]={max_this_turn:round(Math.max(0,Math.min(totalCapacity/recipe.cost,selected.maxByInputs*factor))),inputs:selected.inputs.map(([name,qty])=>({resource:name,available:round(readInv(inv,'resource',name)),per_unit:qty})),capacity_per_unit:recipe.cost};
+      }
+      const produce=(good,limit=Infinity)=>{
+        const recipe=PRODUCTION_RECIPES[good];if(!recipe||capacity<=0)return 0;
+        const factor=Math.max(0,1+outputModifierFor(good)/100);if(factor<=0)return 0;
+        const alternatives=recipeInputs(recipe).map(inputs=>({inputs,maxByInputs:Math.min(...inputs.map(([name,qty])=>readInv(inv,'resource',name)/qty))})).sort((a,b)=>b.maxByInputs-a.maxByInputs);
+        const selected=alternatives[0],plannedOutput=Math.floor(Math.min(limit,capacity/recipe.cost,selected.maxByInputs*factor)*100)/100;
+        const sabotage=spySabotageEffects.filter(effect=>Number(effect.marker_id)===Number(marker.id)&&effect.item_name===good&&Number(effect.starts_turn)<=Number(calendar.turn)&&Number(effect.ends_turn)>=Number(calendar.turn)).reduce((current,effect)=>Math.max(current,Number(effect.reduction)||0),0);
+        const output=Math.floor(plannedOutput*(1-sabotage)*100)/100;if(plannedOutput<=0||output<=0)return 0;
+        for(const [name,qty] of selected.inputs)inv.set(invKey('resource',name),Math.max(0,readInv(inv,'resource',name)-(plannedOutput/factor)*qty));
+        addInv(inv,'good',good,output);capacity-=plannedOutput*recipe.cost;addBalance(production,good,output);goodsProduced[good]=(goodsProduced[good]||0)+output;
+        ownerProduction[owner]??={};addBalance(ownerProduction[owner],good,output);return output;
+      };
+      const orderResults=[];
+      for(const order of orders){const good=String(order?.good||''),quantity=Math.max(0,Number(order?.quantity??order?.qty)||0);if(!PRODUCTION_RECIPES[good]||quantity<=0)continue;
+        const produced=produce(good,quantity);orderResults.push({good,requested:round(quantity),produced:round(produced),unfilled:round(Math.max(0,quantity-produced))});
+      }
+      markerReports[marker.id]={guild_capacity:round(totalCapacity),capacity_used:round(totalCapacity-capacity),capacity_remaining:round(capacity),production_orders:orders,production_order_results:orderResults,production_options:productionOptions,goods_produced:goodsProduced,max_storage:0};
+    }
+  };
   const transportReports=[],routeGroups=new Map();
   for(const route of transportRoutes){const key=`${Number(route.source_marker_id)}:${Number(route.destination_marker_id)}`;if(!routeGroups.has(key))routeGroups.set(key,[]);routeGroups.get(key).push(route);}
   const pendingTransfers=[];
@@ -387,7 +397,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},m
     const water=waterCandidates.filter(candidate=>!candidate.provinceIds.some(id=>rebelliousProvinceIds.has(Number(id)))&&(candidate.mode==='sea'||(candidate.transitOwners.every(transitOwner=>transitOwner===owner)&&candidate.provinceIds.every(provinceId=>provincesById.get(Number(provinceId))?.owner===owner)))).sort((a,b)=>routeScore(a)-routeScore(b))[0]||null;
     const mode=water?.mode||'land',distance=water?.distance??landDistance,capacity=routeCapacity(mode,distance);let remainingCapacity=capacity;
     for(const route of routes){const sourceInv=invByMarker.get(sourceId),itemType=route.item_type,itemName=route.item_name,key=invKey(itemType,itemName),original=sourceInv?readInv(sourceInv,itemType,itemName):0;
-      const reserveMap=new Map();if(sourceInv){const reserved=new Map(sourceInv);for(const need of NEED_GOODS){const demand=(demandsByMarker.get(sourceId)||[]).reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0);takeNeed(reserved,need,demand);}for(const [itemKey,qty] of sourceInv)reserveMap.set(itemKey,Math.max(0,qty-readInv(reserved,itemKey.split('\u0000')[0],itemKey.split('\u0000')[1])));}
+      const reserveMap=new Map();if(sourceInv){const reserved=new Map(sourceInv);for(const need of NEED_GOODS){const demand=(demandsByMarker.get(sourceId)||[]).reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0);takeNeed(reserved,need,demand);}reserveProductionInputs(source,reserved);for(const [itemKey,qty] of sourceInv)reserveMap.set(itemKey,Math.max(0,qty-readInv(reserved,itemKey.split('\u0000')[0],itemKey.split('\u0000')[1])));}
       const available=Math.max(0,original-(reserveMap.get(key)||0)),requested=Math.max(0,Number(route.quantity_per_turn)||0),sent=distance===null?0:round(Math.min(requested,remainingCapacity,available));
       if(sent>0){sourceInv.set(key,original-sent);pendingTransfers.push({marker_id:Number(destinationId),item_type:itemType,item_name:itemName,quantity:sent});remainingCapacity=round(remainingCapacity-sent);}
       const result={route_id:route.id,source_marker_id:sourceId,destination_marker_id:destinationId,item_type:itemType,item_name:itemName,mode,distance,capacity,requested,delivered:sent,reason:distance===null?'Нет сухопутного или водного пути под контролем государства':sent<requested?(remainingCapacity<=0?'Исчерпана пропускная способность':available<=sent?'Недостаточно свободного запаса':'Ограничение маршрута'):null};
@@ -422,7 +432,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},m
     const transitTolls=transitOwners.map(owner=>{const rule=tollsByOwner.get(owner),configured=Number(rule?.toll_rate),rate=Number.isFinite(configured)?Math.max(0,Math.min(50,configured)):10;return {owner,rate};});
     const mapPoints=water?water.mapPoints:[{x:Number(source.coord_1),y:Number(source.coord_2)},...(selectedRoute?.provinceIds.slice(1,-1)||[]).map(id=>provinceCentroids.get(Number(id))).filter(point=>point&&Number.isFinite(point.x)&&Number.isFinite(point.y)),{x:Number(destination.coord_1),y:Number(destination.coord_2)}];
     const capacity=routeCapacity(mode,distance),linkKey=`${sourceId}:${destinationId}`;if(!externalLinkCapacity.has(linkKey))externalLinkCapacity.set(linkKey,capacity);const remainingCapacity=externalLinkCapacity.get(linkKey),itemType=contract.item_type,itemName=contract.item_name,key=invKey(itemType,itemName),sourceInv=invByMarker.get(sourceId);
-    const reserved=new Map(sourceInv||[]);for(const need of NEED_GOODS){const demand=(demandsByMarker.get(sourceId)||[]).reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0);takeNeed(reserved,need,demand);}
+    const reserved=new Map(sourceInv||[]);for(const need of NEED_GOODS){const demand=(demandsByMarker.get(sourceId)||[]).reduce((sum,contribution)=>sum+(Number(contribution.needs?.[need.name])||0),0);takeNeed(reserved,need,demand);}reserveProductionInputs(source,reserved);
     const available=Math.max(0,readInv(sourceInv||new Map(),itemType,itemName)-readInv(reserved,itemType,itemName));
     const requested=Math.max(0,Number(contract.quantity_per_turn)||0),unitPrice=Math.max(0,Number(contract.unit_price)||0),tollRate=transitTolls.reduce((sum,row)=>sum+row.rate,0),buyerCostPerShippedUnit=unitPrice*(neutralLossFactor+tollRate/100),affordable=buyerCostPerShippedUnit>0?contractFunds[buyer]/buyerCostPerShippedUnit:requested;
     const shipped=distance===null?0:round(Math.min(requested,remainingCapacity,available,affordable)),delivered=round(shipped*neutralLossFactor),routeLoss=round(shipped-delivered),paid=round(delivered*unitPrice),tolls=transitTolls.map(row=>({...row,amount:round(shipped*unitPrice*row.rate/100)})),tollPaid=round(tolls.reduce((sum,row)=>sum+(Number(row.amount)||0),0)),buyerTotalPaid=round(paid+tollPaid);externalLinkCapacity.set(linkKey,round(Math.max(0,remainingCapacity-shipped)));
@@ -430,6 +440,9 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},m
     const result={contract_id:Number(contract.id),source_marker_id:sourceId,destination_marker_id:destinationId,source_name:source.name||`Поселение #${sourceId}`,destination_name:destination.name||`Поселение #${destinationId}`,seller_owner:seller,buyer_owner:buyer,item_type:itemType,item_name:itemName,requested,shipped,delivered,route_loss:routeLoss,neutral_province_count:neutralProvinceCount,transit_owners:transitOwners,transit_tolls:tolls,toll_paid:tollPaid,buyer_total_paid:buyerTotalPaid,unit_price:unitPrice,paid,mode,distance,capacity,province_ids:selectedRoute?.provinceIds||[],map_points:mapPoints,manual_route:hasManualRoute,blocked_transit_owners:[...blockedOwners],reason:routeBlocked?'Ручной маршрут проходит через государство, запретившее транзит':distance===null?'Нет доступного сухопутного или водного пути':shipped<requested?(available<=shipped?'Недостаточно свободного избытка':affordable<=shipped?'Недостаточно средств у покупателя':'Ограничение пропускной способности'):null};
     externalTradeReports.push(result);ownerExternalTradeReports[seller]??=[];ownerExternalTradeReports[seller].push({...result,side:'export'});ownerExternalTradeReports[buyer]??=[];ownerExternalTradeReports[buyer].push({...result,side:'import'});for(const toll of tolls){ownerExternalTradeReports[toll.owner]??=[];ownerExternalTradeReports[toll.owner].push({...result,side:'transit',transit_toll_income:toll.amount,transit_toll_owner:toll.owner,transit_toll_rate:toll.rate});}
   }
+  // Production orders run after province deliveries and both internal and
+  // external trade, so this season's incoming resources can be used immediately.
+  produceCityGoods();
   for(const marker of markers){if(!marker.owner||marker.type==='ruins'||isRebellious('marker',marker.id)||isRebellious('province',marker.province_id))continue;ownerMarketSupply[marker.owner]??={};for(const [key,quantity] of invByMarker.get(Number(marker.id))||[]){const itemName=key.split('\u0000')[1];addBalance(ownerMarketSupply[marker.owner],itemName,quantity);}}
   const ownerFreeSurplus={};
   for(const marker of markers){

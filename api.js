@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=state-prestige-limits-20261015';
+import { supabaseClient, state } from './config.js?v=production-orders-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -926,12 +926,10 @@ export async function saveTerritoryRebellions(rows) {
     return data;
 }
 
-export async function saveProductionDirective(markerId, directive, orderGood, orderQuantity) {
-    const { data, error } = await supabaseClient.rpc('save_production_directive', {
+export async function saveProductionOrders(markerId, orders) {
+    const { data, error } = await supabaseClient.rpc('save_production_orders', {
         p_marker_id: markerId,
-        p_directive: directive,
-        p_order_good: orderGood || null,
-        p_order_qty: orderQuantity
+        p_orders: orders
     });
     if (error) throw error;
     return data;

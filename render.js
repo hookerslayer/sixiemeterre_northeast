@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=state-prestige-limits-20261015';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=production-orders-20261015';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
