@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=military-ui-update-20261016';
+import { supabaseClient, state } from './config.js?v=military-ui-update-20261016b';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -173,6 +173,18 @@ export async function saveStateMechanics(owner, settings) {
     const { data, error } = await supabaseClient.from('state_mechanics').upsert({ owner, settings, updated_at: new Date().toISOString() }, { onConflict: 'owner' }).select('settings').single();
     if (error) throw error;
     return data.settings;
+}
+
+export async function saveStateOneOffOperations(owner, operations) {
+    const { data, error } = await supabaseClient.rpc('save_state_one_off_operations', {
+        p_owner: owner,
+        p_one_off_income_treasury: operations.one_off_income_treasury || [],
+        p_one_off_expenses_treasury: operations.one_off_expenses_treasury || [],
+        p_one_off_income_prestige: operations.one_off_income_prestige || [],
+        p_one_off_expenses_prestige: operations.one_off_expenses_prestige || []
+    });
+    if (error) throw error;
+    return data;
 }
 
 export async function submitStateModifierProposal(values) {
@@ -684,14 +696,25 @@ export async function buildMilitaryPort(markerId, portType, sourceMarkerId) {
 }
 
 export async function startMilitaryShipBuild(values) {
-    const { data, error } = await supabaseClient.rpc('start_military_ship_build', {
+    const { data, error } = await supabaseClient.rpc('start_military_ship_build_with_commander', {
         p_port_marker_id: values.portMarkerId,
         p_source_marker_id: values.sourceMarkerId,
         p_ship_type: values.shipType,
         p_fleet_name: values.fleetName || null,
-        p_commander_name: values.commanderName || null,
-        p_commander_age: values.commanderAge ? Number(values.commanderAge) : null,
+        p_commander_id: values.commanderId || null,
         p_fleet_id: values.fleetId || null
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function adminCreateMilitaryFleet(values) {
+    const { data, error } = await supabaseClient.rpc('admin_create_military_fleet', {
+        p_owner: values.owner,
+        p_name: values.name,
+        p_port_marker_id: Number(values.portMarkerId),
+        p_commander_id: values.commanderId,
+        p_ships: values.ships
     });
     if (error) throw error;
     return data;

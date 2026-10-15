@@ -1369,7 +1369,7 @@ body.military-army-placement #visual-map {
 .extend-militia-service { margin-top: 7px; white-space: nowrap; }
 .commander-training { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
 .commander-training select { min-width: 0; max-width: 220px; }
-.commander-training .compact-add-btn { flex: 0 0 auto; }
+.commander-training .compact-add-btn { flex: 0 0 auto; min-width: 88px; white-space: nowrap; padding-inline: 10px; }
 .military-db-warning { margin: 10px 18px; }
 .military-battle-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding: 16px 18px; }
 .military-battle-controls > label:not(.military-check) { display: grid; gap: 6px; min-width: 170px; color: #aeb2a7; font-size: 12px; }

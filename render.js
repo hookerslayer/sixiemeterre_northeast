@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=military-ui-update-20261016';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=military-ui-update-20261016b';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
@@ -30,14 +30,6 @@ function drawTerrainMark(ctx, terrain, x, y, size, bridge = false) {
             ctx.lineTo(px + size * .07, py + size * .07);
         }
         strokeTerrainPath(ctx);
-    } else if (terrain === 'water') {
-        for (const dy of [-.22, .08, .36]) {
-            ctx.beginPath();
-            ctx.moveTo(cx - size * .34, cy + size * dy);
-            ctx.quadraticCurveTo(cx - size * .16, cy + size * (dy - .1), cx, cy + size * dy);
-            ctx.quadraticCurveTo(cx + size * .17, cy + size * (dy + .1), cx + size * .34, cy + size * dy);
-            strokeTerrainPath(ctx);
-        }
     } else if (terrain === 'hill') {
         for (const scale of [1, .62]) {
             const half = size * .34 * scale, rise = size * .28 * scale;
@@ -283,21 +275,19 @@ export async function buildMilitaryGridMetadata() {
     return cells;
 }
 
-function drawMixedWaterMark(ctx, x, y, size) {
-    const cx = x + size * .78, cy = y + size * .78;
+function drawFordMark(ctx, x, y, size) {
+    const cx = x + size / 2, cy = y + size / 2;
+    const radius = Math.max(1.25, size * .035);
     ctx.save();
-    // Keep the hydrology cue in a corner so the terrain symbol stays legible.
-    ctx.beginPath();
-    ctx.arc(cx, cy, size * .18, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(22, 31, 35, .88)';
-    ctx.fill();
-    ctx.lineWidth = Math.max(1, size * .035);
-    ctx.strokeStyle = 'rgba(235, 244, 244, .95)';
-    ctx.beginPath();
-    ctx.moveTo(cx - size * .12, cy);
-    ctx.quadraticCurveTo(cx - size * .06, cy - size * .05, cx, cy);
-    ctx.quadraticCurveTo(cx + size * .06, cy + size * .05, cx + size * .12, cy);
-    ctx.stroke();
+    ctx.fillStyle = 'rgba(244, 235, 205, .96)';
+    ctx.strokeStyle = 'rgba(31, 42, 43, .95)';
+    ctx.lineWidth = Math.max(1, size * .018);
+    for (const dx of [-size * .12, 0, size * .12]) {
+        ctx.beginPath();
+        ctx.arc(cx + dx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+    }
     ctx.restore();
 }
 
@@ -340,12 +330,9 @@ export function renderMilitaryGrid() {
                 const waterCoverage = synchronizedCell ? Number(synchronizedCell.water_coverage) || 0 : sampleCellWaterCoverage(mapData, waterMasks, canvas.width, canvas.height, x, y, Math.min(size, canvas.width - x), key);
                 let terrain = override?.terrain;
                 // A cell belongs to water only when water occupies more than half of it.
-                // Mixed shoreline and narrow-river cells remain land; the small badge
-                // below preserves the separate hydrology feature.
                 if (!terrain) terrain = synchronizedCell?.base_terrain || (waterCoverage > .5 ? 'water' : 'plain');
                 drawTerrainMark(ctx, terrain, x, y, Math.min(size, canvas.width - x), !!override?.bridge);
-                const shouldShowMixedWater = terrain !== 'water' && !override?.bridge && waterCoverage >= .025 && waterCoverage <= .5;
-                if (shouldShowMixedWater) drawMixedWaterMark(ctx, x, y, Math.min(size, canvas.width - x));
+                if (Number(synchronizedCell?.ford_edges) && !override?.bridge) drawFordMark(ctx, x, y, Math.min(size, canvas.width - x));
                 if (synchronizedCell?.flow_dx != null && (Number(synchronizedCell.water_types) & 1)) {
                     drawCurrentMark(ctx, x, y, Math.min(size, canvas.width - x), Number(synchronizedCell.flow_dx), Number(synchronizedCell.flow_dy));
                 }
