@@ -109,6 +109,7 @@ begin
         'government_form',btrim(p_government_form),'region',btrim(p_region),
         'titular_culture',btrim(p_titular_culture),'titular_religion',btrim(p_titular_religion),
         'ruler',jsonb_build_object('name',btrim(p_ruler_name),'title',v_title,'age',p_ruler_age,'status','active','last_age_year',coalesce(v_current_year,1450)),
+        'economy',jsonb_build_object('treasury',15000,'prestige',15),
         'tax_rates',jsonb_build_object('aristocracy',10,'clergy',1,'burghers',2,'peasants',1),
         'estate_loyalty',jsonb_build_object('aristocracy',50,'clergy',50,'burghers',50,'peasants',50)
     );

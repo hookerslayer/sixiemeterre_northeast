@@ -583,7 +583,8 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},m
     const prestigeExpenseTotal=round(prestigeExpenseRecurring+prestigeExpenseOneOff);
     const prestigeAvailable=round(Math.max(0,Number(economy.prestige)||0)+prestigeIncomeTotal);
     const prestigeExpensePaid=round(Math.min(prestigeAvailable,prestigeExpenseTotal));
-    economy.prestige=round(Math.max(0,prestigeAvailable-prestigeExpensePaid));
+    const prestigeCap=30+20*markers.filter(marker=>marker.owner===owner&&marker.type==='large_city').length;
+    economy.prestige=round(Math.min(prestigeCap,Math.max(0,prestigeAvailable-prestigeExpensePaid)));
     economy.one_off_income_prestige=[];
     economy.one_off_expenses_prestige=[];
     economy.prestige_one_off_expenses=0;
