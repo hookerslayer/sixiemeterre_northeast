@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=explicit-move-siege-popup-20261015';
+import { supabaseClient, state } from './config.js?v=raid-river-grid-20261015';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -257,6 +257,12 @@ export async function fetchMilitaryGridCells() {
         const flow = flowByCell.get(`${cell.cell_x},${cell.cell_y}`);
         return flow ? { ...cell, flow_dx:Number(flow.flow_dx), flow_dy:Number(flow.flow_dy) } : cell;
     });
+}
+
+export async function syncMilitaryGridCells(cells) {
+    const { data, error } = await supabaseClient.rpc('sync_military_grid_cells', { p_cells: cells });
+    if (error) throw error;
+    return Number(data) || 0;
 }
 
 export async function setMilitaryWaterCurrent(cellX, cellY, dx, dy) {

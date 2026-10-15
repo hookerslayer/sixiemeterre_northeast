@@ -132,6 +132,8 @@ export const elements = {
     militaryMapTools: document.getElementById('military-map-tools'),
     mapFinanceBadge: document.getElementById('map-finance-badge'),
     militaryTerrainEditBtn: document.getElementById('military-terrain-edit-btn'),
+    militaryGridSyncBtn: document.getElementById('sync-military-grid-btn'),
+    militaryGridSyncStatus: document.getElementById('sync-military-grid-status'),
     militaryTerrainSelect: document.getElementById('military-terrain-select'),
     cancelMilitaryPlacementBtn: document.getElementById('cancel-military-placement-btn'),
     tradeRouteEditor: document.getElementById('trade-route-editor'),

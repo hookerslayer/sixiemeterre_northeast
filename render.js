@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE } from './config.js?v=explicit-move-siege-popup-20261015';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=raid-river-grid-20261015';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
@@ -138,11 +138,37 @@ function isRiverPixel(mask, px, py, width, height) {
         && mask.data[index + 1] > mask.data[index] + 5 && mask.data[index + 2] > 60;
 }
 
-export function buildMilitaryGridMetadata() {
+function cellContainsRiver(mask, x, y, size, width, height) {
+    if (!mask?.data) return false;
+    const left = Math.floor(x * mask.width / width), top = Math.floor(y * mask.height / height);
+    const right = Math.min(mask.width, Math.ceil((x + size) * mask.width / width));
+    const bottom = Math.min(mask.height, Math.ceil((y + size) * mask.height / height));
+    for (let py = top; py < bottom; py++) for (let px = left; px < right; px++) {
+        const index = (py * mask.width + px) * 4;
+        if (mask.data[index + 3] >= 16 && mask.data[index + 2] > mask.data[index] + 15
+            && mask.data[index + 1] > mask.data[index] + 5 && mask.data[index + 2] > 60) return true;
+    }
+    return false;
+}
+
+async function readWaterMask(src) {
+    const image = new Image();
+    image.src = src;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.naturalWidth;
+    canvas.height = image.naturalHeight;
+    const context = canvas.getContext('2d', { willReadFrequently: true });
+    context.drawImage(image, 0, 0);
+    return context.getImageData(0, 0, canvas.width, canvas.height);
+}
+
+export async function buildMilitaryGridMetadata() {
     const width = elements.hiddenCanvas.width, height = elements.hiddenCanvas.height;
     if (!width || !height) throw new Error('Карта провинций ещё не загружена.');
     const mapData = elements.hiddenCtx.getImageData(0, 0, width, height).data;
-    const masks = [];
+    const masks = await Promise.all([RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC].map(readWaterMask));
+    state.militaryWaterCoverage.clear();
     const cellSize = MILITARY_GRID_CELL_SIZE;
     const cells = [];
     const directions = [[1,0,1], [1,1,2], [0,1,4], [-1,1,8], [-1,0,16], [-1,-1,32], [0,-1,64], [1,-1,128]];
@@ -158,7 +184,9 @@ export function buildMilitaryGridMetadata() {
             const provinceId = state.provinceRgbToId[rgb] || null;
             const key = `${cellX},${cellY}`;
             const coverage = sampleCellWaterCoverage(mapData, masks, width, height, x, y, Math.min(actualWidth, actualHeight), key);
-            const waterTypes = sampleCellWaterTypes(masks, width, height, x, y, Math.min(actualWidth, actualHeight));
+            const containsRiver = cellContainsRiver(masks[0], x, y, Math.min(actualWidth, actualHeight), width, height);
+            let waterTypes = sampleCellWaterTypes(masks, width, height, x, y, Math.min(actualWidth, actualHeight));
+            if (containsRiver) waterTypes |= 1;
             let riverEdges = 0;
             for (const [dx, dy, edgeFlag] of directions) {
                 if (cellX + dx < 0 || cellY + dy < 0 || cellX + dx >= cellColumns || cellY + dy >= cellRows) continue;
@@ -175,7 +203,8 @@ export function buildMilitaryGridMetadata() {
                 }
                 if (crossesRiver) riverEdges |= edgeFlag;
             }
-            cells.push({ cell_x: cellX, cell_y: cellY, province_id: provinceId, base_terrain: coverage > .5 ? 'water' : 'plain', river_edges: riverEdges, water_coverage: Number(coverage.toFixed(4)), water_types: waterTypes });
+            const riverCoverage = containsRiver ? Math.max(coverage, .0001) : coverage;
+            cells.push({ cell_x: cellX, cell_y: cellY, province_id: provinceId, base_terrain: coverage > .5 || containsRiver ? 'water' : 'plain', river_edges: riverEdges, water_coverage: Number(riverCoverage.toFixed(4)), water_types: waterTypes });
         }
     }
     return cells;
