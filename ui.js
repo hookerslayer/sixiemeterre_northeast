@@ -1376,7 +1376,10 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
         state.economySnapshot = snapshot;
         refreshTradeRouteOverlay();
         const actualRow = snapshot.reports.find(row => row.owner === owner);
-        const report = actualRow?.report || simulateEconomySnapshot(snapshot).ownerReports[owner] || { production: {}, consumption: {}, shortages: {}, markerReports: {}, provinceReports: {} };
+        const preview = actualRow && tab === 'consumption'
+            ? { ownerReports: { [owner]: actualRow.report }, transportReports: [] }
+            : simulateEconomySnapshot(snapshot);
+        const report = actualRow?.report || preview.ownerReports[owner] || { production: {}, consumption: {}, shortages: {}, markerReports: {}, provinceReports: {} };
         const isPreview = !actualRow;
         const markersById = new Map(snapshot.markers.map(row => [Number(row.id), row]));
         const ownerProvinces = snapshot.provinces.filter(row => row.owner === owner);
