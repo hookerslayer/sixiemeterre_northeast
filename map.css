@@ -1290,6 +1290,9 @@ body.military-army-placement #visual-map {
 .military-preview-panel { margin-bottom: 16px; }
 .military-recruitment-panel { margin-bottom: 16px; }
 .military-forces-panel { margin-bottom: 16px; }
+.military-force-subtable { margin: 0 18px 16px; padding: 12px; border: 1px solid var(--line, #373a34); border-radius: 8px; background: rgba(24, 27, 24, .42); }
+.military-force-subtable h3 { margin: 0 0 10px; color: #e8dfc8; font: 600 17px Georgia, serif; }
+.military-force-subtable .page-table-wrap { max-height: 380px; }
 .military-grid-sync { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 18px; border-bottom: 1px solid var(--line, #373a34); }
 .military-grid-sync span { color: #aeb2a7; font-size: 12px; }
 .military-epidemic-admin { display: grid; grid-template-columns: minmax(260px, 1fr); justify-items: start; }
@@ -1348,7 +1351,6 @@ body.military-army-placement #visual-map {
 .military-forces-panel td:nth-child(8) > small { display: block; margin-bottom: 5px; }
 .military-forces-panel td:nth-child(8) > small { color: #aeb2a7; font-size: 11px; line-height: 1.45; }
 .military-service-term { display: block; margin-top: 4px; color: #c8ae75; font-size: 11px; }
-.military-forces-panel td:nth-child(9) { min-width: 260px; }
 .military-garrison-mobilize { display: grid; grid-template-columns: minmax(100px, 1.2fr) minmax(90px, 1fr) 70px auto; align-items: end; gap: 6px; }
 .military-garrison-mobilize label { display: grid; gap: 4px; color: #aeb2a7; font-size: 10px; }
 .military-garrison-mobilize input { min-width: 0; width: 100%; min-height: 32px; }

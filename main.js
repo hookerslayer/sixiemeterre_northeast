@@ -1,7 +1,7 @@
-import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=production-orders-20261015';
-import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryConditionalOrders, fetchMilitaryColonizationMap } from './api.js?v=militia-navy-ui-20261015';
-import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=military-ui-rivers-fuel-20261015';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=military-ui-rivers-fuel-20261015';
+import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=military-ui-update-20261016';
+import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, fetchMilitaryFleets, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryConditionalOrders, fetchMilitaryColonizationMap } from './api.js?v=military-ui-update-20261016';
+import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=military-ui-update-20261016';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=military-ui-update-20261016';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -151,6 +151,7 @@ Promise.all([
             state.userProfile = await fetchUserProfile(session.user.id);
             try {
                 state.militaryForces = await fetchMilitaryForces();
+                state.militaryCommanders = await fetchMilitaryCommanders();
                 state.militaryFleets = await fetchMilitaryFleets();
                 renderMilitaryGrid();
             } catch (err) { console.info('Постоянные военные силы пока не загружены:', err.message); }
@@ -174,6 +175,7 @@ Promise.all([
             state.userProfile = null;
             state.stateMechanics = {};
             state.militaryForces = [];
+            state.militaryCommanders = [];
             state.militaryConditionalOrders = [];
             state.militaryStructures = [];
             state.militarySieges = [];

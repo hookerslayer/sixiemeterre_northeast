@@ -1,7 +1,7 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=production-orders-20261015';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-rivers-fuel-20261015';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForce, fetchMilitaryConditionalOrders, setMilitaryConditionalOrder, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=militia-navy-ui-20261015';
-import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=militia-navy-ui-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-update-20261016';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier } from './api.js?v=military-ui-update-20261016';
+import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ui-update-20261016';
 import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-20261015';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -90,14 +90,22 @@ function buildMilitaryArmyCardControls(force) {
         .map(group => `<option value="${escapeHtml(group.type)}">${escapeHtml(group.type)} · ${formatNumber(group.count)}</option>`).join('');
     const ownArmyOptions = ownArmies.map(target => `<option value="${escapeHtml(target.id)}">${escapeHtml(target.name)} · ${Number(target.cell_x)+1}:${Number(target.cell_y)+1}</option>`).join('');
     const transfer = ownArmies.length ? `<form class="military-troop-transfer" data-force-id="${escapeHtml(force.id)}"><label>Целевая армия<select name="target_force_id" required>${ownArmyOptions}</select></label><label>Тип войск<select name="unit_type" required>${types}</select></label><label>Число бойцов<input name="count" type="number" min="1" max="100000" value="1" required></label><button class="compact-add-btn" type="submit">Передать по маршруту</button></form><div class="military-merge-actions">${ownArmies.map(target => `<button type="button" class="compact-add-btn" data-merge-force="${escapeHtml(force.id)}" data-target-force="${escapeHtml(target.id)}">Объединить: ${escapeHtml(target.name)}</button>`).join('')}</div>` : '<small>Для передачи или объединения нужна другая доступная армия вашего государства.</small>';
-    const split = `<form class="military-force-split" data-force-id="${escapeHtml(force.id)}"><label>Тип войск<select name="unit_type" required>${types}</select></label><label>Число бойцов<input name="count" type="number" min="1" max="100000" value="1" required></label><label>Название новой армии<input name="name" maxlength="80" value="Отряд армии" required></label><label>Имя Воеводы<input name="commander_name" maxlength="80" required></label><label>Возраст<input name="commander_age" type="number" min="16" max="100" value="35" required></label><button class="compact-add-btn" type="submit">Выделить в соседнюю клетку · 10 ОД</button></form>`;
+    const availableCommanders = (state.militaryCommanders || []).filter(officer => officer.owner === force.owner && officer.status === 'available');
+    const commanderOptions = availableCommanders.map(officer => `<option value="${escapeHtml(officer.id)}">${escapeHtml(officer.name)} · ${formatNumber(officer.age)} лет</option>`).join('');
+    const split = availableCommanders.length
+        ? `<form class="military-force-split" data-force-id="${escapeHtml(force.id)}"><label>Тип войск<select name="unit_type" required>${types}</select></label><label>Число бойцов<input name="count" type="number" min="1" max="100000" value="1" required></label><label>Название новой армии<input name="name" maxlength="80" value="Отряд армии" required></label><label>Воевода<select name="commander_id" required>${commanderOptions}</select></label><button class="compact-add-btn" type="submit">Выделить в соседнюю клетку · 10 ОД</button></form>`
+        : '<small>Чтобы выделить отряд в отдельную армию, сначала наймите свободного Воеводу.</small>';
     const order = (state.militaryConditionalOrders || []).find(row => row.force_id === force.id);
     const targets = state.militaryForces.filter(target => target.id !== force.id && target.force_kind === 'land_army' && target.status === 'active'
         && (target.owner !== force.owner || (!target.is_militia && !target.is_mercenary)))
         .map(target => `<option value="${escapeHtml(target.id)}">${escapeHtml(target.name)} · ${escapeHtml(target.owner)} · ${Number(target.cell_x)+1}:${Number(target.cell_y)+1}</option>`).join('');
+    const orderCells = Array.isArray(order?.condition_cells) && order.condition_cells.length
+        ? order.condition_cells : order ? [{ x: order.condition_x, y: order.condition_y }] : [];
+    const selectedCells = state.militaryConditionalTriggerForceId === force.id ? [...state.militaryConditionalTriggerCells] : [];
+    const orderZone = order ? `${order.condition_mode === 'radius' ? 'радиус' : order.condition_mode === 'reachable' ? 'зона хода' : 'выбранные клетки'} · ${orderCells.length} кл.` : '';
     const conditional = order
-        ? `<p>Активен: ${order.action === 'retreat' ? 'отход' : order.action === 'move' ? 'перемещение' : order.action === 'join' ? 'соединение' : 'атака'} · клетка ${Number(order.condition_x)+1}:${Number(order.condition_y)+1} · резерв ${formatNumber(order.reserved_ap)} ОД</p><small>${escapeHtml(order.last_result || 'Ожидает проверки')}</small><button type="button" class="compact-add-btn" data-cancel-conditional-order="${escapeHtml(force.id)}">Отменить условный приказ</button>`
-        : `<form class="military-conditional-order" data-force-id="${escapeHtml(force.id)}"><label>Клетка противника X<input name="condition_x" type="number" min="0" max="10000" required></label><label>Клетка противника Y<input name="condition_y" type="number" min="0" max="10000" required></label><label>Действие<select name="action"><option value="retreat">Отойти к клетке</option><option value="move">Переместиться к клетке</option><option value="attack">Атаковать рядом стоящую цель</option><option value="join">Соединиться с союзной армией</option></select></label><label>Цель<select name="target_force_id"><option value="">Выберите армию</option>${targets}</select></label><label>Назначение X<input name="dest_x" type="number" min="0" max="10000"></label><label>Назначение Y<input name="dest_y" type="number" min="0" max="10000"></label><label>Резерв ОД<input name="reserved_ap" type="number" min="1" max="100" value="20" required></label><button class="compact-add-btn" type="submit">Сохранить условный приказ</button></form><small>Срабатывает, когда противник занимает указанную видимую клетку. Координаты начинаются с 0; зарезервированные ОД недоступны для других приказов.</small>`;
+        ? `<p>Активен: ${order.action === 'retreat' ? 'отход' : order.action === 'move' ? 'перемещение' : order.action === 'join' ? 'соединение' : 'атака'} · ${orderZone} · резерв ${formatNumber(order.reserved_ap)} ОД</p><small>${escapeHtml(order.last_result || 'Ожидает проверки')}</small><button type="button" class="compact-add-btn" data-cancel-conditional-order="${escapeHtml(force.id)}">Отменить условный приказ</button>`
+        : `<form class="military-conditional-order" data-force-id="${escapeHtml(force.id)}"><label>Условие<select name="condition_mode"><option value="cell">Одна клетка</option><option value="radius">Радиус вокруг клетки</option><option value="reachable">Клетки в пределах хода армии</option></select></label><label>Радиус, клеток<input name="condition_radius" type="number" min="1" max="8" value="2"></label><button type="button" class="compact-add-btn" data-select-conditional-zone="${escapeHtml(force.id)}">Выбрать зону на карте</button><p data-conditional-zone-status>${selectedCells.length ? `Выбрано клеток: ${selectedCells.length}` : 'Зона не выбрана'}</p><label>Действие<select name="action"><option value="retreat">Отойти к клетке</option><option value="move">Переместиться к клетке</option><option value="attack">Атаковать рядом стоящую цель</option><option value="join">Соединиться с союзной армией</option></select></label><label>Цель<select name="target_force_id"><option value="">Выберите армию</option>${targets}</select></label><label>Назначение<input name="destination" value="" placeholder="Выберите клетку на карте" readonly></label><button type="button" class="compact-add-btn" data-select-conditional-destination="${escapeHtml(force.id)}">Выбрать назначение на карте</button><input name="dest_x" type="hidden"><input name="dest_y" type="hidden"><label>Резерв ОД<input name="reserved_ap" type="number" min="1" max="100" value="20" required></label><button class="compact-add-btn" type="submit">Сохранить условный приказ</button></form><small>На карте выбранная область подсвечивается голубым. Проверка учитывает видимость войск; режим «Клетки в пределах хода» включает клетки, доступные армии по её текущим ОД.</small>`;
     return `<details class="army-card-controls"><summary>Разделить / передать войска</summary>${transfer}${split}</details><details class="army-card-controls"><summary>Приказ по условию</summary>${conditional}</details>`;
 }
 
@@ -162,7 +170,7 @@ function getMilitaryRiverStep(from, to, dx, dy) {
     return { blocked: !!major && !bridged, surcharge: !bridged && ford ? 1 : 0 };
 }
 
-function getReachableMilitaryCells(force) {
+function getReachableMilitaryCells(force, { includeEnemyTargets = false } = {}) {
     const cellAt = (x, y) => {
         const key = `${x},${y}`;
         const geometry = state.militaryGridCells.get(key);
@@ -188,8 +196,9 @@ function getReachableMilitaryCells(force) {
         for (const [dx, dy] of directions) {
             const nx = x + dx, ny = y + dy, key = `${nx},${ny}`, to = cellAt(nx, ny);
             if (!to || (!to.province_id && !to.bridge) || (to.terrain === 'water' && !to.bridge)) continue;
-            if (state.militaryForces.some(other => other.id !== force.id && other.force_kind === 'land_army' && other.status === 'active'
-                && Number(other.cell_x) === nx && Number(other.cell_y) === ny && other.owner !== force.owner)) continue;
+            const enemyAtCell = !includeEnemyTargets && state.militaryForces.some(other => other.id !== force.id && other.force_kind === 'land_army' && other.status === 'active'
+                && Number(other.cell_x) === nx && Number(other.cell_y) === ny && other.owner !== force.owner);
+            if (enemyAtCell && !includeEnemyTargets) continue;
             if (state.militaryStructures.some(item => item.structure_type === 'palisade' && item.status === 'active'
                 && Number(item.available_from_turn) <= Number(state.gameCalendar?.turn) && Number(item.cell_x) === nx && Number(item.cell_y) === ny)) continue;
             const diagonal = dx !== 0 && dy !== 0;
@@ -202,6 +211,7 @@ function getReachableMilitaryCells(force) {
             const candidate = best + movementStepCost(to.terrain, diagonal, mobility, crossing.surcharge);
             if (candidate > budget || candidate >= (costs.get(key) ?? Infinity)) continue;
             costs.set(key, candidate);
+            if (enemyAtCell) continue;
             open.add(key);
         }
     }
@@ -526,8 +536,7 @@ export function showProvincePopup(imgX, imgY, info) {
                 <header class="province-popup-heading"><strong>Провинция #${info.id} · ${escapeHtml(name)}</strong><span>${escapeHtml(region)} · ${escapeHtml(owner)}</span></header>
                 <div class="province-popup-facts"><span><small>Культура</small><b>${escapeHtml(culture)}</b></span><span><small>Религия</small><b>${escapeHtml(religion)}</b></span><span><small>Развитие</small><b>${formatNumber(development)}</b></span><span><small>Ресурс</small><b>${escapeHtml(resource)}</b></span></div>
                 ${provinceProductionSummary(dbRow)}
-                <details class="province-popup-section province-demography"><summary>Демография · ${formatNumber(totalYards)} дворов · ${formatNumber(totalPop)} чел.</summary><div class="province-popup-facts"><span><small>В сельской провинции</small><b>${formatNumber(provYards)} дворов</b></span><span><small>В поселениях</small><b>${formatNumber(settlementsYards)} дворов</b></span></div></details>
-                <details class="province-popup-section"><summary>Сословия · сельские дворы</summary><div class="province-estates"><span>Аристократия <b>${formatNumber(estates.aristocracy)}</b></span><span>Духовенство <b>${formatNumber(estates.clergy)}</b></span><span>Горожане <b>${formatNumber(estates.burghers)}</b></span><span>Крестьянство <b>${formatNumber(estates.peasants)}</b></span></div></details>
+                <div class="marker-demography-grid"><section><strong>Демография</strong><span>Дворов <b>${formatNumber(totalYards)}</b></span><span>Население <b>${formatNumber(totalPop)} чел.</b></span><span>В провинции <b>${formatNumber(provYards)}</b></span><span>В поселениях <b>${formatNumber(settlementsYards)}</b></span></section><section><strong>Сословия · сельские дворы</strong><span>Аристократия <b>${formatNumber(estates.aristocracy)}</b></span><span>Духовенство <b>${formatNumber(estates.clergy)}</b></span><span>Горожане <b>${formatNumber(estates.burghers)}</b></span><span>Крестьянство <b>${formatNumber(estates.peasants)}</b></span></section></div>
                 ${playerMapActions}
             </div>
         `;
@@ -1044,7 +1053,7 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
         const rulerApproval = isAdmin && rulerVacant && ruler.proposal_name
             ? `<div class="ruler-pending-proposal"><span>Кандидат: <strong>${escapeHtml(ruler.proposal_name)}</strong>, ${Number(ruler.proposal_age) || '—'} лет${ruler.proposal_title ? ` · ${escapeHtml(ruler.proposal_title)}` : ''}</span><button class="compact-add-btn" type="button" data-ruler-decision="approve">Утвердить</button><button class="page-back-btn" type="button" data-ruler-decision="reject">Отклонить</button></div>`
             : '';
-        const rulerFields = `<section class="page-panel ruler-panel"><div class="page-panel-heading"><div><h2>Правитель</h2><p>${rulerStatus}. Возраст автоматически увеличивается раз в игровой год; начиная с 50 лет проводится проверка риска смерти от старости.</p></div></div><div class="ruler-fields"><label>Имя<input name="ruler_name" maxlength="80" value="${escapeHtml(ruler.name || '')}" ${isAdmin || rulerVacant ? 'readonly' : ''}></label><label>Титул<input name="ruler_title" maxlength="80" value="${escapeHtml(ruler.title || '')}" ${isAdmin || rulerVacant ? 'readonly' : ''}></label><label>Возраст<input type="number" value="${Number(ruler.age) || 0}" readonly></label>${governmentForm === 'Вечевая республика' && ruler.term_end_year ? `<label>Окончание срока<input value="${Number(ruler.term_end_year)} г." readonly></label>` : ''}</div>${rulerNomination}${rulerProposal}${rulerApproval}<span id="ruler-action-status" class="page-note" aria-live="polite"></span></section>`;
+        const rulerFields = `<section class="page-panel ruler-panel"><div class="page-panel-heading"><div><h2>Правитель</h2><p>${rulerStatus}. Возраст автоматически увеличивается раз в игровой год; начиная с 50 лет проводится проверка риска смерти от старости.</p></div></div><div class="ruler-fields"><label>Имя<input name="ruler_name" maxlength="80" value="${escapeHtml(ruler.name || '')}" ${!isAdmin ? 'readonly' : ''}></label><label>Титул<input name="ruler_title" maxlength="80" value="${escapeHtml(ruler.title || '')}" ${!isAdmin ? 'readonly' : ''}></label><label>Возраст<input name="ruler_age" type="number" min="16" max="89" value="${Number(ruler.age) || 0}" ${!isAdmin ? 'readonly' : ''}></label>${governmentForm === 'Вечевая республика' && ruler.term_end_year ? `<label>Окончание срока<input value="${Number(ruler.term_end_year)} г." readonly></label>` : ''}</div>${rulerNomination}${rulerProposal}${rulerApproval}<span id="ruler-action-status" class="page-note" aria-live="polite"></span></section>`;
         const crime = Math.max(0,Math.min(100,Number(settings.crime_rate ?? 20)+modifierValue(stateModifiers,'crime_rate_pp')));
         const corruption = Math.max(0,Math.min(100,Number(settings.corruption_rate ?? 20)+modifierValue(stateModifiers,'corruption_rate_pp')));
         const socialSection = (title, rows, key) => `<div class="statistic-pair"><section class="page-panel"><div class="page-panel-heading"><div><h2>${title}</h2>${key === 'estate' ? `<p>${estateTaxLocked ? 'Ставки уже менялись в этом игровом году.' : 'Игрок может менять ставки раз в игровой год; смена каждой ставки стоит 3 ОП.'}${isAdmin ? ' Администратор может менять их без ограничений и расходов.' : ''}</p>` : ''}</div></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>${key === 'estate' ? 'Сословие' : key === 'culture' ? 'Культура' : 'Религия'}</th>${key === 'estate' ? '<th>Налоговая ставка</th>' : '<th>Статус</th>'}<th>Дворы</th><th>Население</th><th>Лояльность</th></tr></thead><tbody>${rows || `<tr><td colspan="5">Нет данных.</td></tr>`}</tbody></table></div></section>${renderPieChart(`Население по ${key === 'estate' ? 'сословиям' : key === 'culture' ? 'культурам' : 'религиям'}`, key === 'estate' ? Object.entries(stats.estateYards).map(([estate, yards]) => [estateNames.find(([id]) => id === estate)[1], yards * 4]) : key === 'culture' ? culturePie : religionPie)}</div>`;
@@ -1106,8 +1115,7 @@ async function renderStateStatistics(owner, playerName = '', options = {}) {
                 next.titular_culture = form.elements.titular_culture.value;
                 next.titular_religion = form.elements.titular_religion.value;
                 next.government_form = form.elements.government_form.value;
-            } else {
-                next.ruler = { ...(settings.ruler || {}), name: form.elements.ruler_name.value.trim(), title: form.elements.ruler_title.value.trim() };
+                next.ruler = { ...(settings.ruler || {}), name: form.elements.ruler_name.value.trim(), title: form.elements.ruler_title.value.trim(), age: Math.max(16, Math.min(89, Number(form.elements.ruler_age.value) || Number(settings.ruler?.age) || 30)) };
             }
             try {
                 state.stateMechanics[owner] = await saveStateMechanics(owner, next);
@@ -2383,51 +2391,59 @@ async function renderMilitaryPlanner(spyOnly = false) {
         .map(row => `<tr><td>${escapeHtml(row.force_name)}</td><td>${escapeHtml(row.original_owner)}</td><td>${escapeHtml(row.captor_owner)}</td><td>${row.commander_name ? `${escapeHtml(row.commander_name)}${row.commander_age ? ` · ${formatNumber(row.commander_age)} лет` : ''}` : '—'}</td><td>${(row.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ') || '—'}</td><td>${row.status === 'held' ? 'Удерживаются в плену' : row.status === 'released' ? 'Освобождены' : row.status === 'ransomed' ? 'Выкуплены' : 'Бежали'}</td></tr>`).join('');
     const embarkShipOptions = militaryFleets.filter(fleet => fleet.owner === playerOwner && fleet.status === 'active' && !fleet.in_pending_battle)
         .flatMap(fleet => (fleet.ships || []).map((ship, index) => `<option value="${fleet.id}:${index + 1}">${escapeHtml(fleet.name)} · ${escapeHtml(ship.type)} #${index + 1}</option>`)).join('');
-    const commanderSkills = fleetCommanderSkills;
-    const forceRows = state.militaryForces.map(force => {
+    const renderForceRow = force => {
         const composition = (force.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ') || 'нет отрядов';
         const cargo = Object.entries(force.cargo || {}).filter(([, quantity]) => Number(quantity) > 0).map(([name, quantity]) => `${escapeHtml(name)} × ${formatNumber(quantity, 2)}`).join(', ');
         const position = force.status === 'embarked' ? 'На борту флота' : force.force_kind === 'land_army' ? `Провинция ${formatNumber(force.province_id)} · клетка ${Number(force.cell_x) + 1}:${Number(force.cell_y) + 1}` : force.marker_id ? `Поселение #${formatNumber(force.marker_id)}` : `Гарнизон провинции ${formatNumber(force.province_id)}`;
-        const skills = commanderSkills.map(([key, label]) => `${label} ${Number(force.commander_skills?.[key]) || 0}`).join(' · ');
-        const canTrain = force.force_kind === 'land_army' && force.status === 'active' && force.owner === state.userProfile?.owner;
-        const trainingOptions = commanderSkills.filter(([key]) => (Number(force.commander_skills?.[key]) || 0) < 5).map(([key, label]) => {
-            const level = Number(force.commander_skills?.[key]) || 0;
-            return `<option value="${key}">${label} ${level}→${level + 1} · ${2 * (level + 1)} опыта</option>`;
-        }).join('');
-        const experienceCell = `${force.force_kind === 'land_army' ? `<strong>${formatNumber(force.commander_experience || 0)} опыта</strong><small>${skills}</small>${canTrain && trainingOptions ? `<form class="commander-training" data-force-id="${escapeHtml(force.id)}"><select name="skill" aria-label="Навык Воеводы">${trainingOptions}</select><button type="submit" class="compact-add-btn">Повысить</button></form>` : ''}` : '—'}`;
         const canMobilize = !isAdmin && !force.is_permanent_garrison && force.owner === state.userProfile?.owner && force.force_kind === 'garrison' && force.status === 'active' && (force.unit_groups || []).some(group => Number(group.count) > 0);
         const sourceMarker = force.marker_id ? state.dbMarkers?.find(marker => Number(marker.id) === Number(force.marker_id)) : null;
         const sourceProvinceId = force.province_id || sourceMarker?.province_id;
         const mobilizeAction = force.is_permanent_garrison ? 'Неподвижный постоянный гарнизон' : canMobilize && sourceProvinceId ? `<form class="military-garrison-mobilize" data-force-id="${escapeHtml(force.id)}" data-province-id="${Number(sourceProvinceId)}"><label>Название армии<input name="name" maxlength="80" value="${escapeHtml(`Армия: ${force.name}`)}" required></label><label>Воевода<input name="commander_name" maxlength="80" required></label><label>Возраст<input name="commander_age" type="number" min="16" max="100" value="35" required></label><button type="submit" class="compact-add-btn">Вывести на карту</button></form>` : '—';
         const canEmbark = !isAdmin && force.owner === playerOwner && force.force_kind === 'land_army' && force.status === 'active' && embarkShipOptions;
         const embarkAction = canEmbark ? `<form class="military-force-embark" data-force-id="${escapeHtml(force.id)}"><label>Судно<select name="fleet_ship" required><option value="">Выбрать судно</option>${embarkShipOptions}</select></label><button type="submit" class="compact-add-btn">Посадить · 1 ОД</button></form>` : force.status === 'embarked' ? 'На борту' : '—';
-        const campHireAction = !isAdmin && force.owner === 'Лагерь наёмников' && force.force_kind === 'land_army' && force.status === 'active'
-            ? `<button type="button" class="compact-add-btn hire-mercenary-camp" data-force-id="${escapeHtml(force.id)}">Нанять лагерь · 2 z/чел.</button>` : '';
-        const militiaTerm = force.is_militia && force.service_end_turn ? `<small class="military-service-term">Ополчение · служба до хода ${formatNumber(force.service_end_turn)}</small>` : '';
-        const retinueTerm = force.is_retinue ? '<small class="military-service-term">Постоянная дружина · двойное содержание</small>' : '';
+        const campHireAction = !isAdmin && force.owner === 'Лагерь наёмников' && force.force_kind === 'land_army' && force.status === 'active' ? `<button type="button" class="compact-add-btn hire-mercenary-camp" data-force-id="${escapeHtml(force.id)}">Нанять лагерь · 2 z/чел.</button>` : '';
         const canExtend = !isAdmin && force.owner === state.userProfile?.owner && force.is_militia && force.status === 'active' && Number(force.service_end_turn) > (Number(state.gameCalendar?.turn) || 0);
         const extensionCost = (force.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 0) * 2;
         const extendAction = canExtend ? `<button type="button" class="compact-add-btn extend-militia-service" data-force-id="${escapeHtml(force.id)}">Продлить ещё на сезон · ${formatNumber(extensionCost, 2)} z</button>` : '';
-        const mercenaryTerm = force.is_mercenary && force.service_end_turn ? `<small class="military-service-term">Контракт наёмников · до хода ${formatNumber(force.service_end_turn)}</small>` : '';
         const forcePeople = (force.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 1);
-        const canRenewMercenary = !isAdmin && force.owner === playerOwner && force.is_mercenary && force.status === 'active'
-            && Number(force.service_end_turn) > (Number(state.gameCalendar?.turn) || 0)
-            && Number(force.service_end_turn) <= (Number(state.gameCalendar?.turn) || 0) + 1;
+        const canRenewMercenary = !isAdmin && force.owner === playerOwner && force.is_mercenary && force.status === 'active' && Number(force.service_end_turn) > (Number(state.gameCalendar?.turn) || 0) && Number(force.service_end_turn) <= (Number(state.gameCalendar?.turn) || 0) + 1;
         const renewMercenaryAction = canRenewMercenary ? `<button type="button" class="compact-add-btn renew-mercenary-contract" data-force-id="${escapeHtml(force.id)}">Продлить на сезон · ${formatNumber(forcePeople * 2)} z</button>` : '';
-        const supplyCell = force.last_maintenance_turn == null ? 'Содержание ещё не рассчитывалось' : `${formatNumber((Number(force.maintenance_coverage) || 0) * 100, 1)}% снабжения · ${Number(force.underfunded_turns) || 0} сез. дефицита`;
-        return `<tr><td>${escapeHtml(force.name)}${retinueTerm}${militiaTerm}${mercenaryTerm}</td><td>${escapeHtml(force.owner)}</td><td>${position}</td><td>${force.commander_name ? `${escapeHtml(force.commander_name)}, ${formatNumber(force.commander_age)} лет` : '—'}</td><td>${composition}${cargo ? `<small class="military-supply-status">Добыча: ${cargo}</small>` : ''}</td><td>${formatNumber(force.morale)}%<small class="military-supply-status">${escapeHtml(supplyCell)}</small></td><td>${formatNumber(force.action_points)} ОД</td><td>${experienceCell}</td><td>${campHireAction}${mobilizeAction}${extendAction}${renewMercenaryAction}${embarkAction}</td></tr>`;
-    }).join('');
+        const terms = [force.is_retinue ? 'Постоянная дружина' : '', force.is_militia && force.service_end_turn ? `Ополчение · до хода ${formatNumber(force.service_end_turn)}` : '', force.is_mercenary && force.service_end_turn ? `Контракт · до хода ${formatNumber(force.service_end_turn)}` : ''].filter(Boolean).map(text => `<small class="military-service-term">${escapeHtml(text)}</small>`).join('');
+        return `<tr><td>${escapeHtml(force.name)}${terms}</td><td>${escapeHtml(force.owner)}</td><td>${position}</td><td>${force.commander_name ? `${escapeHtml(force.commander_name)}, ${formatNumber(force.commander_age)} лет` : '—'}</td><td>${composition}${cargo ? `<small class="military-supply-status">Добыча: ${cargo}</small>` : ''}</td><td>${formatNumber(force.morale)}%</td><td>${formatNumber(force.action_points)} ОД</td><td>${campHireAction}${mobilizeAction}${extendAction}${renewMercenaryAction}${embarkAction}</td></tr>`;
+    };
+    const liveForces = state.militaryForces.filter(force => !['disbanded','dead'].includes(force.status));
+    const forceTableDefs = [
+        ['Полевые армии', liveForces.filter(force => force.force_kind === 'land_army' && !force.is_retinue && !force.is_militia)],
+        ['Личная дружина', liveForces.filter(force => force.force_kind === 'land_army' && force.is_retinue)],
+        ['Созванное ополчение', liveForces.filter(force => force.is_militia)],
+        ['Гарнизон', liveForces.filter(force => force.force_kind === 'garrison' && !force.is_permanent_garrison)],
+        ['Постоянный гарнизон', liveForces.filter(force => force.is_permanent_garrison)]
+    ];
+    const forceTables = forceTableDefs.map(([title, forces]) => `<section class="military-force-subtable"><h3>${title}</h3><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Положение</th><th>Воевода</th><th>Состав</th><th>Мораль</th><th>ОД</th><th>Действия</th></tr></thead><tbody>${forces.map(renderForceRow).join('') || `<tr><td colspan="8">${title === 'Личная дружина' ? 'Дружины пока нет.' : 'Записей нет.'}</td></tr>`}</tbody></table></div></section>`).join('');
+    const unitNames = Object.keys(LAND_UNIT_PROFILES);
     const ownedCommanders = militaryCommanders.filter(row => isAdmin || row.owner === playerOwner);
-    const availableCommanders = ownedCommanders.filter(row => row.status === 'available');
     const commanderArmyOptions = state.militaryForces.filter(force => force.owner === playerOwner && force.force_kind === 'land_army' && force.status === 'active' && !force.in_pending_battle)
         .map(force => `<option value="${escapeHtml(force.id)}">${escapeHtml(force.name)} · ${Number(force.cell_x)+1}:${Number(force.cell_y)+1}</option>`).join('');
     const commanderLimit = 1 + (state.dbMarkers || []).filter(marker => marker.owner === playerOwner && marker.type !== 'ruins')
         .reduce((sum,marker) => sum + (marker.type === 'large_city' ? 2 : ['fortress','city','monastery'].includes(marker.type) ? 1 : 0),0);
-    const commanderRows = ownedCommanders.map(officer => `<tr><td>${escapeHtml(officer.name)} · ${formatNumber(officer.age)} лет</td><td>${formatNumber(officer.experience)} опыта</td><td>${officer.status === 'dead' ? 'Погиб' : officer.status === 'assigned' ? `В армии ${escapeHtml(state.militaryForces.find(force=>force.id===officer.force_id)?.name || '')}` : 'В резерве'}</td><td>${!isAdmin && officer.status === 'available' && commanderArmyOptions ? `<form class="military-commander-assign" data-commander-id="${escapeHtml(officer.id)}"><select name="force_id" required>${commanderArmyOptions}</select><button class="compact-add-btn" type="submit">Назначить</button></form>` : '—'}</td></tr>`).join('');
-    const commanderPanel = !spyOnly ? `<section class="page-panel military-commanders-panel"><header class="page-panel-heading"><div><h2>Воеводы</h2><p>Лимит: ${formatNumber(commanderLimit)} · занято ${formatNumber(ownedCommanders.filter(item=>item.status!=='dead').length)}. Найм стоит 10 ОП; свободного воеводу можно назначить своей полевой армии.</p></div></header>${commanderDataError ? `<p class="page-error">Не удалось загрузить реестр воевод: ${escapeHtml(commanderDataError)}. Примените supabase/military_commander_roster.sql.</p>` : ''}${!isAdmin ? `<form id="military-commander-hire" class="military-form-grid military-character-hire"><label>Имя Воеводы<input name="name" maxlength="80" autocomplete="off" required></label><button type="submit" class="admin-btn" ${ownedCommanders.filter(item=>item.status!=='dead').length>=commanderLimit?'disabled':''}>Нанять · 10 ОП</button><small>Возраст определяется случайно: от 30 до 60 лет.</small></form>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Имя и возраст</th><th>Опыт</th><th>Статус</th><th>Назначение</th></tr></thead><tbody>${commanderRows || '<tr><td colspan="4">Воеводы ещё не наняты.</td></tr>'}</tbody></table></div></section>` : '';
+    const commanderSkillLabels = [['management','Управление'],['leadership','Лидерство'],['tactics','Тактика'],['planning','Планирование'],['engineering','Инженерия']];
+    const commanderRows = ownedCommanders.map(officer => {
+        const force = state.militaryForces.find(item => item.id === officer.force_id);
+        const skills = commanderSkillLabels.map(([key,label]) => `${label} ${Number(officer.skills?.[key]) || 0}`).join(' · ');
+        const options = commanderSkillLabels.filter(([key]) => (Number(officer.skills?.[key]) || 0) < 5).map(([key,label]) => {
+            const level = Number(officer.skills?.[key]) || 0;
+            return `<option value="${key}">${label} ${level}→${level + 1} · ${2 * (level + 1)} опыта</option>`;
+        }).join('');
+        const train = force && officer.status === 'assigned' && options && (isAdmin || officer.owner === playerOwner)
+            ? `<form class="commander-training" data-force-id="${escapeHtml(force.id)}"><select name="skill" aria-label="Навык Воеводы">${options}</select><button type="submit" class="compact-add-btn">Повысить</button></form>` : '';
+        const assign = !isAdmin && officer.status === 'available' && commanderArmyOptions
+            ? `<form class="military-commander-assign" data-commander-id="${escapeHtml(officer.id)}"><select name="force_id" required>${commanderArmyOptions}</select><button class="compact-add-btn" type="submit">Назначить</button></form>` : '';
+        return `<tr><td>${escapeHtml(officer.name)} · ${formatNumber(officer.age)} лет</td><td>${formatNumber(officer.experience)} опыта${train}</td><td>${escapeHtml(skills)}</td><td>${officer.status === 'dead' ? 'Погиб' : officer.status === 'assigned' ? `В армии ${escapeHtml(force?.name || '')}` : 'В резерве'}</td><td>${assign || '—'}</td></tr>`;
+    }).join('');
+    const commanderPanel = !spyOnly ? `<section class="page-panel military-commanders-panel"><header class="page-panel-heading"><div><h2>Воеводы</h2><p>Лимит: ${formatNumber(commanderLimit)} · занято ${formatNumber(ownedCommanders.filter(item=>item.status!=='dead').length)}. Найм стоит 10 ОП; свободного воеводу можно назначить своей полевой армии.</p></div></header>${commanderDataError ? `<p class="page-error">Не удалось загрузить реестр воевод: ${escapeHtml(commanderDataError)}. Примените supabase/military_commander_roster.sql.</p>` : ''}${!isAdmin ? `<form id="military-commander-hire" class="military-form-grid military-character-hire"><label>Имя Воеводы<input name="name" maxlength="80" autocomplete="off" required></label><button type="submit" class="admin-btn" ${ownedCommanders.filter(item=>item.status!=='dead').length>=commanderLimit?'disabled':''}>Нанять · 10 ОП</button><small>Возраст определяется случайно: от 30 до 60 лет.</small></form>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Имя и возраст</th><th>Опыт</th><th>Навыки</th><th>Статус</th><th>Действия</th></tr></thead><tbody>${commanderRows || '<tr><td colspan="5">Воеводы ещё не наняты.</td></tr>'}</tbody></table></div></section>` : '';
     const visibleEpidemicProvinceNames = epidemicEvents.filter(item => Number(item.active_turn) === Number(state.gameCalendar?.turn)).map(item => state.dbProvinces?.[Number(item.province_id)]?.province_name || `Провинция ${item.province_id}`);
     const epidemicWarning = !isAdmin && visibleEpidemicProvinceNames.length ? `<p class="page-warning">Эпидемический очаг в провинции: ${visibleEpidemicProvinceNames.map(escapeHtml).join(', ')}. В этом ходу повышен риск небоевых потерь войск.</p>` : '';
-    const forcePanel = `<section class="page-panel military-forces-panel"><header class="page-panel-heading"><div><h2>Армии и гарнизоны</h2><p>Полевые армии отображаются на карте в режиме военной сетки. Выберите армию, чтобы открыть её управление на карте и увидеть доступные клетки хода. Обычные войска в Гарнизоне можно вывести в полевую армию в той же провинции; постоянные гарнизоны поселений неподвижны.</p></div></header>${epidemicWarning}${forceDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр войск: ${escapeHtml(forceDataError)}. Примените supabase/military_forces.sql.</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Положение</th><th>Воевода</th><th>Состав</th><th>Мораль</th><th>ОД</th><th>Опыт и навыки</th><th>Приказы</th></tr></thead><tbody>${forceRows || '<tr><td colspan="9">Армии пока не созданы.</td></tr>'}</tbody></table></div>${isAdmin ? `<form id="create-military-force" class="military-force-create"><h3>Создать полевую армию</h3><div class="military-force-controls"><label>Государство<select name="owner" required>${battleOwnerOptions}</select></label><label>Название<input name="name" maxlength="80" value="Новая армия" required></label><label>Имя Воеводы<input name="commander_name" maxlength="80" required></label><label>Возраст Воеводы<input name="commander_age" type="number" min="16" max="100" value="35" required></label><label>Управление<input name="skill_management" type="number" min="0" max="5" value="0"></label><label>Лидерство<input name="skill_leadership" type="number" min="0" max="5" value="0"></label><label>Тактика<input name="skill_tactics" type="number" min="0" max="5" value="0"></label><label>Планирование<input name="skill_planning" type="number" min="0" max="5" value="0"></label><label>Инженерия<input name="skill_engineering" type="number" min="0" max="5" value="0"></label></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Численность</th></tr></thead><tbody>${unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td><input type="number" min="0" max="100000" step="1" value="${name === 'Пешие ратники' ? 100 : 0}" data-force-unit="${escapeHtml(name)}"></td></tr>`).join('')}</tbody></table></div><button class="admin-btn" type="submit">Выбрать клетку и создать армию</button></form>` : ''}</section>`;
+    const forcePanel = `<section class="page-panel military-forces-panel"><header class="page-panel-heading"><div><h2>Армии и гарнизоны</h2><p>Полевые армии отображаются на карте в режиме военной сетки. Выберите армию, чтобы открыть её управление на карте и увидеть доступные клетки хода. Обычные войска в Гарнизоне можно вывести в полевую армию в той же провинции; постоянные гарнизоны поселений неподвижны.</p></div></header>${epidemicWarning}${forceDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр войск: ${escapeHtml(forceDataError)}. Примените supabase/military_forces.sql.</p>` : ''}${forceTables}${isAdmin ? `<form id="create-military-force" class="military-force-create"><h3>Создать полевую армию</h3><div class="military-force-controls"><label>Государство<select name="owner" required>${battleOwnerOptions}</select></label><label>Название<input name="name" maxlength="80" value="Новая армия" required></label><label>Имя Воеводы<input name="commander_name" maxlength="80" required></label><label>Возраст Воеводы<input name="commander_age" type="number" min="16" max="100" value="35" required></label><label>Управление<input name="skill_management" type="number" min="0" max="5" value="0"></label><label>Лидерство<input name="skill_leadership" type="number" min="0" max="5" value="0"></label><label>Тактика<input name="skill_tactics" type="number" min="0" max="5" value="0"></label><label>Планирование<input name="skill_planning" type="number" min="0" max="5" value="0"></label><label>Инженерия<input name="skill_engineering" type="number" min="0" max="5" value="0"></label></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Численность</th></tr></thead><tbody>${unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td><input type="number" min="0" max="100000" step="1" value="${name === 'Пешие ратники' ? 100 : 0}" data-force-unit="${escapeHtml(name)}"></td></tr>`).join('')}</tbody></table></div><button class="admin-btn" type="submit">Выбрать клетку и создать армию</button></form>` : ''}</section>`;
     const statusLabels = { pending: 'Ожидает решения и подтверждения', confirmed: 'Завершено', cancelled: 'Отменено' };
     const eventCards = battleHeaders.map(battle => `<article class="military-event-card"><div><strong>${battle.battle_type === 'naval' ? 'Морское сражение' : 'Сухопутное сражение'} · ${escapeHtml(battle.terrain)}</strong><span>${escapeHtml((battle.participant_owners || []).join(' · '))}</span><small>${statusLabels[battle.status] || battle.status}${battle.public_outcome ? ` · исход: ${battle.public_outcome === 'attacker' ? 'атакующие' : battle.public_outcome === 'defender' ? 'защитники' : 'ничья'}` : ''}</small></div><button class="page-back-btn" type="button" data-open-military-battle="${battle.id}">Открыть</button></article>`).join('');
     const eventPanel = `<section class="page-panel military-events-panel"><header class="page-panel-heading"><div><h2>Боевые события</h2><p>Приказы участников скрыты друг от друга. Полный предварительный расчёт виден только администратору.</p></div></header><p class="page-note">Событие хранит снимок состава. После подтверждения Администратором потери и мораль выбранных армий и флотилий записываются в соответствующий реестр. Предпочитаемая тактика влияет на автоматический выбор тактики в каждом цикле боя.</p>${militaryDataError ? `<p class="page-error military-db-warning">Не удалось загрузить боевые события: ${escapeHtml(militaryDataError)}. Проверьте, что применены файлы боевых событий и синхронизации сил.</p>` : ''}<div id="military-event-list" class="military-event-list">${eventCards || '<p class="page-note">Активных и завершённых боевых событий пока нет.</p>'}</div><div id="military-battle-details" class="military-battle-details" aria-live="polite"></div></section>`;
@@ -2672,13 +2688,51 @@ async function renderMilitaryPlanner(spyOnly = false) {
     militaryForceActionAbort?.abort();
     militaryForceActionAbort = new AbortController();
     document.body.addEventListener('click', async event => {
+        const zoneButton = event.target.closest('[data-select-conditional-zone]');
+        if (zoneButton) {
+            const forceId = zoneButton.dataset.selectConditionalZone;
+            const force = state.militaryForces.find(item => item.id === forceId);
+            const form = zoneButton.closest('.military-conditional-order');
+            const mode = form?.elements.condition_mode.value || 'cell';
+            if (!force) { showToast('Армия не найдена.'); return; }
+            state.militaryConditionalTriggerForceId = forceId;
+            state.militaryConditionalTriggerCenter = null;
+            state.militaryConditionalTriggerCells = new Set();
+            if (mode === 'reachable') {
+                state.militaryConditionalTriggerCells = getReachableMilitaryCells(force, { includeEnemyTargets: true });
+                if (!state.militaryConditionalTriggerCells.size) { showToast('Нет клеток в пределах доступных ОД.'); return; }
+                state.pendingMilitaryConditionalSelection = null;
+                renderMilitaryGrid();
+                const status = form.querySelector('[data-conditional-zone-status]');
+                if (status) status.textContent = `Выбрана зона хода: ${state.militaryConditionalTriggerCells.size} клеток`;
+                showToast(`Выбрано клеток в пределах хода армии: ${state.militaryConditionalTriggerCells.size}. Голубая заливка показывает зону условия.`);
+            } else {
+                const radius = mode === 'radius' ? Math.max(1, Math.min(8, Number(form.elements.condition_radius.value) || 1)) : 0;
+                state.pendingMilitaryConditionalSelection = { forceId, kind: 'zone', mode, radius };
+                showToast(mode === 'radius' ? `Щёлкните центр зоны на военной карте. Радиус: ${radius} клеток.` : 'Щёлкните клетку на военной карте.');
+            }
+            return;
+        }
+        const destinationButton = event.target.closest('[data-select-conditional-destination]');
+        if (destinationButton) {
+            const forceId = destinationButton.dataset.selectConditionalDestination;
+            state.pendingMilitaryConditionalSelection = { forceId, kind: 'destination' };
+            showToast('Щёлкните клетку назначения на военной карте.');
+            return;
+        }
         const cancelConditional = event.target.closest('[data-cancel-conditional-order]');
         if (cancelConditional) {
             cancelConditional.disabled = true;
             try {
                 await cancelMilitaryConditionalOrder(cancelConditional.dataset.cancelConditionalOrder);
                 state.militaryForces = await fetchMilitaryForces();
+                state.militaryConditionalOrders = await fetchMilitaryConditionalOrders();
+                state.militaryConditionalTriggerCells = new Set();
+                state.militaryConditionalTriggerForceId = null;
+                state.militaryConditionalTriggerCenter = null;
+                state.pendingMilitaryConditionalSelection = null;
                 showToast('Условный приказ отменён; резерв ОД освобождён.');
+                renderMilitaryGrid();
                 await renderMilitaryPlanner();
             } catch (error) { showToast(`Не удалось отменить условный приказ: ${error.message}`, 7000); cancelConditional.disabled = false; }
             return;
@@ -2721,8 +2775,13 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 const force = state.militaryForces.find(item => item.id === conditionalForm.dataset.forceId);
                 if (!force) throw new Error('Армия не найдена.');
                 const action = conditionalForm.elements.action.value;
-                const conditionX = Number(conditionalForm.elements.condition_x.value), conditionY = Number(conditionalForm.elements.condition_y.value);
-                if (!Number.isInteger(conditionX) || !Number.isInteger(conditionY)) throw new Error('Координаты условия должны быть целыми числами.');
+                if (state.militaryConditionalTriggerForceId !== force.id || !state.militaryConditionalTriggerCells.size)
+                    throw new Error('Выберите область условия на карте.');
+                const conditionMode = conditionalForm.elements.condition_mode.value;
+                const conditionCells = [...state.militaryConditionalTriggerCells].map(key => {
+                    const [x,y] = key.split(',').map(Number);
+                    return { x, y };
+                });
                 const targetId = conditionalForm.elements.target_force_id.value || null;
                 let route = [], minReserve = 1;
                 if (action === 'retreat' || action === 'move') {
@@ -2741,9 +2800,13 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 }
                 const reserve = Math.floor(Number(conditionalForm.elements.reserved_ap.value) || 0);
                 if (reserve < minReserve) throw new Error(`Для этого приказа нужно зарезервировать не менее ${minReserve} ОД.`);
-                if (!state.militaryGridCells.has(`${conditionX},${conditionY}`)) throw new Error('Указанной клетки нет на военной карте.');
-                await setMilitaryConditionalOrder(force.id, conditionX, conditionY, action, route, targetId, reserve);
+                const center = state.militaryConditionalTriggerCenter || conditionCells[0];
+                await setMilitaryConditionalOrderZone(force.id, conditionMode, conditionCells, center.x, center.y, action, route, targetId, reserve);
                 state.militaryForces = await fetchMilitaryForces();
+                state.militaryConditionalOrders = await fetchMilitaryConditionalOrders();
+                state.militaryConditionalTriggerCells = new Set();
+                state.militaryConditionalTriggerForceId = null;
+                state.militaryConditionalTriggerCenter = null;
                 showToast(`Условный приказ сохранён; зарезервировано ${reserve} ОД.`);
                 await renderMilitaryPlanner();
             } catch (error) { showToast(`Не удалось сохранить условный приказ: ${error.message}`, 7000); button.disabled = false; }
@@ -2776,6 +2839,8 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 const count = Math.max(1, Math.floor(Number(splitForm.elements.count.value) || 0));
                 const group = source?.unit_groups?.find(item => item.type === type);
                 if (!group || count > Number(group.count)) throw new Error('В армии недостаточно бойцов этого типа.');
+                const commander = state.militaryCommanders.find(item => item.id === splitForm.elements.commander_id.value && item.owner === source.owner && item.status === 'available');
+                if (!commander) throw new Error('Выберите свободного Воеводу.');
                 const options = [];
                 for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
                     if (!dx && !dy) continue;
@@ -2785,7 +2850,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 }
                 if (!options.length) throw new Error('Рядом нет свободной сухопутной клетки для новой армии.');
                 const destination = options[0];
-                await splitMilitaryForce(source.id, [{type,count}], splitForm.elements.name.value.trim(), splitForm.elements.commander_name.value.trim(), Number(splitForm.elements.commander_age.value), destination.x, destination.y);
+                await splitMilitaryForceWithCommander(source.id, [{type,count}], splitForm.elements.name.value.trim(), commander.id, destination.x, destination.y);
                 state.militaryForces = await fetchMilitaryForces();
                 showToast(`Армия разделена и размещена в клетке ${destination.x + 1}:${destination.y + 1}. Новый отряд получит ОД в следующем ходу.`);
                 await renderMilitaryPlanner();
@@ -4044,6 +4109,36 @@ export function initEventListeners() {
 
         if (state.showMilitaryGrid) {
             const cellX = Math.floor(imgX / MILITARY_GRID_CELL_SIZE), cellY = Math.floor(imgY / MILITARY_GRID_CELL_SIZE);
+            if (state.pendingMilitaryConditionalSelection) {
+                const selection = state.pendingMilitaryConditionalSelection;
+                const cellKey = `${cellX},${cellY}`;
+                if (!state.militaryGridCells.has(cellKey)) { showToast('Выберите существующую клетку военной карты.'); return; }
+                if (selection.kind === 'destination') {
+                    const form = document.querySelector(`.military-conditional-order[data-force-id="${selection.forceId}"]`);
+                    if (!form) { state.pendingMilitaryConditionalSelection = null; showToast('Карточка армии закрыта. Повторите выбор назначения.'); return; }
+                    form.elements.dest_x.value = String(cellX);
+                    form.elements.dest_y.value = String(cellY);
+                    form.elements.destination.value = `Клетка ${cellX + 1}:${cellY + 1}`;
+                    state.pendingMilitaryConditionalSelection = null;
+                    renderMilitaryGrid();
+                    showToast(`Назначение выбрано: клетка ${cellX + 1}:${cellY + 1}.`);
+                    return;
+                }
+                const radius = selection.mode === 'radius' ? selection.radius : 0;
+                state.militaryConditionalTriggerCenter = { x: cellX, y: cellY };
+                state.militaryConditionalTriggerForceId = selection.forceId;
+                state.militaryConditionalTriggerCells = new Set([...state.militaryGridCells.keys()].filter(key => {
+                    const [x, y] = key.split(',').map(Number);
+                    return Math.max(Math.abs(x - cellX), Math.abs(y - cellY)) <= radius;
+                }));
+                state.pendingMilitaryConditionalSelection = null;
+                renderMilitaryGrid();
+                const form = document.querySelector(`.military-conditional-order[data-force-id="${selection.forceId}"]`);
+                const status = form?.querySelector('[data-conditional-zone-status]');
+                if (status) status.textContent = `Выбрано клеток: ${state.militaryConditionalTriggerCells.size} · центр ${cellX + 1}:${cellY + 1}`;
+                showToast(`Зона условия выбрана: ${state.militaryConditionalTriggerCells.size} клеток. Голубая заливка отмечает область.`);
+                return;
+            }
             if (state.pendingMilitaryDisembark) {
                 const pending = state.pendingMilitaryDisembark;
                 try {

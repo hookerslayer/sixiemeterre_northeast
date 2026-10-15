@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=production-orders-20261015';
+import { supabaseClient, state } from './config.js?v=military-ui-update-20261016';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -166,6 +166,8 @@ export async function saveStateMechanics(owner, settings) {
             if (Object.prototype.hasOwnProperty.call(current?.settings || {}, key)) merged[key] = current.settings[key];
             else delete merged[key];
         }
+        if (Object.prototype.hasOwnProperty.call(current?.settings || {}, 'ruler')) merged.ruler = current.settings.ruler;
+        else delete merged.ruler;
         settings = merged;
     }
     const { data, error } = await supabaseClient.from('state_mechanics').upsert({ owner, settings, updated_at: new Date().toISOString() }, { onConflict: 'owner' }).select('settings').single();
@@ -329,6 +331,25 @@ export async function splitMilitaryForce(forceId, units, name, commanderName, co
     const { data, error } = await supabaseClient.rpc('split_military_force', {
         p_force_id: forceId, p_units: units, p_name: name, p_commander_name: commanderName,
         p_commander_age: Number(commanderAge), p_cell_x: Number(cellX), p_cell_y: Number(cellY)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function splitMilitaryForceWithCommander(forceId, units, name, commanderId, cellX, cellY) {
+    const { data, error } = await supabaseClient.rpc('split_military_force_with_commander', {
+        p_force_id: forceId, p_units: units, p_name: String(name).trim(), p_commander_id: commanderId,
+        p_cell_x: Number(cellX), p_cell_y: Number(cellY)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function setMilitaryConditionalOrderZone(forceId, mode, cells, centerX, centerY, action, route, targetForceId, reservedAp) {
+    const { data, error } = await supabaseClient.rpc('set_military_conditional_order_zone', {
+        p_force_id: forceId, p_condition_mode: mode, p_condition_cells: cells,
+        p_condition_x: Number(centerX), p_condition_y: Number(centerY), p_action: action,
+        p_route: route || [], p_target_force_id: targetForceId || null, p_reserved_ap: Number(reservedAp)
     });
     if (error) throw error;
     return data;

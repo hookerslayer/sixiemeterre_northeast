@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=production-orders-20261015';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=military-ui-update-20261016';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';
@@ -441,6 +441,19 @@ export function renderMilitaryGrid() {
             ctx.restore();
             ctx.strokeStyle = 'rgba(255, 249, 218, 1)'; ctx.lineWidth = 1.5;
             ctx.strokeRect(x + 1, y + 1, w - 2, h - 2);
+        }
+        ctx.restore();
+    }
+    if (state.militaryConditionalTriggerCells?.size) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(132, 190, 214, .34)';
+        ctx.strokeStyle = 'rgba(224, 245, 255, .95)';
+        ctx.lineWidth = Math.max(2, size * .08);
+        ctx.setLineDash([Math.max(3, size * .14), Math.max(2, size * .1)]);
+        for (const key of state.militaryConditionalTriggerCells) {
+            const [cellX, cellY] = key.split(',').map(Number);
+            ctx.fillRect(cellX * size + 2, cellY * size + 2, size - 4, size - 4);
+            ctx.strokeRect(cellX * size + 2, cellY * size + 2, size - 4, size - 4);
         }
         ctx.restore();
     }
