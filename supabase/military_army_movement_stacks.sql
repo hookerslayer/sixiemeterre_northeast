@@ -58,7 +58,7 @@ begin
     if (p_path->0->>'x')::integer <> v_force.cell_x or (p_path->0->>'y')::integer <> v_force.cell_y then
         raise exception 'Route must start at the army current position' using errcode = '22023';
     end if;
-    select grid.cell_x, grid.cell_y, coalesce(override.province_id, grid.province_id) as province_id,
+    select grid.cell_x as x, grid.cell_y as y, grid.cell_x, grid.cell_y, coalesce(override.province_id, grid.province_id) as province_id,
            coalesce(override.terrain, grid.base_terrain) as terrain,
            (coalesce(override.bridge, false) or exists(select 1 from public.military_structures structure
               where structure.cell_x=grid.cell_x and structure.cell_y=grid.cell_y and structure.structure_type='bridge'
@@ -107,7 +107,7 @@ begin
         v_dy := v_step.y - v_prev.y;
         if greatest(abs(v_dx), abs(v_dy)) <> 1 then raise exception 'Each route step must lead to a neighboring cell' using errcode = '22023'; end if;
         v_diagonal := v_dx <> 0 and v_dy <> 0;
-        select grid.cell_x, grid.cell_y, coalesce(override.province_id, grid.province_id) as province_id,
+        select grid.cell_x as x, grid.cell_y as y, grid.cell_x, grid.cell_y, coalesce(override.province_id, grid.province_id) as province_id,
                coalesce(override.terrain, grid.base_terrain) as terrain,
                (coalesce(override.bridge, false) or exists(select 1 from public.military_structures structure
                   where structure.cell_x=grid.cell_x and structure.cell_y=grid.cell_y and structure.structure_type='bridge'
