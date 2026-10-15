@@ -1,4 +1,4 @@
--- City mercenary offers and fixed two-season contracts.
+-- City mercenary offers and fixed two-year contracts.
 alter table public.military_forces
     add column if not exists is_mercenary boolean not null default false;
 
@@ -132,10 +132,10 @@ begin
     if coalesce((settings_row.settings#>>'{economy,treasury}')::numeric,0)<contract_cost then raise exception 'Not enough treasury for the first season of the contract (% z)',contract_cost using errcode='23514'; end if;
     update public.state_mechanics set settings=settings||jsonb_build_object('economy',coalesce(settings->'economy','{}'::jsonb)||jsonb_build_object('treasury',(settings_row.settings#>>'{economy,treasury}')::numeric-contract_cost)),updated_at=now() where owner=profile.owner;
     insert into public.military_forces(owner,name,force_kind,marker_id,commander_name,commander_age,unit_groups,morale,action_points,status,is_mercenary,service_end_turn)
-    values(profile.owner,offer.commander_name||' · наёмники','garrison',marker.id,offer.commander_name,offer.commander_age,offer.unit_groups,100,0,'active',true,cal.turn+2)
+    values(profile.owner,offer.commander_name||' · наёмники','garrison',marker.id,offer.commander_name,offer.commander_age,offer.unit_groups,100,0,'active',true,cal.turn+8)
     returning id into force_id;
     update public.military_mercenary_market set available=false,refresh_turn=cal.turn+2,hired_force_id=force_id,updated_at=now() where id=offer.id;
-    return jsonb_build_object('force_id',force_id,'commander',offer.commander_name,'troops',troop_total,'paid_z',contract_cost,'service_end_turn',cal.turn+2);
+    return jsonb_build_object('force_id',force_id,'commander',offer.commander_name,'troops',troop_total,'paid_z',contract_cost,'service_end_turn',cal.turn+8);
 end;
 $function$;
 revoke all on function public.hire_military_mercenary(uuid) from public,anon;

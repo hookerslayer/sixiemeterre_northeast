@@ -1,4 +1,4 @@
--- Extend an active militia contract by one season for 0.25 z per fighter.
+-- Extend an active militia contract by one season for 2 z per fighter.
 create or replace function public.extend_military_militia_service(p_force_id uuid)
 returns jsonb
 language plpgsql
@@ -31,7 +31,7 @@ begin
       from jsonb_array_elements(v_force.unit_groups) as group_row(value)
      where coalesce((group_row.value->>'count')::integer, 0) > 0;
     if v_unit_count < 1 then raise exception 'The militia has no serving troops' using errcode = '23514'; end if;
-    v_cost := v_unit_count * 0.25;
+    v_cost := v_unit_count * 2;
     select * into v_state from public.state_mechanics where owner = v_profile.owner for update;
     if not found then raise exception 'State treasury is unavailable' using errcode = '22023'; end if;
     v_treasury := greatest(0, coalesce((v_state.settings #>> '{economy,treasury}')::numeric, 0));

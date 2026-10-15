@@ -23,7 +23,8 @@ export const LAND_UNIT_PROFILES = Object.freeze({
   'Конные копейщики': { mobility: 1.25, strike: 4, defense: 3, role: 'cavalry' },
   'Лёгкая конница': { mobility: 1.4, strike: 3, defense: 2, role: 'cavalry' },
   'Конные лучники': { mobility: 1.4, strike: 3, defense: 2, role: 'cavalry' },
-  'Лыжники-разведчики': { mobility: 1, strike: 2, defense: 2, role: 'scout' }
+  'Лыжники-разведчики': { mobility: 1, strike: 2, defense: 2, role: 'scout' },
+  'Ушкуйники': { mobility: 1.15, strike: 3, defense: 2, role: 'infantry', cultures: ['Новгородцы', 'Вятичи'], navalBonus: 0.5 }
 });
 // Special hostile unit from the summer infected-horde rules. Kept separate
 // from the recruitable roster so players cannot hire or levy infected troops.
@@ -36,7 +37,7 @@ export const LAND_COMBAT_PHASES = Object.freeze({
     name: 'Первое столкновение', intensity: 0.04, lossCap: 0.12,
     factors: {
       'Пешие ратники': 1, 'Копейщики': 1,
-      'Лыжники-разведчики': 1,
+      'Лыжники-разведчики': 1, 'Ушкуйники': 1,
       'Лучники': { ranged: 1.25, melee: 0.5 },
       'Арбалетчики': { ranged: 1.5, melee: 0.5 },
       'Конные копейщики': { charge: 1.25, ordinary: 0.5 },
@@ -49,7 +50,7 @@ export const LAND_COMBAT_PHASES = Object.freeze({
     name: 'Перелом боя', intensity: 0.06, lossCap: 0.15,
     factors: {
       'Пешие ратники': 1, 'Копейщики': 1,
-      'Лыжники-разведчики': 1,
+      'Лыжники-разведчики': 1, 'Ушкуйники': 1,
       'Лучники': 0.5, 'Арбалетчики': 0.5,
       'Конные копейщики': 0.75, 'Лёгкая конница': { flank: 1, ordinary: 0.75 },
       'Конные лучники': { ranged: 0.75, melee: 0.5 },
@@ -64,7 +65,7 @@ export const LAND_COMBAT_PHASES = Object.freeze({
       'Конные копейщики': { pursuit: 1.25, ordinary: 0.5 },
       'Лёгкая конница': { pursuit: 1.5, ordinary: 0.5 },
       'Конные лучники': { pursuit: 1, ordinary: 0.5 },
-      'Лыжники-разведчики': 0.5,
+      'Лыжники-разведчики': 0.5, 'Ушкуйники': 0.5,
       'Заражённый': 0.5
     }
   }
@@ -103,7 +104,6 @@ export const NAVAL_SHIP_PROFILES = Object.freeze({
   'Когг': { crew: 20, maneuver: 2, hull: 4, capacity: 50, hullUpkeep: 1.25 },
   'Хольк': { crew: 30, maneuver: 1, hull: 5, capacity: 70, hullUpkeep: 1.75 }
 });
-export const NAVAL_WEAPONS = Object.freeze({ none: 'Без вооружения', deck: 'Палубное метательное оружие', light_gun: 'Лёгкое корабельное орудие' });
 
 export const SIEGE_WORK_THRESHOLDS = Object.freeze({
   0: { weaken: 20, breach: 40 },
@@ -699,6 +699,15 @@ export function simulateMilitaryMaintenance({ forces = [], fleets = [], ports = 
     if (disbandedPassengers.size) for (const ship of ships) ship.passengers = (ship.passengers || []).filter(passenger => !disbandedPassengers.has(passenger.force_id));
     const coverage = Math.min(treasuryCoverage, foodCoverage, clothCoverage, fuelCoverage);
     const shortfall = 1 - coverage;
+    if (inServicePort && shortfall === 0) {
+      for (const ship of ships) {
+        const profile = NAVAL_SHIP_PROFILES[ship.type];
+        if (!profile || ship.hull <= 0) continue;
+        ship.crew = profile.crew;
+        ship.hull = profile.hull;
+        delete ship.maintenance_loss_carry;
+      }
+    }
     const underfundedTurns = shortfall > 0 ? (Number(fleet.underfunded_turns) || 0) + 1 : 0;
     let crewTotal = crew, deserters = 0;
     if (underfundedTurns >= 2 && shortfall > 0 && crewTotal > 0) {
@@ -943,16 +952,13 @@ const navalPassengerLoad = ship => (ship.passengers || []).reduce((sum, passenge
     + (SIEGE_LOAD[name] || 0) * integer(count), 0);
   return sum + troopPlaces + equipment;
 }, 0);
-function chooseNavalTarget(targets, seed, key, mode = 'ranged') {
+function chooseNavalTarget(targets, seed, key) {
   if (!targets.length) return null;
   const profile = ship => NAVAL_SHIP_PROFILES[ship.type] || NAVAL_SHIP_PROFILES['Ладья'];
   const score = ship => {
     const hullRatio = Math.max(0, Number(ship.hull) || 0) / Math.max(1, profile(ship).hull);
     const crewRatio = Math.max(0, Number(ship.crew) || 0) / Math.max(1, profile(ship).crew);
-    const speed = navalManeuver(ship);
-    return mode === 'boarding'
-      ? [ship.disabled ? 0 : 1, hullRatio, Number(ship.morale) || 0, speed, crewRatio]
-      : [ship.weapon && ship.weapon !== 'none' ? 0 : 1, hullRatio, crewRatio, Number(ship.morale) || 0];
+    return [ship.disabled ? 0 : 1, hullRatio, Number(ship.morale) || 0, navalManeuver(ship), crewRatio];
   };
   const compare = (left, right) => {
     const a = score(left), b = score(right);
@@ -965,7 +971,9 @@ function chooseNavalTarget(targets, seed, key, mode = 'ranged') {
 function navalShipStrength(ship, morale = 100, combatFactor = 1) {
   const crew = integer(ship.crew);
   const boardingMen = integer(ship.boardingMen);
-  return (crew + boardingMen) * (0.75 + clamp(morale, 0, 100) / 200) * navalHullFactor(ship) * combatFactor;
+  const ushkuynikBonus = (ship.passengers || []).reduce((sum, passenger) => sum + (passenger.unit_groups || []).reduce((groupSum, group) =>
+    groupSum + (group.type === 'Ушкуйники' ? integer(group.count) * 0.5 : 0), 0), 0);
+  return (crew + boardingMen + ushkuynikBonus) * (0.75 + clamp(morale, 0, 100) / 200) * navalHullFactor(ship) * combatFactor;
 }
 function navalManeuver(ship) {
   const profile = NAVAL_SHIP_PROFILES[ship.type] || NAVAL_SHIP_PROFILES['Ладья'];
@@ -981,10 +989,10 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
       const maxCrew = profile.crew;
       return { ...structuredClone(raw), id: String(raw.id ?? `${side}-${index + 1}`), type: NAVAL_SHIP_PROFILES[raw.type] ? raw.type : 'Ладья', maxCrew,
         crew: clamp(raw.crew ?? maxCrew, 0, maxCrew), hull: clamp(raw.hull ?? profile.hull, 0, profile.hull),
-        morale: clamp(raw.morale ?? source.morale ?? 100, 0, 100), weapon: Object.hasOwn(NAVAL_WEAPONS, raw.weapon) ? raw.weapon : 'none', capturedBy: null,
+        morale: clamp(raw.morale ?? source.morale ?? 100, 0, 100), capturedBy: null,
         cargoPlaces: integer(raw.cargoPlaces), boardingMen: integer(raw.boardingMen), capacity: profile.capacity,
         passengers: Array.isArray(raw.passengers) ? structuredClone(raw.passengers) : [],
-        volleys: clamp(raw.volleys ?? 0, 0, 3), fire: Boolean(raw.fire), captured: false, sunk: false, disabled: false, lossCarry: 0 };
+        captured: false, sunk: false, disabled: false, lossCarry: 0 };
     });
     if (!ships.length) throw new Error(`Добавьте хотя бы одно судно для стороны «${side === 'attacker' ? 'Атакующие' : 'Защитники'}».`);
     const combatFactor = Math.max(0, 1 + modifierValue(source.modifiers || [], 'battle_strength_pct', {
@@ -1024,35 +1032,6 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
     const start = { attacker: afloat('attacker'), defender: afloat('defender') };
     const cycleMorale = { attacker: fleets.attacker.morale, defender: fleets.defender.morale };
     const cycleStart = new Map([...start.attacker, ...start.defender].map(ship => [ship, { crew: ship.crew, hull: ship.hull, morale: ship.morale }]));
-    const rangedCrewLosses = new Map([...cycleStart.keys()].map(ship => [ship, 0]));
-    const ranged = [];
-    for (const side of ['attacker', 'defender']) {
-      const enemy = side === 'attacker' ? 'defender' : 'attacker';
-      start[side].forEach((ship, index) => {
-        if (ship.weapon === 'none' || ship.volleys >= 3 || ship.disabled || ship.crew < ship.maxCrew * 0.75) return;
-        const targets = start[enemy];
-        if (!targets.length) return;
-        const target = chooseNavalTarget(targets, randomSeed, `naval-target:${side}:${ship.id}:${cycle}`, 'ranged');
-        ship.volleys += 1;
-        const ownManeuver = navalManeuver(ship);
-        const targetManeuver = navalManeuver(target);
-        const seaPenalty = weather?.sea_condition === 'storm' ? 10 : weather?.sea_condition === 'rough' ? 5 : 0;
-        const chance = clamp(30 + 5 * (ownManeuver - targetManeuver) - (poorVisibility ? 10 : 0) - seaPenalty + (target.type === 'Хольк' ? 5 : 0), 10, 60);
-        const hit = stableRoll(randomSeed, `naval-hit:${side}:${ship.id}:${cycle}`) < chance / 100;
-        ranged.push({ side, attacker: ship.id, target: target.id, weapon: ship.weapon, chance, hit, damage: hit && ship.weapon === 'light_gun' ? 1 : 0,
-          crewLoss: hit && ship.weapon === 'deck' ? Math.max(1, Math.ceil(target.crew * 0.05)) : 0,
-          fire: hit && ship.weapon === 'light_gun' && stableRoll(randomSeed, `naval-fire:${side}:${ship.id}:${cycle}`) < 0.2 });
-      });
-    }
-    const targetById = new Map([...start.attacker, ...start.defender].map(ship => [ship.id, ship]));
-    for (const attack of ranged) {
-      if (!attack.hit) continue;
-      const target = targetById.get(attack.target);
-      target.crew = Math.max(0, target.crew - attack.crewLoss);
-      rangedCrewLosses.set(target, (rangedCrewLosses.get(target) || 0) + attack.crewLoss);
-      target.hull = Math.max(0, target.hull - attack.damage);
-      target.fire ||= attack.fire;
-    }
     const boarding = [];
     const boardingLosses = new Map([...start.attacker, ...start.defender].map(ship => [ship, 0]));
     for (const side of ['attacker', 'defender']) {
@@ -1062,7 +1041,7 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
       const counts = new Map();
       for (const ship of start[side]) {
         if (ship.disabled || ship.crew < ship.maxCrew * 0.75 || ship.morale <= 0) continue;
-        const target = chooseNavalTarget(targets, randomSeed, `naval-board-target:${side}:${ship.id}:${cycle}`, 'boarding');
+        const target = chooseNavalTarget(targets, randomSeed, `naval-board-target:${side}:${ship.id}:${cycle}`);
         counts.set(target, (counts.get(target) || 0) + 1);
         boarding.push({ side, ship, target });
       }
@@ -1095,7 +1074,6 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
         const crewBefore = cycleStart.get(ship).crew;
         const boardLoss = Math.min(crewBefore, boardingLosses.get(ship) || 0);
         ship.crew = Math.max(0, ship.crew - boardLoss);
-        const rangedLoss = rangedCrewLosses.get(ship) || 0;
         const lost = crewBefore - ship.crew;
         lossBySide[side] += lost;
         const leadership = clamp(fleets[side].commanderSkills?.leadership, 0, 5);
@@ -1109,17 +1087,11 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
           const enemySide = side === 'attacker' ? 'defender' : 'attacker';
           if (navalShipStrength(ship, ship.morale, fleets[side].combatFactor) <= start[enemySide].reduce((sum, enemy) => sum + navalShipStrength(enemy, cycleMorale[enemySide], fleets[enemySide].combatFactor), 0)) { ship.captured = true; ship.capturedBy = enemySide; }
         }
-        if (ship.captured) ship.fire = false;
-        if (ship.fire && !ship.captured && ship.hull > 0) {
-          ship.hull = Math.max(0, ship.hull - 1);
-          const extinguishChance = Math.min(0.8, 0.5 + Math.floor(ship.crew / 10) * 0.05);
-          if (stableRoll(randomSeed, `naval-extinguish:${ship.id}:${cycle}`) < extinguishChance) ship.fire = false;
-        }
         const profile = NAVAL_SHIP_PROFILES[ship.type];
         ship.disabled = profile.hull - ship.hull >= profile.hull * 0.75;
         let crewKilledOnSinking = 0, crewSurvivors = 0;
         if (ship.hull <= 0) {
-          ship.sunk = true; ship.captured = false; ship.capturedBy = null; ship.fire = false;
+          ship.sunk = true; ship.captured = false; ship.capturedBy = null;
           crewKilledOnSinking = Math.floor(ship.crew / 2);
           crewSurvivors = ship.crew - crewKilledOnSinking;
           sunkSurvivors.push({ side, ship, survivors: crewSurvivors, passengers: structuredClone(ship.passengers || []) });
@@ -1129,7 +1101,7 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
         }
         const passengerPrisoners = ship.captured ? (ship.passengers || []).reduce((sum, passenger) => sum
           + (passenger.unit_groups || []).reduce((count, group) => count + integer(group.count), 0), 0) : 0;
-        casualties[side].push({ shipId: ship.id, crewBefore, crewLost: lost + crewKilledOnSinking, crewSurvivors, crewRescued: 0, crewPrisoners: 0, crewMissing: crewSurvivors, passengerDeaths: 0, passengerRescued: 0, passengerPrisoners, passengerMissing: 0, boardingLoss: boardLoss, rangedLoss, hull: ship.hull, fire: ship.fire, morale: ship.morale, captured: ship.captured, sunk: ship.sunk, disabled: ship.disabled });
+        casualties[side].push({ shipId: ship.id, crewBefore, crewLost: lost + crewKilledOnSinking, crewSurvivors, crewRescued: 0, crewPrisoners: 0, crewMissing: crewSurvivors, passengerDeaths: 0, passengerRescued: 0, passengerPrisoners, passengerMissing: 0, boardingLoss: boardLoss, hull: ship.hull, morale: ship.morale, captured: ship.captured, sunk: ship.sunk, disabled: ship.disabled });
       }
       const capturedShips = start[side].filter(ship => ship.captured).length;
       const leadership = clamp(fleets[side].commanderSkills?.leadership, 0, 5);
@@ -1211,7 +1183,7 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
       casualty.passengerPrisoners = passengerPrisoners;
       casualty.passengerMissing = passengerMissing;
     }
-    cycles.push({ cycle, ranged, boarding: boarding.filter(row => row.target && typeof row.target === 'string'), casualties });
+    cycles.push({ cycle, boarding: boarding.filter(row => row.target && typeof row.target === 'string'), casualties });
     for (const side of ['attacker', 'defender']) if (fleets[side].morale <= 30) {
       const check = withdrawalCheck(side, cycle);
       if (check) withdrawals.push(check);
@@ -1257,7 +1229,7 @@ export function simulateNavalBattle({ battleId = 'naval-preview', attacker, defe
       pursuitResult = { pursuerSide, retreatingSide, chance: pursuers.length ? chance : 0, roll, success: false, reason: pursuers.length ? 'неудачный перехват' : 'нет управляемых судов для преследования' };
     }
   }
-  return { battleId, outcome, cycles, withdrawals, pursuit: pursuitResult, fleets, randomSeed, drawsRemaining: Object.fromEntries(['attacker', 'defender'].map(side => [side, Object.fromEntries(fleets[side].ships.map(ship => [ship.id, Math.max(0, 3 - ship.volleys)]))])) };
+  return { battleId, outcome, cycles, withdrawals, pursuit: pursuitResult, fleets, randomSeed };
 }
 
 function phaseFactor(phase, type, conditions = {}) {

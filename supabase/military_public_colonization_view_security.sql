@@ -7,7 +7,7 @@ create policy "Active colonization publicly visible on map"
     using (status='active');
 
 grant select (id, owner, target_province_id, status)
-    on public.military_colonization_missions to anon;
+    on public.military_colonization_missions to anon, authenticated;
 
 create or replace view public.military_active_colonization_map
 with (security_barrier=true, security_invoker=true)

@@ -110,7 +110,7 @@ begin
             raise exception 'The fleet has a vessel incompatible with this port' using errcode='22023';
         end if;
     end if;
-    ship:=jsonb_build_object('type',p_ship_type,'crew',crew_count,'hull',case p_ship_type when 'Ушкуй' then 2 when 'Насад' then 4 when 'Ладья' then 3 when 'Когг' then 4 else 5 end,'weapon','none','boarding_troops',0,'cargo',jsonb_build_object());
+    ship:=jsonb_build_object('type',p_ship_type,'crew',crew_count,'hull',case p_ship_type when 'Ушкуй' then 2 when 'Насад' then 4 when 'Ладья' then 3 when 'Когг' then 4 else 5 end,'boarding_troops',0,'cargo',jsonb_build_object());
     select coalesce(sum(case item.value->>'type' when 'Ушкуй' then 1 when 'Насад' then 2 when 'Ладья' then 2 when 'Когг' then 3 when 'Хольк' then 4 else 99 end),0)::integer
       into used_berths from public.military_fleets existing cross join lateral jsonb_array_elements(existing.ships) item
      where existing.port_marker_id=port.marker_id and existing.location_kind='port' and existing.status='active';

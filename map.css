@@ -205,13 +205,13 @@ body.military-army-placement #visual-map {
 .military-map-tools {
     position: fixed; z-index: 1200; left: 18px; bottom: 18px; width: min(330px, calc(100vw - 36px));
     padding: 12px 14px; color: #eee8da; background: rgba(18,22,20,.96); border: 1px solid rgba(222,210,183,.3); border-radius: 9px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.38); font-size: 13px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.38); font-size: 13px; pointer-events: auto; isolation: isolate;
 }
 .military-map-tools[hidden], .map-finance-badge[hidden] { display: none; }
 .military-map-tools details { display: grid; gap: 10px; }
 .military-map-tools summary { color: #e7dcc4; font-weight: 700; cursor: pointer; }
 .military-map-tools label { display: grid; gap: 5px; color: #b7b4a9; }
-.military-map-tools select { min-height: 34px; width: 100%; }
+.military-map-tools select { min-height: 34px; width: 100%; color-scheme: dark; color: #e8dfc8; background: #20231f; border: 1px solid #514e43; border-radius: 5px; padding: 5px 8px; }
 .map-structure-cost { padding: 8px; border-radius: 6px; background: rgba(255,255,255,.04); color: #ded6c3; line-height: 1.45; }
 .map-finance-badge { position: fixed; z-index: 1001; top: 20px; right: calc(20px + 234px + 9px); display: flex; gap: 12px; padding: 10px 13px; border: 1px solid rgba(222,210,183,.26); border-radius: 8px; color: #eee8da; background: rgba(18,22,20,.94); font-weight: 700; }
 .map-finance-item { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
@@ -1426,7 +1426,6 @@ body.military-army-placement #visual-map {
 @media (max-width: 720px) { .military-form-grid { grid-template-columns: 1fr; } .military-form-grid [data-road-status] { grid-column: auto; } .military-order-panel { left: 12px; right: 12px; bottom: 12px; transform: none; align-items: stretch; flex-direction: column; gap: 8px; } .military-order-panel > div { justify-content: flex-end; } .military-preview-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-recruitment-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-force-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-recruitment-estimate { grid-template-columns: 1fr; } .battle-army-card > header { align-items: stretch; flex-direction: column; } .battle-army-controls { grid-template-columns: 1fr 1fr; } .military-event-card { align-items: stretch; flex-direction: column; } .battle-event-decision { grid-template-columns: 1fr; } }
 
 
-#military-port-build { display: none !important; }
 .military-capacity-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0; }
 .military-capacity-summary > div { display:flex; flex-direction:column; gap:5px; padding:12px 14px; border:1px solid var(--border-color,rgba(220,210,185,.16)); border-radius:10px; background:rgba(255,255,255,.025); }
 .military-capacity-summary span,.military-capacity-summary small { color:var(--muted-color,#a9a89f); font-size:.84rem; }
@@ -1483,11 +1482,12 @@ body.military-army-placement #visual-map {
 .province-demography .province-popup-facts > span { min-height: 54px; align-content: center; padding: 9px 11px; }
 .province-demography .province-popup-facts small { font-size: 11px; line-height: 1.35; }
 .province-demography .province-popup-facts b { font-size: 13px; line-height: 1.35; }
-.marker-demography-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
-.marker-demography-grid section { display: grid; gap: 7px; min-width: 0; padding: 10px 12px; border: 1px solid rgba(232,223,200,.16); border-radius: 7px; background: rgba(255,255,255,.035); }
-.marker-demography-grid section > strong { color: #e8dfc8; line-height: 1.35; }
-.marker-demography-grid section > span { display: flex; justify-content: space-between; gap: 8px; color: #b9b6a9; line-height: 1.35; overflow-wrap: anywhere; }
+.marker-demography-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
+.marker-demography-grid section { display: grid; gap: 4px; min-width: 0; padding: 7px 9px; border: 1px solid rgba(232,223,200,.16); border-radius: 7px; background: rgba(255,255,255,.035); font-size: 11px; }
+.marker-demography-grid section > strong { color: #e8dfc8; line-height: 1.25; font-size: 12px; }
+.marker-demography-grid section > span { display: flex; justify-content: space-between; gap: 8px; color: #b9b6a9; line-height: 1.25; overflow-wrap: anywhere; }
 .marker-demography-grid b { color: #eee8da; text-align: right; }
+.military-map-tools label, .military-map-tools button, .military-map-tools select { position: relative; z-index: 1; }
 @media (max-width: 420px) { .marker-demography-grid { grid-template-columns: 1fr; } }
 
 .province-name-edit { box-sizing: border-box; width: min(220px, 100%); min-width: 130px; min-height: 32px; }

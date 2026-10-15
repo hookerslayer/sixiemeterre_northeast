@@ -63,7 +63,7 @@ begin
     if p_unit_count is null or p_unit_count<1 or p_unit_count>5000 then
         raise exception 'Recruitment count must be between 1 and 5000' using errcode='22023';
     end if;
-    if p_unit_type not in ('Пешие ратники','Копейщики','Лучники','Арбалетчики','Конные копейщики','Лёгкая конница','Конные лучники','Лыжники-разведчики') then
+    if p_unit_type not in ('Пешие ратники','Копейщики','Лучники','Арбалетчики','Конные копейщики','Лёгкая конница','Конные лучники','Лыжники-разведчики','Ушкуйники') then
         raise exception 'This unit type cannot be recruited into a retinue' using errcode='22023';
     end if;
     select * into v_marker from public.markers where id=p_marker_id for update;
@@ -76,7 +76,8 @@ begin
     end if;
     if (p_unit_type='Арбалетчики' and lower(coalesce(nullif(v_marker.culture,''),v_province.main_culture,'')) !~ '(свей|эст)')
        or (p_unit_type='Конные лучники' and lower(coalesce(nullif(v_marker.culture,''),v_province.main_culture,'')) not like '%казан%')
-       or (p_unit_type='Лыжники-разведчики' and lower(coalesce(nullif(v_marker.culture,''),v_province.main_culture,'')) !~ '(коми|саам)') then
+       or (p_unit_type='Лыжники-разведчики' and lower(coalesce(nullif(v_marker.culture,''),v_province.main_culture,'')) !~ '(коми|саам)')
+       or (p_unit_type='Ушкуйники' and lower(coalesce(nullif(v_marker.culture,''),v_province.main_culture,'')) !~ '(новгород|вятич)') then
         raise exception 'This culture cannot recruit the selected unit type' using errcode='23514';
     end if;
     select * into v_calendar from public.game_calendar where singleton=true for update;

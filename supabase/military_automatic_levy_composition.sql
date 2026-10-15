@@ -236,9 +236,9 @@ begin
             then v_order.unit_groups
             else jsonb_build_array(jsonb_build_object('type',v_order.unit_type,'count',v_order.unit_count)) end;
         insert into public.military_forces(owner, name, force_kind, marker_id, unit_groups, morale, action_points,
-            status, is_militia, levy_source_kind, levy_source_id, service_end_turn)
+            status, is_militia, levy_source_kind, levy_source_id, service_end_turn, militia_base_end_turn)
         values(v_order.owner, 'Ополчение · ' || v_order.levy_kind, 'garrison', v_order.destination_marker_id, v_groups, 100, 0,
-            'active', true, v_order.levy_kind, v_order.source_id, new.turn + 2)
+            'active', true, v_order.levy_kind, v_order.source_id, new.turn + 4, new.turn + 4)
         returning id into v_force_id;
         update public.military_levy_orders set status = 'raised', force_id = v_force_id where id = v_order.id;
     end loop;

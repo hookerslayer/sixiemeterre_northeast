@@ -162,7 +162,7 @@ begin
     cost:=(soldiers+1)*2;
     if coalesce((state_row.settings#>>'{economy,treasury}')::numeric,0)<cost then raise exception 'Not enough treasury for the first season of the contract' using errcode='23514'; end if;
     update public.state_mechanics set settings=settings||jsonb_build_object('economy',coalesce(settings->'economy','{}'::jsonb)||jsonb_build_object('treasury',(state_row.settings#>>'{economy,treasury}')::numeric-cost)),updated_at=now() where owner=profile.owner;
-    update public.military_forces set owner=profile.owner,is_mercenary=true,service_end_turn=calendar.turn+2,action_points=0,underfunded_turns=0,updated_at=now()
+    update public.military_forces set owner=profile.owner,is_mercenary=true,service_end_turn=calendar.turn+8,action_points=0,underfunded_turns=0,updated_at=now()
       where id=camp.id returning * into camp;
     return jsonb_build_object('force_id',camp.id,'troops',soldiers,'paid_z',cost,'service_end_turn',camp.service_end_turn,'hired_from_camp',true);
 end;

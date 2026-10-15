@@ -709,15 +709,6 @@ export async function transferMilitaryFleetCargo(fleetId, shipIndex, itemType, i
     return data;
 }
 
-export async function serviceMilitaryShip(fleetId, shipIndex, action, quantity = 0, weapon = null) {
-    const { data, error } = await supabaseClient.rpc('service_military_ship', {
-        p_fleet_id:fleetId, p_ship_index:Number(shipIndex), p_action:action,
-        p_quantity:Number(quantity), p_weapon:weapon
-    });
-    if (error) throw error;
-    return data;
-}
-
 export async function trainMilitaryCommander(forceId, skill) {
     const { data, error } = await supabaseClient.rpc('train_military_commander', {
         p_force_id: forceId,
