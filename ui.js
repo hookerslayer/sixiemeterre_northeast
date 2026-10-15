@@ -2832,6 +2832,9 @@ async function renderMilitaryPlanner(spyOnly = false) {
                 const battle = details.battle;
                 if (!battle || battle.status !== 'pending') throw new Error('Событие уже закрыто или недоступно. Обновите список боёв.');
                 if (details.armies.some(army => army.decision === 'pending')) throw new Error('Назначьте решение для каждого отряда; при отсутствии ответа решение может выбрать администратор.');
+                const battleRegion = battle.location?.region || state.dbProvinces?.[Number(battle.location?.province_id)]?.region || 'Общая зона';
+                const weather = battle.location?.weather || state.regionalWeather?.find(row => row.region === battleRegion)
+                    || state.regionalWeather?.find(row => row.region === 'Общая зона') || null;
                 const modifierSnapshot = state.economySnapshot || await fetchEconomySnapshot();
                 state.economySnapshot = modifierSnapshot;
                 const modifierTurn = Number(modifierSnapshot.calendar?.turn) || 1;
