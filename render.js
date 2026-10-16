@@ -806,9 +806,11 @@ export function setMilitaryGridHoverAt(x, y) {
 }
 
 export function drawMarkerLabel(ctx, text, x, y) {
+    ctx.save();
     ctx.font = 'bold 14px sans-serif';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
+    ctx.lineJoin = 'round';
 
     ctx.strokeStyle = '#000000';
     ctx.lineWidth = 3;
@@ -816,6 +818,7 @@ export function drawMarkerLabel(ctx, text, x, y) {
 
     ctx.fillStyle = '#ffffff';
     ctx.fillText(text, x, y);
+    ctx.restore();
 }
 
 export function highlightProvince(targetHex) {

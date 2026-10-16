@@ -3,6 +3,14 @@ import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalen
 import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=admin-water-icons-20261016';
 import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=water-types-bridge-only-20261016';
 
+function openPasswordRecoveryModal() {
+    elements.loginModal?.classList.remove('active');
+    elements.passwordRecoveryModal?.classList.add('active');
+    elements.passwordRecoveryModal?.setAttribute('aria-hidden', 'false');
+    requestAnimationFrame(() => elements.passwordRecoveryNew?.focus());
+}
+const isPasswordRecoveryRedirect = new URLSearchParams(window.location.hash.slice(1)).get('type') === 'recovery';
+
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
     new Promise(resolve => {
@@ -141,12 +149,13 @@ Promise.all([
         }
     }, 60_000);
 
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    supabaseClient.auth.onAuthStateChange((event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
-            elements.loginModal?.classList.remove('active');
-            elements.passwordRecoveryModal?.classList.add('active');
-            elements.passwordRecoveryModal?.setAttribute('aria-hidden', 'false');
+            openPasswordRecoveryModal();
         }
+        // Auth callbacks run under the client's internal lock. Defer network
+        // work so password updates remain available after a recovery link.
+        window.setTimeout(async () => {
         if (state.currentUser?.id !== session?.user?.id) {
             state.militarySelectedForceId = null;
             state.militaryMoveMode = false;
@@ -206,7 +215,11 @@ Promise.all([
             renderMilitaryGrid();
         }
         updateAuthUI();
+        }, 0);
     });
+    // Auth initialization may consume the recovery callback before this late
+    // listener is registered. Keep the recovery form reachable from the URL too.
+    if (isPasswordRecoveryRedirect) openPasswordRecoveryModal();
 }).catch(err => {
     console.error('Ошибка инициализации данных:', err);
     elements.legendContent.innerHTML = 'Ошибка загрузки данных';

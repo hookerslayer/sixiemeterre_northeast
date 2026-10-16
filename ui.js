@@ -418,6 +418,19 @@ function religiousMissionButton(targetType, targetId, targetOwner, targetReligio
     const playerOwner = state.userProfile?.role === 'player' ? state.userProfile.owner : null;
     const settings = state.stateMechanics[playerOwner] || {};
     if (!playerOwner || settings.government_form !== 'Теократия' || targetOwner === playerOwner || targetReligion === settings.titular_religion) return '';
+    if (targetType === 'province') {
+        const adjacentProvinces = state.provinceAdjacency.get(Number(targetId)) || new Set();
+        const bordersPlayerTerritory = [...adjacentProvinces].some(id => state.dbProvinces[Number(id)]?.owner === playerOwner);
+        if (!bordersPlayerTerritory) return '';
+    } else {
+        const activeTrade = (state.economySnapshot?.tradeContracts || []).some(contract => {
+            if (contract.status !== 'active'
+                || ![Number(contract.source_marker_id), Number(contract.destination_marker_id)].includes(Number(targetId))) return false;
+            return (contract.seller_owner === playerOwner && contract.buyer_owner === targetOwner)
+                || (contract.buyer_owner === playerOwner && contract.seller_owner === targetOwner);
+        });
+        if (!activeTrade) return '';
+    }
     const attempts = (state.religiousMissionEvents || []).filter(row => row.owner === playerOwner && row.target_type === targetType && Number(row.target_id) === Number(targetId)).length;
     const chance = Math.min(75, 5 + attempts * 5);
     return `<section class="map-operation-menu"><strong>Миссионерство</strong><p>Попыток: ${attempts} · шанс обращения: ${chance}% · стоимость: 5 ОП.</p><button type="button" class="admin-btn" data-religious-mission data-target-type="${targetType}" data-target-id="${Number(targetId)}">Обратить</button></section>`;
