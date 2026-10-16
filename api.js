@@ -1065,6 +1065,16 @@ export async function deleteStateSymbol(path) {
     if (error) throw error;
 }
 
+export async function saveStateSymbol(owner, path, url) {
+    const { data, error } = await supabaseClient.rpc('save_state_symbol', {
+        p_owner: owner,
+        p_path: path,
+        p_url: url
+    });
+    if (error) throw error;
+    return data;
+}
+
 export async function updateProvinceData(id, fields) {
     const { data, error } = await supabaseClient
         .from('Provinces')

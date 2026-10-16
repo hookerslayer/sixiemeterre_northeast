@@ -1,7 +1,7 @@
 import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=military-ui-update-20261016d';
 import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, fetchMilitaryFleets, fetchMilitaryPorts, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryConditionalOrders, fetchMilitaryColonizationMap, fetchReligiousMissionEvents } from './api.js?v=water-types-bridge-only-20261016';
 import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=admin-water-icons-20261016';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=water-types-bridge-only-20261016';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=state-symbol-save-20261016';
 
 function openPasswordRecoveryModal() {
     elements.loginModal?.classList.remove('active');
