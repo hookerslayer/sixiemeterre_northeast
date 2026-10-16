@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=military-ui-update-20261016b';
+import { supabaseClient, state } from './config.js?v=military-ui-update-20261016c';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -513,6 +513,44 @@ export async function adminBuildMilitaryStructure(type, cellX, cellY, owner) {
 
 export async function destroyMilitaryStructure(structureId) {
     const { data, error } = await supabaseClient.rpc('destroy_military_structure', { p_structure_id: structureId });
+    if (error) throw error;
+    return data;
+}
+
+export async function setMilitaryRiverCrossing(cellX, cellY, mode) {
+    const { data, error } = await supabaseClient.rpc('set_military_river_crossing', {
+        p_cell_x: Number(cellX), p_cell_y: Number(cellY), p_mode: mode
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function adminBuildMilitaryPort(markerId, portType, owner) {
+    const { data, error } = await supabaseClient.rpc('admin_build_military_port', {
+        p_marker_id: Number(markerId), p_port_type: portType, p_owner: owner
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function attemptReligiousMission(targetType, targetId) {
+    const { data, error } = await supabaseClient.rpc('attempt_religious_mission', {
+        p_target_type: targetType, p_target_id: Number(targetId)
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchReligiousMissionEvents() {
+    const { data, error } = await supabaseClient.rpc('get_religious_mission_events');
+    if (error) throw error;
+    return Array.isArray(data) ? data : [];
+}
+
+export async function recruitPermanentGarrison(markerId, unitType, count) {
+    const { data, error } = await supabaseClient.rpc('recruit_permanent_garrison', {
+        p_marker_id: Number(markerId), p_unit_type: unitType, p_count: Number(count)
+    });
     if (error) throw error;
     return data;
 }

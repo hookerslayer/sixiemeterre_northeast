@@ -119,8 +119,8 @@ begin
     update public."Provinces" set owner=btrim(p_owner),occupied_by=null where id=any(p_province_ids);
     update public.markers set owner=btrim(p_owner) where province_id=any(p_province_ids) and type<>'ruins';
     if v_city_required then
-        insert into public.markers(name,type,coord_1,coord_2,description,owner,yards,province_id,culture,religion)
-        values(btrim(p_city_name),'city',p_city_x,p_city_y,null,btrim(p_owner),400,p_capital_province_id,v_capital.main_culture,v_capital.main_religion);
+        insert into public.markers(name,type,coord_1,coord_2,owner,yards,province_id,culture,religion)
+        values(btrim(p_city_name),'city',p_city_x,p_city_y,btrim(p_owner),400,p_capital_province_id,v_capital.main_culture,v_capital.main_religion);
     end if;
     return jsonb_build_object('owner',btrim(p_owner),'username',btrim(p_username),'province_ids',to_jsonb(p_province_ids),
         'capital_province_id',p_capital_province_id,'created_capital_city',v_city_required,'province_points',v_cost);

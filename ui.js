@@ -1,7 +1,7 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016b';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-update-20261016b';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminCreateMilitaryFleet } from './api.js?v=military-ui-update-20261016b';
-import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ui-update-20261016b';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016c';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-update-20261016c';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, setMilitaryRiverCrossing, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=military-ui-update-20261016c';
+import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ui-update-20261016c';
 import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-20261015';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -403,6 +403,35 @@ function assimilationLine(record, kind, name, settings) {
     return `<br>Ассимиляция ${kind === 'culture' ? 'культуры' : 'религии'} (${status}): ${formatNumber(turns)} ходов`;
 }
 
+function religiousMissionButton(targetType, targetId, targetOwner, targetReligion) {
+    const playerOwner = state.userProfile?.role === 'player' ? state.userProfile.owner : null;
+    const settings = state.stateMechanics[playerOwner] || {};
+    if (!playerOwner || settings.government_form !== 'Теократия' || targetOwner === playerOwner || targetReligion === settings.titular_religion) return '';
+    const attempts = (state.religiousMissionEvents || []).filter(row => row.owner === playerOwner && row.target_type === targetType && Number(row.target_id) === Number(targetId)).length;
+    const chance = Math.min(75, 5 + attempts * 5);
+    return `<section class="map-operation-menu"><strong>Миссионерство</strong><p>Попыток: ${attempts} · шанс обращения: ${chance}% · стоимость: 5 ОП.</p><button type="button" class="admin-btn" data-religious-mission data-target-type="${targetType}" data-target-id="${Number(targetId)}">Обратить</button></section>`;
+}
+
+function showMilitaryStructurePopup(structure) {
+    const playerOwner = state.userProfile?.role === 'player' ? state.userProfile.owner : null;
+    const gridCell = state.militaryGridCells.get(`${structure.cell_x},${structure.cell_y}`) || {};
+    const terrain = state.militaryTerrainCells.get(`${structure.cell_x},${structure.cell_y}`) || {};
+    const provinceId = terrain.province_id ?? gridCell.province_id;
+    const provinceOwner = state.dbProvinces[Number(provinceId)]?.owner;
+    const free = state.userProfile?.role === 'admin' || (!!playerOwner && provinceOwner === playerOwner && structure.owner === playerOwner);
+    const adjacent = state.militaryForces.find(force => force.owner === playerOwner && force.force_kind === 'land_army' && force.status === 'active'
+        && Math.max(Math.abs(Number(force.cell_x) - Number(structure.cell_x)), Math.abs(Number(force.cell_y) - Number(structure.cell_y))) <= 1);
+    const canDestroy = free || (adjacent && Number(adjacent.action_points) >= 30);
+    const names = { bridge:'Мост', camp:'Полевой лагерь', watchtower:'Сторожевая башня', palisade:'Засека', ferry:'Волок' };
+    const status = structure.status === 'active' ? 'Действует' : structure.status === 'broken' ? 'Сломан' : structure.status === 'destroyed' ? 'Разрушен' : `Строится с хода ${formatNumber(structure.available_from_turn)}`;
+    state.activePopupType = 'military_structure';
+    state.selectedImgX = Number(structure.cell_x) * MILITARY_GRID_CELL_SIZE + MILITARY_GRID_CELL_SIZE / 2;
+    state.selectedImgY = Number(structure.cell_y) * MILITARY_GRID_CELL_SIZE + MILITARY_GRID_CELL_SIZE / 2;
+    elements.popupContent.innerHTML = `<strong>${names[structure.structure_type] || escapeHtml(structure.structure_type)}</strong><br>Государство: ${escapeHtml(structure.owner || '—')}<br>Состояние: ${status}<br>Клетка: ${Number(structure.cell_x)+1}:${Number(structure.cell_y)+1}${structure.structure_type === 'bridge' && structure.status === 'broken' ? '<p>Мост сломан; его можно восстановить обычным строительным действием.</p>' : ''}${structure.status === 'active' ? `<section class="map-operation-menu"><button type="button" class="admin-btn danger" data-destroy-military-structure="${Number(structure.id)}" ${canDestroy ? '' : 'disabled'}>Разрушить${free ? ' · бесплатно' : ' · 30 ОД'}</button>${!free && !adjacent ? '<small>Для разрушения нужна ваша армия на соседней клетке.</small>' : !free && adjacent && Number(adjacent.action_points)<30 ? `<small>У армии «${escapeHtml(adjacent.name)}» недостаточно ОД.</small>` : ''}</section>` : ''}`;
+    elements.popup.style.display = 'block';
+    updatePopupPosition();
+}
+
 function provinceProductionSummary(province) {
     const lastReport = state.economySnapshot?.reports?.find(row => row.owner === province.owner)?.report;
     const rebellion = (state.economySnapshot?.rebellions || []).find(row => row.territory_type === 'province' && Number(row.territory_id) === Number(province.id));
@@ -538,6 +567,7 @@ export function showProvincePopup(imgX, imgY, info) {
                 ${provinceProductionSummary(dbRow)}
                 <div class="marker-demography-grid"><section><strong>Демография</strong><span>Дворов <b>${formatNumber(totalYards)}</b></span><span>Население <b>${formatNumber(totalPop)} чел.</b></span><span>В провинции <b>${formatNumber(provYards)}</b></span><span>В поселениях <b>${formatNumber(settlementsYards)}</b></span></section><section><strong>Сословия · сельские дворы</strong><span>Аристократия <b>${formatNumber(estates.aristocracy)}</b></span><span>Духовенство <b>${formatNumber(estates.clergy)}</b></span><span>Горожане <b>${formatNumber(estates.burghers)}</b></span><span>Крестьянство <b>${formatNumber(estates.peasants)}</b></span></section></div>
                 ${playerMapActions}
+                ${religiousMissionButton('province', info.id, dbRow.owner, dbRow.main_religion)}
             </div>
         `;
 
@@ -574,10 +604,12 @@ export function showMarkerPopup(marker) {
     const markerAssimilationInputs = marker.type === 'ruins' ? '' : `${markerCultureTurns === null ? '' : `<label>До смены культуры, ходов:<input type="number" min="1" id="admin-marker-culture-turns" value="${markerCultureTurns}"></label>`}${markerReligionTurns === null ? '' : `<label>До смены религии, ходов:<input type="number" min="1" id="admin-marker-religion-turns" value="${markerReligionTurns}"></label>`}`;
     const playerOwner = state.userProfile?.role === 'player' ? state.userProfile.owner : null;
     const markerLevyActions = marker.owner === playerOwner && marker.type !== 'ruins' && !owningProvince.occupied_by ? `<section class="map-operation-menu"><strong>Сбор ополчения из провинции</strong><p>Одним приказом собираются все доступные сословные квоты провинции: крестьянская, служилая и городская. Состав и численность рассчитываются автоматически; войска появятся в ближайшем поселении с вашим гарнизоном.</p><button type="button" class="admin-btn" id="map-levy-form">Собрать доступное ополчение</button></section>` : '';
+    const markerPort = (state.militaryPorts || []).find(port => Number(port.marker_id) === Number(marker.id) && ['active','building'].includes(port.status));
+    const portShipForm = markerPort?.status === 'active' && marker.owner === playerOwner ? `<section class="map-operation-menu"><strong>${markerPort.port_type === 'river_port' ? 'Речной порт' : 'Порт'}</strong><p>Статус: действует. Флот может базироваться здесь.</p><form id="marker-port-ship-build" class="admin-form"><label>Судно<select name="ship_type">${Object.keys(NAVAL_SHIP_PROFILES).map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('')}</select></label><label>Воевода<select name="commander_id" required><option value="">Выбрать свободного Воеводу</option>${(state.militaryCommanders || []).filter(commander => commander.owner === playerOwner && commander.status === 'available').map(commander => `<option value="${escapeHtml(commander.id)}">${escapeHtml(commander.name)}</option>`).join('')}</select></label><label>Новая флотилия<input name="fleet_name" maxlength="80" value="Флотилия ${escapeHtml(marker.name || '')}"></label><button class="admin-btn" type="submit">Заложить судно</button></form></section>` : markerPort ? `<section class="map-operation-menu"><strong>${markerPort.port_type === 'river_port' ? 'Речной порт' : 'Порт'}</strong><p>${markerPort.status === 'building' ? `Строится · действует с хода ${formatNumber(markerPort.available_from_turn)}` : 'Флот может базироваться здесь.'}</p></section>` : '';
     const targetCellX = Math.floor(Number(marker.coord_1) / MILITARY_GRID_CELL_SIZE);
     const targetCellY = Math.floor(Number(marker.coord_2) / MILITARY_GRID_CELL_SIZE);
     const currentSiege = (state.militarySieges || []).find(siege => Number(siege.marker_id) === Number(marker.id) && ['active', 'battle_pending'].includes(siege.status));
-    const siegeArmies = playerOwner && marker.owner && marker.owner !== playerOwner && marker.type !== 'ruins'
+    const siegeArmies = playerOwner && marker.owner !== playerOwner && marker.type !== 'ruins'
         && (marker.type === 'fortress' || Number(marker.fortification_level) >= 1)
         && !marker.military_controlled_by
         ? state.militaryForces.filter(force => force.force_kind === 'land_army' && force.status === 'active'
@@ -616,9 +648,6 @@ export function showMarkerPopup(marker) {
                 </label>
                 <label>Развитие:
                     <input type="number" min="0" id="admin-marker-development" value="${development}">
-                </label>
-                <label>Описание:
-                    <textarea id="admin-marker-desc">${marker.description || ''}</textarea>
                 </label>
                 <div class="coords-row">
                     <label>Coord 1 (X):
@@ -670,7 +699,6 @@ export function showMarkerPopup(marker) {
                 religion: markerType === 'ruins' ? null : markerReligionInput.value.trim() || null,
                 yards: parseInt(document.getElementById('admin-marker-yards').value, 10) || 0,
                 development: Math.max(0, parseInt(markerDevelopmentInput.value, 10) || 0),
-                description: document.getElementById('admin-marker-desc').value.trim(),
                 coord_1: parseInt(document.getElementById('admin-marker-x').value, 10),
                 coord_2: parseInt(document.getElementById('admin-marker-y').value, 10)
             };
@@ -719,14 +747,20 @@ export function showMarkerPopup(marker) {
             Развитие: ${development}<br>
             Культура: ${marker.culture || '—'}<br>
             Религия: ${marker.religion || '—'}<br>
-            ${marker.description || 'Описание отсутствует'}<br>
             <hr>
             <div class="marker-demography-grid"><section><strong>Демография</strong><span>Дворов <b>${formatNumber(yards)}</b></span><span>Население <b>${formatNumber(pop)} чел.</b></span></section><section><strong>Сословия</strong><span>Аристократия <b>${formatNumber(estates.aristocracy)}</b></span><span>Духовенство <b>${formatNumber(estates.clergy)}</b></span><span>Горожане <b>${formatNumber(estates.burghers)}</b></span><span>Крестьянство <b>${formatNumber(estates.peasants)}</b></span></section></div>
             ${markerEconomySummary(marker)}
+            ${portShipForm}
             ${markerSiegeAction}
             ${markerLevyActions}
+            ${religiousMissionButton('marker', marker.id, marker.owner, marker.religion)}
         `;
         document.getElementById('map-levy-form')?.addEventListener('click',async event=>{const button=event.currentTarget;button.disabled=true;try{const result=await placeMilitaryLevyOrder(Number(marker.province_id));showToast(`Сбор ополчения начат: ${formatNumber(result.unit_count)} бойцов. Гарнизон: ${escapeHtml(state.dbMarkers.find(item=>Number(item.id)===Number(result.destination_marker_id))?.name||'ближайшее контролируемое поселение')}; прибытие с хода ${formatNumber(result.due_turn)}.`);clearSelection();}catch(error){showToast(`Не удалось начать сбор ополчения: ${error.message}`,7000);button.disabled=false;}});
+        document.getElementById('marker-port-ship-build')?.addEventListener('submit', async event => {
+            event.preventDefault(); const form=event.currentTarget; const button=form.querySelector('button[type="submit"]'); button.disabled=true;
+            try { await startMilitaryShipBuild({portMarkerId:Number(marker.id),sourceMarkerId:Number(marker.id),shipType:form.elements.ship_type.value,fleetName:form.elements.fleet_name.value.trim(),commanderId:form.elements.commander_id.value||null}); fetchMilitaryPorts().then(ports=>{state.militaryPorts=ports;renderMarkers();}); state.militaryFleets=await fetchMilitaryFleets(); showToast('Закладка судна начата.'); showMarkerPopup(marker); }
+            catch(error){showToast(`Не удалось заложить судно: ${error.message}`,7000);button.disabled=false;}
+        });
 
     }
 
@@ -763,9 +797,6 @@ export function showNewMarkerPopup(imgX, imgY) {
             </label>
             <label>Развитие:
                 <input type="number" min="0" id="new-marker-development" value="200">
-            </label>
-            <label>Описание:
-                <textarea id="new-marker-desc"></textarea>
             </label>
             <div class="coords-row">
                 <label>Coord 1 (X):
@@ -817,7 +848,6 @@ export function showNewMarkerPopup(imgX, imgY) {
             religion: markerType === 'ruins' ? null : newMarkerReligionInput.value.trim() || null,
             yards: parseInt(document.getElementById('new-marker-yards').value, 10) || 0,
             development: Math.max(0, parseInt(newMarkerDevelopmentInput.value, 10) || 0),
-            description: document.getElementById('new-marker-desc').value.trim(),
             coord_1: imgX,
             coord_2: imgY
         };
@@ -1519,7 +1549,7 @@ function startTradeRouteSelection(contract, owner, playerName) {
     };
     state.showTradeRoutes = true;
     elements.tradeRoutesToggleBtn?.classList.add('active');
-    if (elements.tradeRoutesToggleBtn) elements.tradeRoutesToggleBtn.textContent = 'Торговые маршруты: показаны';
+    if (elements.tradeRoutesToggleBtn) elements.tradeRoutesToggleBtn.textContent = 'Торговые маршруты';
     closePageView();
     elements.tradeRouteEditor.hidden = false;
     syncTradeRouteEditor();
@@ -1717,6 +1747,22 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
             const foodCoverage = Number(foodEffect.food_coverage);
             if (Number.isFinite(foodCoverage)) content += `<section class="page-panel state-shortage-summary"><div><span>Обеспеченность государства продовольствием</span><strong>${number(foodCoverage * 100)}%</strong></div><p>Потеря дворов за этот ход: ${number(foodEffect.yards_lost)} из ${number(foodEffect.yards_before)} · изменение общей лояльности крестьянства: ${number(foodEffect.peasants_loyalty_change)} п.п.${foodEffect.winter_fuel_coverage === null || foodEffect.winter_fuel_coverage === undefined ? '' : ` · зимнее покрытие топливом: ${number(Number(foodEffect.winter_fuel_coverage) * 100)}%`}</p></section>`;
             content += productionReportTable('Потребление ресурсов и товаров за ход', ['Ресурс или товар', 'Количество'], consumptionRows, 'Потребление пока не рассчитано.');
+            const upkeepRows = (report.military?.maintenance || []).filter(row => {
+                const force = snapshot.militaryForces?.find(item => String(item.id) === String(row.force_id));
+                const fleet = snapshot.militaryFleets?.find(item => String(item.id) === String(row.fleet_id));
+                return (force?.owner || fleet?.owner) === owner;
+            }).map(row => {
+                const force = snapshot.militaryForces?.find(item => String(item.id) === String(row.force_id));
+                const fleet = snapshot.militaryFleets?.find(item => String(item.id) === String(row.fleet_id));
+                const category = fleet ? 'Флот' : force?.is_permanent_garrison ? 'Гарнизон' : force?.force_kind === 'garrison' ? 'Войска в поселении' : 'Армия';
+                const goods = (row.withdrawn || []).map(item => `${safe(item.item_name)} ${number(item.quantity)}`).join(', ');
+                const costs = fleet ? `${number(row.hull_upkeep)} ед. ремонта корпуса; ${number(row.treasury_upkeep)} z` : goods || (row.shortfall ? `недостаток снабжения ${number(row.shortfall)}` : 'ресурсы на содержание не списывались');
+                return [safe(category), safe(fleet?.name || force?.name || row.force_name || row.fleet_name || '—'), safe(costs)];
+            });
+            const ownStructures = (snapshot.militaryStructures || []).filter(item => item.owner === owner && ['active','building'].includes(item.status));
+            ownStructures.forEach(item => upkeepRows.push(['Сооружение', safe(item.structure_type), 'Постоянное содержание не предусмотрено действующими правилами.']));
+            (snapshot.militaryPorts || []).filter(item => item.owner === owner && ['active','building'].includes(item.status)).forEach(item => upkeepRows.push(['Порт', safe(item.port_type === 'river_port' ? 'Речной порт' : 'Порт'), 'Отдельное содержание объекта не списывается; содержание флота показано по флотилиям.']));
+            content += productionReportTable('Содержание армии, гарнизонов, флота и объектов', ['Категория', 'Отряд или объект', 'Потребление за ход'], upkeepRows, 'Нет военных расходов за этот ход.');
             content += productionReportTable('Непокрытые потребности', ['Потребность', 'Дефицит'], shortageRows, 'По последнему расчёту дефицита нет.');
             content += productionReportTable('Покрытие потребностей по поселениям', ['Поселение', 'Потребность', 'Требуется', 'Покрыто', 'Покрытие'], coverageRows, 'Нет данных по покрытию потребностей.');
         }
@@ -2145,20 +2191,22 @@ async function renderMilitaryPlanner(spyOnly = false) {
         catch (error) { return { error }; }
     };
     if (spyOnly) {
-        const [profilesResult, spyResult] = await Promise.all([
+        const [profilesResult, spyResult, missionResult] = await Promise.all([
             isAdmin ? loadResult(fetchStateProfiles) : Promise.resolve({ data: [] }),
-            canUseSpySystem ? loadResult(fetchMilitarySpyRecords) : Promise.resolve({ data: spyRecords })
+            canUseSpySystem ? loadResult(fetchMilitarySpyRecords) : Promise.resolve({ data: spyRecords }),
+            canUseSpySystem ? loadResult(fetchReligiousMissionEvents) : Promise.resolve({ data: [] })
         ]);
         militaryProfiles = profilesResult.data?.filter(profile => profile.owner) || [];
         if (profilesResult.error) forceDataError = profilesResult.error.message || 'Не удалось загрузить список государств.';
         spyRecords = spyResult.data || spyRecords;
+        state.religiousMissionEvents = missionResult.data || [];
         if (spyResult.error) spyDataError = spyResult.error.message || 'Не удалось загрузить шпионскую систему.';
     } else {
         const loaders = [
             ['battles', fetchMilitaryBattles], ['profiles', isAdmin ? fetchStateProfiles : null],
             ['forces', fetchMilitaryForces], ['commanders', fetchMilitaryCommanders],
             ['conditional', canUseSpySystem ? fetchMilitaryConditionalOrders : null],
-            ['spies', canUseSpySystem ? fetchMilitarySpyRecords : null], ['epidemics', fetchMilitaryEpidemicEvents],
+            ['spies', canUseSpySystem ? fetchMilitarySpyRecords : null], ['missions', canUseSpySystem ? fetchReligiousMissionEvents : null], ['epidemics', fetchMilitaryEpidemicEvents],
             ['fleets', fetchMilitaryFleets], ['prisoners', fetchMilitaryPrisoners], ['ports', fetchMilitaryPorts],
             ['shipOrders', fetchMilitaryShipBuildOrders], ['structures', fetchMilitaryStructures],
             ['sieges', fetchMilitarySieges], ['raids', fetchMilitaryRaids], ['colonization', fetchMilitaryColonizationMissions],
@@ -2176,6 +2224,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         if (militaryCommanders.length || !error('commanders')) state.militaryCommanders = militaryCommanders;
         conditionalOrders = read('conditional') || []; state.militaryConditionalOrders = conditionalOrders;
         spyRecords = read('spies') || spyRecords;
+        state.religiousMissionEvents = read('missions') || [];
         epidemicEvents = read('epidemics') || [];
         militaryFleets = read('fleets') || []; state.militaryFleets = militaryFleets;
         militaryPrisoners = read('prisoners') || [];
@@ -2228,7 +2277,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         return `<tr><td>${escapeHtml(spy.name)} · ${escapeHtml(spy.owner)}<small>${formatNumber(spy.age)} лет</small></td><td>${xp}</td><td>${escapeHtml(spyStatusLabels[spy.status] || spy.status)} · ${action}</td><td>${controls}</td></tr>`;
     }).join('');
     const spyIntelRows = spyRecords.intel.filter(item => isAdmin || item.owner === playerOwner).map(item => `<article class="military-event-card"><div><strong>${escapeHtml(item.intel_type === 'garrison' ? 'Разведка гарнизона' : item.intel_type === 'province' ? 'Разведка провинции' : 'Обнаружение сетей')} · ${escapeHtml(item.target_label)}</strong><span>${escapeHtml(item.source_owner)} · действует до хода ${formatNumber(item.expires_turn)}</span><small>${escapeHtml(JSON.stringify(item.payload))}</small></div></article>`).join('');
-    const spyAlertRows = spyRecords.alerts.filter(item => isAdmin || item.owner === playerOwner).slice(0,12).map(item => `<article class="military-event-card"><div><strong>${escapeHtml(item.message)}</strong><span>Ход ${formatNumber(item.created_turn)}</span></div></article>`).join('');
+    const spyAlertRows = [...spyRecords.alerts.filter(item => isAdmin || item.owner === playerOwner).slice(0,12).map(item => `<article class="military-event-card"><div><strong>${escapeHtml(item.message)}</strong><span>Ход ${formatNumber(item.created_turn)}</span></div></article>`), ...(state.religiousMissionEvents || []).filter(item => item.target_owner === playerOwner).slice(0,12).map(item => `<article class="military-event-card"><div><strong>Попытка миссионерского обращения · ${escapeHtml(item.target_name)}</strong><span>Ход ${formatNumber(item.turn)} · шанс ${formatNumber(item.success_chance)}% · ${item.succeeded ? 'успех' : 'неудача'}</span></div></article>`)].join('');
     const spyPanel = state.userProfile?.role === 'player' || isAdmin ? `<section class="page-panel military-spy-panel"><header class="page-panel-heading"><div><h2>Шпионаж</h2><p>Сеть растёт на 5 пунктов за сезон и на 2 дополнительных за каждый уровень агента выше первого. Операция разрешается при смене хода; шанс успеха и риск раскрытия учитывают силу сети и контршпионаж.</p></div></header>${spyDataError ? `<p class="page-error">Не удалось загрузить шпионскую систему: ${escapeHtml(spyDataError)}</p>` : ''}${state.userProfile?.role === 'player' ? `<form id="military-spy-hire" class="military-form-grid military-character-hire"><label>Имя шпиона<input name="name" maxlength="80" autocomplete="off" required></label><button class="admin-btn" type="submit">Нанять · 10 ОП</button><small>Возраст шпиона определяется случайно: от 30 до 60 лет. Лимит: 1 шпион + 1 за каждый Крупный город; до 3 сверх лимита с содержанием 2 ОП/ход.</small></form>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Агент</th><th>Опыт</th><th>Назначение</th><th>Приказы</th></tr></thead><tbody>${spyRows || '<tr><td colspan="4">Шпионов пока нет.</td></tr>'}</tbody></table></div><h3>Сведения разведки</h3><div class="military-event-list">${spyIntelRows || '<p class="page-note">Действующей разведывательной информации нет.</p>'}</div><h3>Уведомления службы</h3><div class="military-event-list">${spyAlertRows || '<p class="page-note">Новых уведомлений нет.</p>'}</div></section>` : '';
     const ownedLevyMarkers = (levySnapshot?.markers || []).filter(marker => marker.owner === playerOwner && marker.type !== 'ruins' && (levySnapshot?.provinces || []).some(province => Number(province.id) === Number(marker.province_id) && province.owner === playerOwner && !province.occupied_by));
     const levyProvinces = (levySnapshot?.provinces || []).filter(province => province.owner === playerOwner && !province.occupied_by);
@@ -2242,14 +2291,14 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const ownedRoadProvinces = (levySnapshot?.provinces || []).filter(province => province.owner === playerOwner && !province.occupied_by);
     const roadProvinceOptions = ownedRoadProvinces.map(province => `<option value="${Number(province.id)}">${escapeHtml(roadProvinceName(province.id))}</option>`).join('');
     const roadSourceOptions = ownedLevyMarkers.map(marker => `<option value="${Number(marker.id)}">${escapeHtml(marker.name || `Поселение #${marker.id}`)}</option>`).join('');
-    const siegeMarkerOptions = (levySnapshot?.markers || []).filter(marker => marker.owner && marker.owner !== playerOwner && marker.type !== 'ruins' && (marker.type === 'fortress' || Number(marker.fortification_level) > 0)).map(marker => `<option value="${Number(marker.id)}">${escapeHtml(marker.name || `Поселение #${marker.id}`)} · ${escapeHtml(marker.owner)} · укрепления ${marker.type === 'fortress' ? 'I' : formatNumber(marker.fortification_level)}</option>`).join('');
+    const siegeMarkerOptions = (levySnapshot?.markers || []).filter(marker => marker.owner !== playerOwner && marker.type !== 'ruins' && (marker.type === 'fortress' || Number(marker.fortification_level) > 0)).map(marker => `<option value="${Number(marker.id)}">${escapeHtml(marker.name || `Поселение #${marker.id}`)} · ${escapeHtml(marker.owner || 'Нейтральные земли')} · укрепления ${marker.type === 'fortress' ? 'I' : formatNumber(marker.fortification_level)}</option>`).join('');
     const activeSiegeRows = militarySieges.map(siege => {
         const mineAttacker = isAdmin || siege.attacker_owner === playerOwner, mineDefender = isAdmin || siege.defender_owner === playerOwner;
         const participating = (siege.attacker_force_ids || []).map(id => state.militaryForces.find(force => force.id === id)).filter(force => force?.status === 'active' && force.force_kind === 'land_army');
         const forceOptions = participating.map(force => `<option value="${force.id}">${escapeHtml(force.name)} · ${formatNumber(force.action_points)} ОД</option>`).join('');
         const actionForm = (side) => {
             const attacker = side === 'attacker', allowed = attacker ? mineAttacker : mineDefender;
-            if (!allowed || siege.status !== 'active') return `<small>${attacker ? `Осаждают: ${escapeHtml(siege.attacker_owner)}` : `Защитник: ${escapeHtml(siege.defender_owner)}`}${attacker ? '' : ' · приказ осаждающих скрыт'}</small>`;
+            if (!allowed || siege.status !== 'active') return `<small>${attacker ? `Осаждают: ${escapeHtml(siege.attacker_owner)}` : `Защитник: ${escapeHtml(siege.defender_owner || 'Нейтральные земли')}`}${attacker ? '' : ' · приказ осаждающих скрыт'}</small>`;
             const options = attacker ? [['blockade','Продолжить блокаду'],['works','Осадные работы'],['assault','Штурм'],['lift','Снять осаду']] : [['defend','Обороняться'],['repair','Восстановить укрепления'],['sortie','Вылазка'],['surrender','Сдаться']];
             const currentOrder = attacker ? siege.attacker_order : siege.defender_order;
             const submittedTurn = Number(attacker ? siege.attacker_orders_turn : siege.defender_orders_turn);
@@ -2421,11 +2470,22 @@ async function renderMilitaryPlanner(spyOnly = false) {
         ['Полевые армии', liveForces.filter(force => force.force_kind === 'land_army' && !force.is_retinue && !force.is_militia)],
         ['Личная дружина', liveForces.filter(force => force.force_kind === 'land_army' && force.is_retinue)],
         ['Созванное ополчение', liveForces.filter(force => force.is_militia)],
-        ['Гарнизон', liveForces.filter(force => force.force_kind === 'garrison' && !force.is_permanent_garrison)],
-        ['Постоянный гарнизон', liveForces.filter(force => force.is_permanent_garrison)]
+        ['Войска в поселении', liveForces.filter(force => force.force_kind === 'garrison' && !force.is_permanent_garrison)],
+        ['Гарнизон', liveForces.filter(force => force.is_permanent_garrison)]
     ];
     const forceTables = forceTableDefs.map(([title, forces]) => `<section class="military-force-subtable"><h3>${title}</h3><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Положение</th><th>Воевода</th><th>Состав</th><th>Мораль</th><th>ОД</th><th>Действия</th></tr></thead><tbody>${forces.map(renderForceRow).join('') || `<tr><td colspan="8">${title === 'Личная дружина' ? 'Дружины пока нет.' : 'Записей нет.'}</td></tr>`}</tbody></table></div></section>`).join('');
     const unitNames = Object.keys(LAND_UNIT_PROFILES);
+    const garrisonRecruitRows = !isAdmin ? liveForces.filter(force => force.is_permanent_garrison && force.owner === playerOwner && force.status === 'active').map(force => {
+        const marker = state.dbMarkers.find(item => Number(item.id) === Number(force.marker_id));
+        if (!marker) return '';
+        const level = Number(marker.fortification_level) || 0;
+        const base = { large_city:60, city:30, fortress:40, monastery:15 }[marker.type] || 0;
+        const total = (force.unit_groups || []).reduce((sum, group) => sum + (Number(group.count) || 0), 0);
+        const cap = level * 50;
+        const remaining = Math.max(0, cap - Math.max(0, total - base));
+        return `<tr><td>${escapeHtml(marker.name || 'Поселение')}</td><td>${formatNumber(Math.max(0,total-base))} / ${formatNumber(cap)}</td><td><form class="permanent-garrison-recruitment" data-marker-id="${Number(marker.id)}"><select name="unit_type">${unitNames.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('')}</select><input name="count" type="number" min="1" max="${remaining || 1}" value="${Math.min(10, remaining || 1)}" ${remaining ? '' : 'disabled'}><button class="compact-add-btn" type="submit" ${remaining ? '' : 'disabled'}>Нанять · 2 z/боец</button></form></td></tr>`;
+    }).join('') : '';
+    const garrisonRecruitPanel = garrisonRecruitRows ? `<section class="military-force-subtable"><h3>Дополнительный найм в неподвижный гарнизон</h3><p>Отдельная вместимость: 50 бойцов на уровень укреплений поселения. Найм стоит 2 z за бойца; содержание добавится к обычным военным расходам.</p><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Занято мест</th><th>Набор</th></tr></thead><tbody>${garrisonRecruitRows}</tbody></table></div></section>` : '';
     const ownedCommanders = militaryCommanders.filter(row => isAdmin || row.owner === playerOwner);
     const commanderArmyOptions = state.militaryForces.filter(force => force.owner === playerOwner && force.force_kind === 'land_army' && force.status === 'active' && !force.in_pending_battle)
         .map(force => `<option value="${escapeHtml(force.id)}">${escapeHtml(force.name)} · ${Number(force.cell_x)+1}:${Number(force.cell_y)+1}</option>`).join('');
@@ -2449,7 +2509,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const commanderPanel = !spyOnly ? `<section class="page-panel military-commanders-panel"><header class="page-panel-heading"><div><h2>Воеводы</h2><p>Лимит: ${formatNumber(commanderLimit)} · занято ${formatNumber(ownedCommanders.filter(item=>item.status!=='dead').length)}. Найм стоит 10 ОП; свободного воеводу можно назначить своей полевой армии.</p></div></header>${commanderDataError ? `<p class="page-error">Не удалось загрузить реестр воевод: ${escapeHtml(commanderDataError)}. Примените supabase/military_commander_roster.sql.</p>` : ''}${!isAdmin ? `<form id="military-commander-hire" class="military-form-grid military-character-hire"><label>Имя Воеводы<input name="name" maxlength="80" autocomplete="off" required></label><button type="submit" class="admin-btn" ${ownedCommanders.filter(item=>item.status!=='dead').length>=commanderLimit?'disabled':''}>Нанять · 10 ОП</button><small>Возраст определяется случайно: от 30 до 60 лет.</small></form>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Имя и возраст</th><th>Опыт</th><th>Навыки</th><th>Статус</th><th>Действия</th></tr></thead><tbody>${commanderRows || '<tr><td colspan="5">Воеводы ещё не наняты.</td></tr>'}</tbody></table></div></section>` : '';
     const visibleEpidemicProvinceNames = epidemicEvents.filter(item => Number(item.active_turn) === Number(state.gameCalendar?.turn)).map(item => state.dbProvinces?.[Number(item.province_id)]?.province_name || `Провинция ${item.province_id}`);
     const epidemicWarning = !isAdmin && visibleEpidemicProvinceNames.length ? `<p class="page-warning">Эпидемический очаг в провинции: ${visibleEpidemicProvinceNames.map(escapeHtml).join(', ')}. В этом ходу повышен риск небоевых потерь войск.</p>` : '';
-    const forcePanel = `<section class="page-panel military-forces-panel"><header class="page-panel-heading"><div><h2>Армии и гарнизоны</h2><p>Полевые армии отображаются на карте в режиме военной сетки. Выберите армию, чтобы открыть её управление на карте и увидеть доступные клетки хода. Обычные войска в Гарнизоне можно вывести в полевую армию в той же провинции; постоянные гарнизоны поселений неподвижны.</p></div></header>${epidemicWarning}${forceDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр войск: ${escapeHtml(forceDataError)}. Примените supabase/military_forces.sql.</p>` : ''}${forceTables}${isAdmin ? `<form id="create-military-force" class="military-force-create"><h3>Создать полевую армию</h3><div class="military-force-controls"><label>Государство<select name="owner" required>${battleOwnerOptions}</select></label><label>Название<input name="name" maxlength="80" value="Новая армия" required></label><label>Имя Воеводы<input name="commander_name" maxlength="80" required></label><label>Возраст Воеводы<input name="commander_age" type="number" min="16" max="100" value="35" required></label><label>Управление<input name="skill_management" type="number" min="0" max="5" value="0"></label><label>Лидерство<input name="skill_leadership" type="number" min="0" max="5" value="0"></label><label>Тактика<input name="skill_tactics" type="number" min="0" max="5" value="0"></label><label>Планирование<input name="skill_planning" type="number" min="0" max="5" value="0"></label><label>Инженерия<input name="skill_engineering" type="number" min="0" max="5" value="0"></label></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Численность</th></tr></thead><tbody>${unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td><input type="number" min="0" max="100000" step="1" value="${name === 'Пешие ратники' ? 100 : 0}" data-force-unit="${escapeHtml(name)}"></td></tr>`).join('')}</tbody></table></div><button class="admin-btn" type="submit">Выбрать клетку и создать армию</button></form>` : ''}</section>`;
+    const forcePanel = `<section class="page-panel military-forces-panel"><header class="page-panel-heading"><div><h2>Армии и гарнизоны</h2><p>Полевые армии отображаются на карте в режиме военной сетки. Выберите армию, чтобы открыть её управление на карте и увидеть доступные клетки хода. Войска в поселении можно вывести в полевую армию; гарнизон остаётся неподвижным.</p></div></header>${epidemicWarning}${forceDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр войск: ${escapeHtml(forceDataError)}. Примените supabase/military_forces.sql.</p>` : ''}${forceTables}${garrisonRecruitPanel}${isAdmin ? `<form id="create-military-force" class="military-force-create"><h3>Создать полевую армию</h3><div class="military-force-controls"><label>Государство<select name="owner" required>${battleOwnerOptions}</select></label><label>Название<input name="name" maxlength="80" value="Новая армия" required></label><label>Имя Воеводы<input name="commander_name" maxlength="80" required></label><label>Возраст Воеводы<input name="commander_age" type="number" min="16" max="100" value="35" required></label><label>Управление<input name="skill_management" type="number" min="0" max="5" value="0"></label><label>Лидерство<input name="skill_leadership" type="number" min="0" max="5" value="0"></label><label>Тактика<input name="skill_tactics" type="number" min="0" max="5" value="0"></label><label>Планирование<input name="skill_planning" type="number" min="0" max="5" value="0"></label><label>Инженерия<input name="skill_engineering" type="number" min="0" max="5" value="0"></label></div><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип войск</th><th>Численность</th></tr></thead><tbody>${unitNames.map(name => `<tr><td>${escapeHtml(name)}</td><td><input type="number" min="0" max="100000" step="1" value="${name === 'Пешие ратники' ? 100 : 0}" data-force-unit="${escapeHtml(name)}"></td></tr>`).join('')}</tbody></table></div><button class="admin-btn" type="submit">Выбрать клетку и создать армию</button></form>` : ''}</section>`;
     const statusLabels = { pending: 'Ожидает решения и подтверждения', confirmed: 'Завершено', cancelled: 'Отменено' };
     const eventCards = battleHeaders.map(battle => `<article class="military-event-card"><div><strong>${battle.battle_type === 'naval' ? 'Морское сражение' : 'Сухопутное сражение'} · ${escapeHtml(battle.terrain)}</strong><span>${escapeHtml((battle.participant_owners || []).join(' · '))}</span><small>${statusLabels[battle.status] || battle.status}${battle.public_outcome ? ` · исход: ${battle.public_outcome === 'attacker' ? 'атакующие' : battle.public_outcome === 'defender' ? 'защитники' : 'ничья'}` : ''}</small></div><button class="page-back-btn" type="button" data-open-military-battle="${battle.id}">Открыть</button></article>`).join('');
     const eventPanel = `<section class="page-panel military-events-panel"><header class="page-panel-heading"><div><h2>Боевые события</h2><p>Приказы участников скрыты друг от друга. Полный предварительный расчёт виден только администратору.</p></div></header><p class="page-note">Событие хранит снимок состава. После подтверждения Администратором потери и мораль выбранных армий и флотилий записываются в соответствующий реестр. Предпочитаемая тактика влияет на автоматический выбор тактики в каждом цикле боя.</p>${militaryDataError ? `<p class="page-error military-db-warning">Не удалось загрузить боевые события: ${escapeHtml(militaryDataError)}. Проверьте, что применены файлы боевых событий и синхронизации сил.</p>` : ''}<div id="military-event-list" class="military-event-list">${eventCards || '<p class="page-note">Активных и завершённых боевых событий пока нет.</p>'}</div><div id="military-battle-details" class="military-battle-details" aria-live="polite"></div></section>`;
@@ -2458,6 +2518,11 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const shipServicePanel = `<p class="page-note naval-auto-service-note">Экипажи автоматически пополняются, а повреждённые суда ремонтируются при сезонном обслуживании флота в порту. Отдельного ручного обслуживания нет.</p>`;
     const content = spyOnly ? spyPanel : `${commanderPanel}${forcePanel}${isAdmin ? siegePanel : ""}${isAdmin ? raidPanel : ""}${isAdmin ? colonizationPanel : ""}${portPanel}${shipServicePanel}${fleetPanel}${prisonerPanel}${eventPanel}${recruitmentPanel}${retinuePanel}${mercenaryPanel}`;
     showPageView(spyOnly ? 'Шпионаж и Саботаж' : 'Военное дело', content, { navId: spyOnly ? 'nav-spy' : 'nav-military', subtitle: state.userProfile?.owner || '' });
+    elements.pageView.querySelectorAll('.permanent-garrison-recruitment').forEach(form => form.addEventListener('submit', async event => {
+        event.preventDefault(); const button=form.querySelector('button[type="submit"]'); button.disabled=true;
+        try { const result=await recruitPermanentGarrison(Number(form.dataset.markerId),form.elements.unit_type.value,Number(form.elements.count.value)); showToast(`Нанято ${formatNumber(result.count)} бойцов · ${formatNumber(result.paid_z)} z.`); await renderMilitaryPlanner(); }
+        catch(error){showToast(`Не удалось пополнить гарнизон: ${error.message}`,7000);button.disabled=false;}
+    }));
     elements.pageView.querySelector('#military-commander-hire')?.addEventListener('submit', async event => {
         event.preventDefault(); const form=event.currentTarget,button=form.querySelector('button[type="submit"]'); button.disabled=true;
         const age = 30 + Math.floor(Math.random() * 31);
@@ -2941,7 +3006,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
             state.showMilitaryGrid = true;
             elements.militaryGridToggleBtn?.classList.add('active');
             elements.militaryGridToggleBtn?.setAttribute('aria-pressed', 'true');
-            if (elements.militaryGridToggleBtn) elements.militaryGridToggleBtn.textContent = 'Военная сетка: показана';
+            if (elements.militaryGridToggleBtn) elements.militaryGridToggleBtn.textContent = 'Военная сетка';
             elements.cancelMilitaryPlacementBtn.style.display = 'inline-flex';
             document.body.classList.add('military-army-placement');
             closePageView();
@@ -2995,7 +3060,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         state.showMilitaryGrid = true;
         elements.militaryGridToggleBtn?.classList.add('active');
         elements.militaryGridToggleBtn?.setAttribute('aria-pressed', 'true');
-        if (elements.militaryGridToggleBtn) elements.militaryGridToggleBtn.textContent = 'Военная сетка: показана';
+        if (elements.militaryGridToggleBtn) elements.militaryGridToggleBtn.textContent = 'Военная сетка';
         elements.cancelMilitaryPlacementBtn.style.display = 'inline-flex';
         document.body.classList.add('military-army-placement');
         closePageView();
@@ -3536,6 +3601,35 @@ export function initEventListeners() {
             button.disabled = false;
         }
     });
+    elements.popupContent?.addEventListener('click', async event => {
+        const button = event.target.closest('[data-religious-mission]');
+        if (!button || button.disabled) return;
+        button.disabled = true;
+        try {
+            const result = await attemptReligiousMission(button.dataset.targetType, Number(button.dataset.targetId));
+            state.religiousMissionEvents = await fetchReligiousMissionEvents();
+            await loadSupabaseData();
+            renderActiveLayer();
+            showToast(`${result.succeeded ? 'Обращение удалось' : 'Попытка не удалась'} · шанс был ${result.success_chance}% · потрачено 5 ОП.`, 7000);
+            clearSelection();
+        } catch (error) {
+            showToast(`Не удалось провести миссионерскую попытку: ${error.message}`, 7000);
+            button.disabled = false;
+        }
+    });
+    elements.popupContent?.addEventListener('click', async event => {
+        const button = event.target.closest('[data-destroy-military-structure]');
+        if (!button || button.disabled) return;
+        button.disabled = true;
+        try {
+            const result = await destroyMilitaryStructure(Number(button.dataset.destroyMilitaryStructure));
+            state.militaryStructures = await fetchMilitaryStructures();
+            state.militaryForces = await fetchMilitaryForces();
+            renderMilitaryGrid();
+            clearSelection();
+            showToast(`${result.status === 'broken' ? 'Мост сломан' : 'Сооружение разрушено'} · потрачено ${formatNumber(result.spent_action_points)} ОД.`, 7000);
+        } catch (error) { showToast(`Не удалось разрушить объект: ${error.message}`, 7000); button.disabled = false; }
+    });
 
     if (window.innerWidth <= 768) {
         elements.legendPanel?.classList.add('collapsed');
@@ -3572,7 +3666,7 @@ export function initEventListeners() {
     elements.tradeRoutesToggleBtn?.addEventListener('click', () => {
         state.showTradeRoutes = !state.showTradeRoutes;
         elements.tradeRoutesToggleBtn.classList.toggle('active', state.showTradeRoutes);
-        elements.tradeRoutesToggleBtn.textContent = `Торговые маршруты: ${state.showTradeRoutes ? 'показаны' : 'скрыты'}`;
+        elements.tradeRoutesToggleBtn.textContent = 'Торговые маршруты';
         refreshTradeRouteOverlay();
     });
 
@@ -3757,7 +3851,7 @@ export function initEventListeners() {
         state.showMilitaryGrid = !state.showMilitaryGrid;
         elements.militaryGridToggleBtn.classList.toggle('active', state.showMilitaryGrid);
         elements.militaryGridToggleBtn.setAttribute('aria-pressed', String(state.showMilitaryGrid));
-        elements.militaryGridToggleBtn.textContent = `Военная сетка: ${state.showMilitaryGrid ? 'показана' : 'скрыта'}`;
+        elements.militaryGridToggleBtn.textContent = 'Военная сетка';
         if (elements.militaryMapTools) elements.militaryMapTools.hidden = !state.showMilitaryGrid || !['player','admin'].includes(state.userProfile?.role);
         if (!state.showMilitaryGrid) {
             state.militarySelectedForceId = null; state.militaryMoveMode = false; state.militaryReachableCells = new Set(); state.militaryMoveDraft = null;
@@ -3797,7 +3891,7 @@ export function initEventListeners() {
         if (elements.militaryGridToggleBtn) {
             elements.militaryGridToggleBtn.classList.toggle('active', state.showMilitaryGrid);
             elements.militaryGridToggleBtn.setAttribute('aria-pressed', String(state.showMilitaryGrid));
-            elements.militaryGridToggleBtn.textContent = `Военная сетка: ${state.showMilitaryGrid ? 'показана' : 'скрыта'}`;
+            elements.militaryGridToggleBtn.textContent = 'Военная сетка';
         }
         if (elements.militaryMapTools) elements.militaryMapTools.hidden = !state.showMilitaryGrid || !['player','admin'].includes(state.userProfile?.role);
         renderMilitaryGrid();
@@ -3821,7 +3915,6 @@ export function initEventListeners() {
         if (ownerWrap) ownerWrap.hidden = !admin;
     };
     const ownerSelect = document.getElementById('map-structure-owner');
-    if (state.userProfile?.role === 'admin') document.querySelectorAll('#map-structure-type option[value="river_port"], #map-structure-type option[value="port"]').forEach(option => option.disabled = true);
     const sourceSelect = document.getElementById('map-structure-source');
     refreshMilitaryStructureOptions();
     const settlementSelect = document.getElementById('map-structure-settlement');
@@ -3831,13 +3924,13 @@ export function initEventListeners() {
         const isAdmin = state.userProfile?.role === 'admin';
         const sourceMarkerId = Number(sourceSelect?.value);
         if (!isAdmin && !sourceMarkerId) { showToast('Нужно выбрать поселение со складом материалов.'); return; }
-        if (type === 'river_port' || type === 'port') { if(isAdmin){showToast('Строительство портов доступно игроку государства.');return;} const markerId=Number(settlementSelect?.value); if(!markerId){showToast('Выберите поселение для строительства порта.');return;} const button=document.getElementById('map-structure-build'); button.disabled=true; buildMilitaryPort(markerId,type,sourceMarkerId).then(result=>{document.getElementById('map-structure-status').textContent=`Порт будет готов с хода ${result.available_from_turn}.`;showToast(`Строительство порта начато; списано ${formatNumber(result.paid_z)} z.`);}).catch(error=>{document.getElementById('map-structure-status').textContent=error.message;showToast(`Не удалось начать строительство порта: ${error.message}`,7000);}).finally(()=>{button.disabled=false;}); return; }
+        if (type === 'river_port' || type === 'port') { const markerId=Number(settlementSelect?.value); if(!markerId){showToast('Выберите поселение для строительства порта.');return;} const button=document.getElementById('map-structure-build'); button.disabled=true; (isAdmin ? adminBuildMilitaryPort(markerId,type,ownerSelect?.value) : buildMilitaryPort(markerId,type,sourceMarkerId)).then(result=>{document.getElementById('map-structure-status').textContent=isAdmin?'Порт построен и действует сразу.':`Порт будет готов с хода ${result.available_from_turn}.`;showToast(isAdmin?'Порт построен администратором.':`Строительство порта начато; списано ${formatNumber(result.paid_z)} z.`);fetchMilitaryPorts().then(ports=>state.militaryPorts=ports);}).catch(error=>{document.getElementById('map-structure-status').textContent=error.message;showToast(`Не удалось построить порт: ${error.message}`,7000);}).finally(()=>{button.disabled=false;}); return; }
         if (!state.militaryGridCells.size) { showToast('Сначала синхронизируйте клетки военной карты.'); return; }
         state.pendingMilitaryStructure = { type, sourceMarkerId, owner: isAdmin ? ownerSelect?.value : state.userProfile?.owner, admin: isAdmin };
         state.showMilitaryGrid = true;
         elements.militaryGridToggleBtn?.classList.add('active');
         elements.militaryGridToggleBtn?.setAttribute('aria-pressed','true');
-        if (elements.militaryGridToggleBtn) elements.militaryGridToggleBtn.textContent = 'Военная сетка: показана';
+        if (elements.militaryGridToggleBtn) elements.militaryGridToggleBtn.textContent = 'Военная сетка';
         elements.militaryMapTools.hidden = false;
         document.getElementById('map-structure-status').textContent = 'Щёлкните по клетке на карте.';
         document.getElementById('map-structure-cancel').hidden = false;
@@ -4024,7 +4117,7 @@ export function initEventListeners() {
 
     elements.viewport?.addEventListener('click', async (e) => {
         if (elements.pageView?.classList.contains('active')) return;
-        if (state.dragDistance > 5) return;
+        if (state.dragDistance > 5 && e.pointerType !== 'touch') return;
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#left-sidebar') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#trade-route-editor')) return;
 
         const rect = elements.viewport.getBoundingClientRect();
@@ -4038,6 +4131,17 @@ export function initEventListeners() {
             if (imgX < 0 || imgX >= elements.hiddenCanvas.width || imgY < 0 || imgY >= elements.hiddenCanvas.height) return;
             const cellX = Math.floor(imgX / MILITARY_GRID_CELL_SIZE), cellY = Math.floor(imgY / MILITARY_GRID_CELL_SIZE);
             const selected = elements.militaryTerrainSelect?.value || 'plain';
+            if (selected === 'river:fordable' || selected === 'river:impassable') {
+                const cell = state.militaryGridCells.get(`${cellX},${cellY}`);
+                if (!(Number(cell?.water_types) & 1) || !Number(cell?.river_edges)) { showToast('Выбранная клетка не содержит отмеченного участка реки.'); return; }
+                try {
+                    const result = await setMilitaryRiverCrossing(cellX, cellY, selected === 'river:fordable' ? 'fordable' : 'impassable');
+                    state.militaryGridCells.set(`${cellX},${cellY}`, { ...cell, ford_edges: Number(result.ford_edges) });
+                    renderMilitaryGrid();
+                    showToast(selected === 'river:fordable' ? 'Участок реки отмечен как брод.' : 'Участок реки требует моста.');
+                } catch (error) { showToast(`Не удалось изменить переход через реку: ${error.message}`, 7000); }
+                return;
+            }
             if (selected.startsWith('flow:')) {
                 const cell = state.militaryGridCells.get(`${cellX},${cellY}`);
                 if (!(Number(cell?.water_types) & 1)) { showToast('Для направления течения выбери клетку, отмеченную как река.'); return; }
@@ -4253,22 +4357,9 @@ export function initEventListeners() {
                 syncMilitaryMovePanel();
                 return;
             }
+            const structure = state.militaryStructures.find(item => item.status !== 'destroyed' && Number(item.cell_x) === cellX && Number(item.cell_y) === cellY);
+            if (structure) { showMilitaryStructurePopup(structure); return; }
             const selectedForce = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
-            const structure = state.militaryStructures.find(item => item.status === 'active' && Number(item.cell_x) === cellX && Number(item.cell_y) === cellY);
-            if (structure && selectedForce && (state.userProfile?.role === 'admin' || selectedForce.owner === state.userProfile?.owner)) {
-                if (structure.owner === state.userProfile?.owner && state.userProfile?.role !== 'admin') {
-                    showToast('Нельзя разрушить собственное сооружение.');
-                    return;
-                }
-                try {
-                    const result = await destroyMilitaryStructure(structure.id);
-                    state.militaryStructures = await fetchMilitaryStructures();
-                    state.militaryForces = await fetchMilitaryForces();
-                    renderMilitaryGrid();
-                    showToast(`${structure.structure_type === 'bridge' ? 'Мост сломан' : 'Сооружение разрушено'} · потрачено ${result.spent_action_points} ОД.`);
-                } catch (error) { showToast(`Не удалось разрушить сооружение: ${error.message}`,7000); }
-                return;
-            }
             const force = state.militaryForces.find(item => item.force_kind === 'land_army' && item.status === 'active' && Number(item.cell_x) === cellX && Number(item.cell_y) === cellY);
             if (force) {
                 const canCommand = state.userProfile?.role === 'admin' || force.owner === state.userProfile?.owner;
@@ -4325,10 +4416,23 @@ export function initEventListeners() {
             return;
         }
 
-        const pixel = elements.hiddenCtx.getImageData(imgX, imgY, 1, 1).data;
-        const hex = '#' + ((1 << 24) + (pixel[0] << 16) + (pixel[1] << 8) + pixel[2]).toString(16).slice(1).toUpperCase();
-
-        const info = state.provincesMeta[hex];
+        // Touch targets often land on an antialiased border between provinces.
+        // Vote in a small source-image neighbourhood so those taps still resolve.
+        const radius = 5;
+        const left = Math.max(0, imgX - radius), top = Math.max(0, imgY - radius);
+        const right = Math.min(elements.hiddenCanvas.width - 1, imgX + radius), bottom = Math.min(elements.hiddenCanvas.height - 1, imgY + radius);
+        const sample = elements.hiddenCtx.getImageData(left, top, right - left + 1, bottom - top + 1);
+        const votes = new Map();
+        for (let py = 0; py <= bottom - top; py++) for (let px = 0; px <= right - left; px++) {
+            const offset = (py * (right - left + 1) + px) * 4;
+            const provinceId = state.provinceRgbToId[(sample.data[offset] << 16) | (sample.data[offset + 1] << 8) | sample.data[offset + 2]];
+            if (!provinceId) continue;
+            const distance = Math.hypot(left + px - imgX, top + py - imgY);
+            votes.set(provinceId, (votes.get(provinceId) || 0) + 1 / (1 + distance));
+        }
+        const provinceId = [...votes].sort((a, b) => b[1] - a[1])[0]?.[0];
+        const hex = provinceId ? Object.keys(state.provincesMeta).find(color => Number(state.provincesMeta[color]?.id) === Number(provinceId)) : null;
+        const info = hex ? state.provincesMeta[hex] : null;
 
         if (info) {
             highlightProvince(hex);

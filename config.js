@@ -39,6 +39,7 @@ export const state = {
     militaryColonizationMap: [],
     militaryStructures: [],
     militarySieges: [],
+    religiousMissionEvents: [],
     militaryForces: [],
     militarySelectedForceId: null,
     militaryMoveMode: false,

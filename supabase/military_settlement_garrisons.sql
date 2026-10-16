@@ -57,7 +57,7 @@ begin
         when 'monastery' then '[{"type":"Копейщики","count":10},{"type":"Лучники","count":5}]'::jsonb
         else '[]'::jsonb
     end;
-    v_name := 'Постоянный гарнизон: ' || coalesce(nullif(btrim(new.name), ''), 'поселение #' || new.id::text);
+    v_name := 'Гарнизон: ' || coalesce(nullif(btrim(new.name), ''), 'поселение #' || new.id::text);
 
     select id into v_force_id
       from public.military_forces
