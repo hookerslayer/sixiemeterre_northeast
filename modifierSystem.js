@@ -69,12 +69,25 @@ export function buildStaticModifiers(owner, settings={}) {
     const rows=[];
     const form=settings.government_form;
     const add=(effect,value,scope='state',scopeValue=null,extra={})=>rows.push(makeStatic(owner,effect,value,scope,scopeValue,{...extra,source:extra.source||`Форма правления: ${form||'—'}`}));
-    if(form==='Феодальная монархия'){add('tax_income_pct',10);add('estate_loyalty_pp',5,'estate','aristocracy');}
-    if(form==='Вечевая республика'){add('internal_trade_income_pct',15);add('estate_loyalty_pp',5,'estate','burghers');}
-    if(form==='Теократия'){add('estate_loyalty_pp',10,'estate','clergy');if(settings.titular_religion)add('religion_loyalty_pp',10,'religion',settings.titular_religion);}
+    if(form==='Феодальная монархия'){
+        add('tax_income_pct',10);add('estate_loyalty_pp',5,'estate','aristocracy');
+        add('crime_rate_pp',5);add('guild_capacity_pct',-10);add('military_recruitment_cost_pct',-20);add('battle_strength_pct',10,'state',null,{target_type:'army'});
+    }
+    if(form==='Вечевая республика'){
+        add('internal_trade_income_pct',15);add('estate_loyalty_pp',5,'estate','burghers');
+        add('corruption_rate_pp',15);add('crime_rate_pp',-5);add('guild_capacity_pct',20);add('storage_capacity_pct',20);
+    }
+    if(form==='Теократия'){
+        add('estate_loyalty_pp',10,'estate','clergy');if(settings.titular_religion)add('religion_loyalty_pp',10,'religion',settings.titular_religion);
+        add('tax_income_pct',20);add('corruption_rate_pp',5);add('crime_rate_pp',-15);add('military_upkeep_pct',20);
+    }
     if(form==='Вождество'&&settings.titular_culture){
         add('estate_loyalty_pp',10,'estate','peasants');
         for(const item_name of ['Скот','Пушнина'])add('resource_production_pct',15,'culture',settings.titular_culture,{item_name,source:`Форма правления: Вождество`});
+    }
+    if(form==='Вождество'){
+        add('crime_rate_pp',15);add('battle_strength_pct',10,'state',null,{target_type:'army'});add('morale_change_pp',10);
+        add('guild_capacity_pct',-10);add('resource_production_pct',15);
     }
     for(const [culture,items] of Object.entries(CULTURE_RESOURCE_BONUSES))for(const item_name of items){
         const value=CULTURE_RESOURCE_VALUES[culture]||10;
@@ -84,8 +97,15 @@ export function buildStaticModifiers(owner, settings={}) {
     for(const religion of RELIGIONS)add('religion_loyalty_pp',5,'religion',religion,{source:`Религия: ${religion}`});
     add('guild_capacity_pct',10,'religion','Католичество',{target_type:'city',source:'Религия: Католичество'});
     add('good_production_pct',10,'religion','Православие',{target_type:'monastery',source:'Религия: Православие'});
+    if(settings.titular_religion==='Православие')add('battle_strength_pct',10,'state',null,{target_type:'army',source:'Религия: Православие'});
     if(settings.titular_religion==='Ислам')add('internal_trade_income_pct',10,'state',null,{source:'Религия: Ислам'});
     for(const item_name of ['Скот','Пушнина'])add('resource_production_pct',10,'religion','Язычество',{item_name,source:'Религия: Язычество'});
+    if(form==='Вечевая республика'&&settings.ruler?.status==='active'){
+        for(const effect of settings.ruler.elected_effects||[]){
+            if(!MODIFIER_EFFECTS.some(item=>item.key===effect.effect_key))continue;
+            rows.push(makeStatic(owner,effect.effect_key,Number(effect.value)||0,effect.scope_type||'state',effect.scope_value||null,{target_type:effect.target_type||null,source:`Посадник: ${settings.ruler.name||'избранный'} (${Number(settings.ruler.term_start_year)||'—'}–${Number(settings.ruler.term_end_year)||'—'})`}));
+        }
+    }
     return rows;
 }
 

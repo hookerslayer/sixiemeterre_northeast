@@ -868,6 +868,36 @@ body.military-army-placement #visual-map {
 .ruler-pending-proposal { align-items: center; }
 .ruler-pending-proposal > span { margin-right: auto; color: #d8d2c4; }
 .ruler-panel > .page-note { display: block; padding: 0 20px 14px; }
+.dynasty-family-panel, .dynasty-election-panel { margin: 0 0 14px; }
+.dynasty-household { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 16px 20px; }
+.dynasty-person { display: grid; align-content: start; gap: 6px; min-width: 0; padding: 13px; border: 1px solid rgba(222,210,183,.16); border-radius: 7px; background: rgba(255,255,255,.025); }
+.dynasty-person > span, .dynasty-person small { color: #aeb2a7; font-size: 12px; }
+.dynasty-person > strong { color: #eee5d4; font: 500 18px Georgia,serif; overflow-wrap: anywhere; }
+.dynasty-child { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; padding-top: 6px; border-top: 1px solid rgba(222,210,183,.1); }
+.dynasty-child strong { color: #e8deca; font-size: 13px; }
+.dynasty-actions { display: flex; align-items: end; flex-wrap: wrap; gap: 10px; padding: 0 20px 16px; }
+.dynasty-actions #find-ruler-spouse { box-sizing: border-box; width: auto; height: auto; min-height: 34px; padding: 7px 12px; font-size: 13px; line-height: 1.25; white-space: nowrap; }
+.dynasty-actions label { display: grid; gap: 6px; min-width: min(280px,100%); color: #b6b8ae; font-size: 12px; }
+.dynasty-actions select { min-height: 34px; padding: 6px 9px; color: #eee8da; background: #20231f; border: 1px solid rgba(222,210,183,.2); border-radius: 5px; font: inherit; }
+.dynasty-actions small, .dynasty-note { color: #aeb2a7; font-size: 12px; }
+.dynasty-candidate-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; padding: 16px 20px; }
+.dynasty-candidate { display: grid; align-content: start; gap: 12px; min-width: 0; padding: 14px; border: 1px solid rgba(222,210,183,.2); border-radius: 8px; background: linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.015)); }
+.dynasty-candidate h3 { margin: 0 0 5px; color: #eee5d4; font: 500 17px Georgia,serif; }
+.dynasty-candidate > div > small { color: #aeb2a7; }
+.dynasty-candidate ul { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.dynasty-candidate li { display: grid; gap: 2px; padding: 8px; border-radius: 5px; background: rgba(255,255,255,.025); }
+.dynasty-candidate li strong { font-size: 13px; }
+.dynasty-candidate li span { color: #b6b8ae; font-size: 12px; }
+.dynasty-candidate .effect-positive strong { color: #a6c28a; }
+.dynasty-candidate .effect-negative strong { color: #d08e7c; }
+.dynasty-candidate .compact-add-btn { width: 100%; }
+.dynasty-current-effects { padding: 0 20px 16px; color: #d8d2c4; }
+.dynasty-note { margin: 0 0 14px; }
+.dynastic-diplomacy .military-form-grid { padding: 12px 16px; margin: 12px 0; border: 1px solid rgba(222,210,183,.12); border-radius: 7px; }
+.dynastic-diplomacy > p { margin: 0; padding: 0 20px 10px; color: #aeb2a7; font-size: 12px; line-height: 1.45; }
+.dynastic-diplomacy .military-form-grid small { grid-column: 1 / -1; color: #aeb2a7; }
+.marriage-child-picker { display: grid; gap: 5px; min-width: 160px; margin-bottom: 8px; color: #b6b8ae; font-size: 12px; }
+.marriage-child-picker select { min-height: 32px; max-width: 220px; padding: 5px 8px; color: #eee8da; background: #20231f; border: 1px solid rgba(222,210,183,.2); border-radius: 5px; font: inherit; }
 .economy-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
 .economy-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .economy-fields label > span { display: flex; align-items: center; gap: 7px; }
@@ -1723,6 +1753,18 @@ body.military-army-placement #visual-map {
   .army-inspector-columns section { min-width: 0; }
   .army-card-controls form { grid-template-columns: minmax(0, 1fr); }
   .army-card-controls .compact-add-btn { justify-self: stretch; }
+}
+@media (max-width: 800px) {
+  .dynasty-household { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .dynasty-candidate-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 560px) {
+  .dynasty-household { grid-template-columns: 1fr; padding: 12px; }
+  .dynasty-actions { align-items: stretch; flex-direction: column; padding-inline: 12px; }
+  .dynasty-actions .compact-add-btn { width: 100%; }
+  .dynasty-actions #find-ruler-spouse { white-space: normal; }
+  .dynasty-candidate-grid { padding: 12px; }
+  .dynastic-diplomacy .military-form-grid { padding: 10px; }
 }
 .army-inspector-actions button[data-order-move-start], .army-inspector-actions button[data-order-confirm] { background: #75633e; border-color: #9c8556; }
 .marker-siege-action p { margin: 5px 0 8px; color: #b9b5a6; font-size: 12px; }

@@ -439,8 +439,44 @@ export async function decideDiplomacyProposal(proposalId, approve) {
     return data;
 }
 
-export async function hireMilitarySpy(name, age) {
-    const { data, error } = await supabaseClient.rpc('hire_military_spy', { p_name:name, p_age:Number(age) });
+export async function fetchDynasticMarriageProposals() {
+    const { data, error } = await supabaseClient.from('state_dynastic_marriage_proposals').select('*').order('created_at', { ascending:false });
+    if (error) throw error;
+    return data || [];
+}
+
+export async function createDynasticMarriageProposal(targetOwner, heirsOwner, childId) {
+    const { data, error } = await supabaseClient.rpc('create_dynastic_marriage_proposal', { p_target_owner:targetOwner, p_heirs_owner:heirsOwner, p_child_id:String(childId) });
+    if (error) throw error;
+    return data;
+}
+
+export async function decideDynasticMarriageProposal(proposalId, approve, targetChildId = null) {
+    const { data, error } = await supabaseClient.rpc('decide_dynastic_marriage_proposal', { p_proposal_id:proposalId, p_approve:!!approve, p_target_child_id:targetChildId ? String(targetChildId) : null });
+    if (error) throw error;
+    return data;
+}
+
+export async function fetchStateGovernance(owner) {
+    const { data, error } = await supabaseClient.rpc('open_state_governance', { p_owner:owner });
+    if (error) throw error;
+    return data || {};
+}
+
+export async function electStateRuler(candidateId) {
+    const { data, error } = await supabaseClient.rpc('elect_state_ruler', { p_candidate_id:String(candidateId) });
+    if (error) throw error;
+    return data;
+}
+
+export async function findLocalRulerSpouse() {
+    const { data, error } = await supabaseClient.rpc('find_local_ruler_spouse');
+    if (error) throw error;
+    return data;
+}
+
+export async function hireMilitarySpy() {
+    const { data, error } = await supabaseClient.rpc('hire_military_spy');
     if (error) throw error;
     return data;
 }
@@ -673,8 +709,8 @@ export async function fetchMilitaryCommanders() {
     return data || [];
 }
 
-export async function hireMilitaryCommander(name, age) {
-    const { data, error } = await supabaseClient.rpc('hire_military_commander', { p_name:String(name).trim(), p_age:Number(age) });
+export async function hireMilitaryCommander() {
+    const { data, error } = await supabaseClient.rpc('hire_military_commander');
     if (error) throw error;
     return data;
 }
