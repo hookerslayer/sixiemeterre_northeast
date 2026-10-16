@@ -1,7 +1,7 @@
 import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=military-ui-update-20261016d';
 import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, fetchMilitaryFleets, fetchMilitaryPorts, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryConditionalOrders, fetchMilitaryColonizationMap, fetchReligiousMissionEvents } from './api.js?v=dynastic-child-marriage-20261016';
 import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=military-ui-update-20261016d';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=local-spouse-status-20261016';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=rules-wiki-live-20261016d';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),

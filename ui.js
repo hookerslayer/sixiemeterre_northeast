@@ -946,6 +946,7 @@ function showPageView(title, content, options = {}) {
 }
 
 function closePageView() {
+    stopRulesWikiRefresh();
     elements.pageView?.classList.remove('active');
     if (elements.pageView) elements.pageView.innerHTML = '';
     syncMilitaryMovePanel();
@@ -2074,6 +2075,211 @@ async function renderEconomy(owner, playerName = '') {
             catch (error) { status.textContent = `Ошибка сохранения: ${error.message}`; }
         });
     } catch (error) { showPageView('Экономика', `<div class="page-error">Не удалось загрузить экономику: ${escapeHtml(error.message)}</div>`, { navId: 'nav-economy', subtitle: owner }); }
+}
+
+const RULES_WIKI_DEFAULT_PAGES = [
+    { title: 'Главная страница', slug: 'Sixième-Terre-Wiki' },
+    { title: 'Введение', slug: 'Введение' },
+    { title: 'Правила и основные понятия', slug: 'Правила-и-основные-понятия' },
+    { title: 'Формы правления', slug: 'Формы-правления' },
+    { title: 'Культуры', slug: 'Культуры' },
+    { title: 'Религии', slug: 'Религии' },
+    { title: 'Экономика', slug: 'Экономика' },
+    { title: 'Военное дело', slug: 'Военное-дело' },
+    { title: 'Колонизация', slug: 'Колонизация' },
+    { title: 'Шпионаж и Саботаж', slug: 'Шпионаж-и-Саботаж' }
+];
+let RULES_WIKI_PAGES = RULES_WIKI_DEFAULT_PAGES;
+const RULES_WIKI_RAW_BASE = 'https://raw.githubusercontent.com/wiki/hookerslayer/sixiemeterre_northeast/';
+const RULES_WIKI_WEB_BASE = 'https://github.com/hookerslayer/sixiemeterre_northeast/wiki/';
+const RULES_WIKI_CACHE_KEY = 'sixieme-terre-rules-wiki-v1:';
+let rulesWikiCurrentSlug = RULES_WIKI_PAGES[0].slug;
+let rulesWikiRefreshTimer = null;
+let rulesWikiRequestId = 0;
+let rulesWikiNavigationRequestId = 0;
+let rulesWikiRendererPromise = null;
+const rulesWikiScriptPromises = new Map();
+
+function stopRulesWikiRefresh() {
+    if (rulesWikiRefreshTimer) window.clearInterval(rulesWikiRefreshTimer);
+    rulesWikiRefreshTimer = null;
+    rulesWikiRequestId += 1;
+}
+
+function loadWikiScript(src, globalName) {
+    if (window[globalName]) return Promise.resolve(window[globalName]);
+    if (rulesWikiScriptPromises.has(globalName)) return rulesWikiScriptPromises.get(globalName);
+    const promise = new Promise((resolve, reject) => {
+        const existing = document.querySelector(`script[data-rules-wiki-lib="${globalName}"]`);
+        if (existing) {
+            existing.addEventListener('load', () => window[globalName] ? resolve(window[globalName]) : reject(new Error(`Не удалось загрузить ${globalName}`)), { once: true });
+            existing.addEventListener('error', () => reject(new Error(`Не удалось загрузить ${globalName}`)), { once: true });
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = src;
+        script.async = true;
+        script.crossOrigin = 'anonymous';
+        script.dataset.rulesWikiLib = globalName;
+        script.onload = () => window[globalName] ? resolve(window[globalName]) : reject(new Error(`Библиотека ${globalName} не обнаружена`));
+        script.onerror = () => reject(new Error(`Не удалось загрузить ${globalName}`));
+        document.head.appendChild(script);
+    }).catch(error => { rulesWikiScriptPromises.delete(globalName); throw error; });
+    rulesWikiScriptPromises.set(globalName, promise);
+    return promise;
+}
+
+async function getRulesWikiRenderer() {
+    if (!rulesWikiRendererPromise) {
+        rulesWikiRendererPromise = Promise.all([
+            loadWikiScript('https://cdn.jsdelivr.net/npm/marked@18.1.1/lib/marked.umd.js', 'marked'),
+            loadWikiScript('https://cdn.jsdelivr.net/npm/dompurify@3.4.16/dist/purify.min.js', 'DOMPurify')
+        ]).catch(error => { rulesWikiRendererPromise = null; throw error; });
+    }
+    const [marked, purifier] = await rulesWikiRendererPromise;
+    return markdown => purifier.sanitize(marked.parse(markdown, { gfm: true }), { USE_PROFILES: { html: true } });
+}
+
+function getRulesWikiCache(slug) {
+    try { return localStorage.getItem(`${RULES_WIKI_CACHE_KEY}${slug}`) || ''; }
+    catch { return ''; }
+}
+
+function renderRulesWikiNavigation() {
+    const nav = elements.pageView?.querySelector('.rules-wiki-nav');
+    if (!nav) return;
+    nav.innerHTML = RULES_WIKI_PAGES.map(page => `<button class="wiki-page-button ${page.slug === rulesWikiCurrentSlug ? 'active' : ''}" type="button" data-wiki-slug="${escapeHtml(page.slug)}">${escapeHtml(page.title)}</button>`).join('');
+    nav.querySelectorAll('[data-wiki-slug]').forEach(button => button.addEventListener('click', () => loadRulesWikiPage(button.dataset.wikiSlug)));
+}
+
+async function refreshRulesWikiNavigation() {
+    const requestId = ++rulesWikiNavigationRequestId;
+    try {
+        const response = await fetch(`${RULES_WIKI_RAW_BASE}_Sidebar.md?updated=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`GitHub ответил кодом ${response.status}`);
+        const markdown = await response.text();
+        if (requestId !== rulesWikiNavigationRequestId) return;
+        const prefix = '/hookerslayer/sixiemeterre_northeast/wiki/';
+        const pages = [];
+        for (const match of markdown.matchAll(/\[([^\]]+)\]\(([^)]+)\)/g)) {
+            try {
+                const url = new URL(match[2].trim(), RULES_WIKI_WEB_BASE);
+                if (url.origin !== 'https://github.com' || !url.pathname.startsWith(prefix)) continue;
+                const slug = decodeURIComponent(url.pathname.slice(prefix.length)).replace(/\.md$/i, '').replace(/\/$/, '');
+                if (slug && !pages.some(page => page.slug === slug)) pages.push({ title: match[1].trim(), slug });
+            } catch { /* Ignore malformed or external sidebar links. */ }
+        }
+        if (!pages.length) return;
+        RULES_WIKI_PAGES = pages;
+        if (!RULES_WIKI_PAGES.some(page => page.slug === rulesWikiCurrentSlug)) {
+            rulesWikiCurrentSlug = RULES_WIKI_PAGES[0].slug;
+            try { sessionStorage.setItem('sixieme-terre-rules-wiki-page', rulesWikiCurrentSlug); } catch { /* Optional preference. */ }
+            loadRulesWikiPage(rulesWikiCurrentSlug);
+        }
+        renderRulesWikiNavigation();
+    } catch { /* Keep the bundled page list if GitHub's sidebar is unavailable. */ }
+}
+
+function expandRulesWikiLinks(markdown) {
+    return markdown.replace(/\[\[([^\]|]+?)(?:\|([^\]]+))?\]\]/g, (match, rawTitle, rawLabel) => {
+        const key = rawTitle.trim().toLocaleLowerCase('ru').replace(/ё/g, 'е');
+        const page = RULES_WIKI_PAGES.find(item => [item.title, item.slug].some(value => value.toLocaleLowerCase('ru').replace(/ё/g, 'е') === key));
+        if (!page) return match;
+        const label = (rawLabel || page.title).trim();
+        return `[${label}](${RULES_WIKI_WEB_BASE}${encodeURIComponent(page.slug)})`;
+    });
+}
+
+function setRulesWikiCache(slug, markdown) {
+    try { localStorage.setItem(`${RULES_WIKI_CACHE_KEY}${slug}`, markdown); }
+    catch { /* Storage is optional; the live page remains usable. */ }
+}
+
+function normalizeRulesWikiSlug(href, currentSlug) {
+    if (!href || href.startsWith('#')) return null;
+    try {
+        const url = new URL(href, `${RULES_WIKI_WEB_BASE}${encodeURIComponent(currentSlug)}`);
+        const prefix = '/hookerslayer/sixiemeterre_northeast/wiki/';
+        if (url.origin !== 'https://github.com' || !url.pathname.startsWith(prefix)) return null;
+        const slug = decodeURIComponent(url.pathname.slice(prefix.length)).replace(/\.md$/i, '').replace(/\/$/, '');
+        return RULES_WIKI_PAGES.some(page => page.slug === slug) ? slug : null;
+    } catch { return null; }
+}
+
+async function renderRulesWikiMarkdown(slug, markdown, requestId) {
+    const renderMarkdown = await getRulesWikiRenderer();
+    if (requestId !== rulesWikiRequestId || !elements.pageView?.classList.contains('active')) return;
+    const article = elements.pageView.querySelector('#rules-wiki-article');
+    if (!article) return;
+    const template = document.createElement('template');
+    template.innerHTML = renderMarkdown(expandRulesWikiLinks(markdown));
+    template.content.querySelectorAll('a[href]').forEach(link => {
+        const wikiSlug = normalizeRulesWikiSlug(link.getAttribute('href'), slug);
+        if (wikiSlug) {
+            link.dataset.wikiSlug = wikiSlug;
+            link.removeAttribute('target');
+        } else if (/^https?:/i.test(link.getAttribute('href') || '')) {
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+        }
+    });
+    article.replaceChildren(template.content.cloneNode(true));
+    article.querySelectorAll('[data-wiki-slug]').forEach(link => link.addEventListener('click', event => {
+        event.preventDefault();
+        loadRulesWikiPage(link.dataset.wikiSlug);
+    }));
+}
+
+async function loadRulesWikiPage(slug, { silent = false } = {}) {
+    if (!RULES_WIKI_PAGES.some(page => page.slug === slug)) return;
+    rulesWikiCurrentSlug = slug;
+    try { sessionStorage.setItem('sixieme-terre-rules-wiki-page', slug); } catch { /* Optional preference. */ }
+    const requestId = ++rulesWikiRequestId;
+    const selectedPage = RULES_WIKI_PAGES.find(page => page.slug === slug);
+    const status = elements.pageView?.querySelector('#rules-wiki-status');
+    const article = elements.pageView?.querySelector('#rules-wiki-article');
+    elements.pageView?.querySelectorAll('.rules-wiki-nav [data-wiki-slug]').forEach(button => button.classList.toggle('active', button.dataset.wikiSlug === slug));
+    if (!article) return;
+    if (!silent) {
+        const cached = getRulesWikiCache(slug);
+        if (cached) {
+            try { await renderRulesWikiMarkdown(slug, cached, requestId); }
+            catch { /* A live fetch below will show a useful error if needed. */ }
+        } else article.innerHTML = '<div class="page-loading">Загружаю страницу Wiki…</div>';
+    }
+    if (status && !silent) status.textContent = 'Проверяю обновления GitHub Wiki…';
+    try {
+        const url = `${RULES_WIKI_RAW_BASE}${encodeURIComponent(slug)}.md?updated=${Date.now()}`;
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`GitHub ответил кодом ${response.status}`);
+        const markdown = await response.text();
+        if (requestId !== rulesWikiRequestId) return;
+        const changed = markdown !== getRulesWikiCache(slug);
+        setRulesWikiCache(slug, markdown);
+        if (changed) await renderRulesWikiMarkdown(slug, markdown, requestId);
+        if (status) status.textContent = `${changed ? 'Обновлено' : 'Актуально'} · GitHub Wiki · проверено ${new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}`;
+    } catch (error) {
+        if (requestId !== rulesWikiRequestId) return;
+        const cached = getRulesWikiCache(slug);
+        if (!silent && !cached && article) article.innerHTML = `<div class="page-error">Не удалось загрузить «${escapeHtml(selectedPage.title)}»: ${escapeHtml(error.message)}. Проверьте подключение к интернету и нажмите «Обновить».</div>`;
+        if (status) status.textContent = cached ? 'GitHub Wiki временно недоступна · показана последняя сохранённая версия' : 'GitHub Wiki временно недоступна';
+    }
+}
+
+function renderRulesWiki() {
+    stopRulesWikiRefresh();
+    try {
+        const remembered = sessionStorage.getItem('sixieme-terre-rules-wiki-page');
+        if (RULES_WIKI_PAGES.some(page => page.slug === remembered)) rulesWikiCurrentSlug = remembered;
+    } catch { /* Use the default page. */ }
+    showPageView('Правила и механики', `<section class="page-panel rules-wiki-panel"><header class="page-panel-heading wiki-reader-heading"><div><h2>Материалы проекта</h2><p>Содержание загружается из GitHub Wiki и проверяется на обновления раз в минуту.</p></div><button id="rules-wiki-refresh" class="page-back-btn" type="button">Обновить</button></header><div class="rules-wiki-layout"><nav class="rules-wiki-nav" aria-label="Страницы Wiki"></nav><article id="rules-wiki-article" class="rules-wiki-article" aria-live="polite"><div class="page-loading">Подключаюсь к GitHub Wiki…</div></article></div><p id="rules-wiki-status" class="rules-wiki-status" aria-live="polite">Подключаюсь к GitHub Wiki…</p></section>`, { navId: 'nav-rules' });
+    renderRulesWikiNavigation();
+    elements.pageView.querySelector('#rules-wiki-refresh')?.addEventListener('click', () => loadRulesWikiPage(rulesWikiCurrentSlug));
+    refreshRulesWikiNavigation().finally(() => loadRulesWikiPage(rulesWikiCurrentSlug));
+    rulesWikiRefreshTimer = window.setInterval(async () => {
+        await refreshRulesWikiNavigation();
+        await loadRulesWikiPage(rulesWikiCurrentSlug, { silent: true });
+    }, 60_000);
 }
 
 function renderUnavailableSection(title, description, navId) {
@@ -3496,6 +3702,7 @@ function getNavigationItems() {
 
 function activateNavigationItem(id, url) {
     if (url) { window.open(url, '_blank', 'noopener,noreferrer'); return; }
+    if (id !== 'nav-rules') stopRulesWikiRefresh();
     const owner = activePageOwner || state.userProfile?.owner || '';
     if (id === 'nav-map') closePageView();
     else if (id === 'nav-stats') state.userProfile?.role === 'admin' ? renderAdminStateList() : state.userProfile?.owner && renderStateStatistics(state.userProfile.owner, state.userProfile.nickname || '');
@@ -3509,7 +3716,7 @@ function activateNavigationItem(id, url) {
     else if (id === 'nav-spy') renderMilitaryPlanner(true);
     else if (id === 'nav-diplomacy') renderDiplomacy(owner);
     else if (id === 'nav-modifiers') renderModifierPage(owner);
-    else if (id === 'nav-rules') renderUnavailableSection('Правила и механики', 'Раздел откроется здесь после публикации отдельной вики-страницы проекта.', id);
+    else if (id === 'nav-rules') renderRulesWiki();
 }
 
 export function renderNavMenu() {
