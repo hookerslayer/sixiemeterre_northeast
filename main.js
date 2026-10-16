@@ -1,7 +1,7 @@
 import { state, elements, COLOR_MAP_SRC, META_JSON_SRC, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC, supabaseClient } from './config.js?v=military-ui-update-20261016d';
 import { loadSupabaseData, fetchUserProfile, fetchStateMechanics, fetchGameCalendar, fetchEconomySnapshot, fetchRegionalWeather, fetchMilitaryTerrainCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, fetchMilitaryFleets, fetchMilitaryPorts, fetchMilitaryStructures, fetchMilitarySieges, fetchMilitaryConditionalOrders, fetchMilitaryColonizationMap, fetchReligiousMissionEvents } from './api.js?v=military-ui-update-20261016d';
 import { renderActiveLayer, renderMarkers, renderMilitaryGrid } from './render.js?v=military-ui-update-20261016d';
-import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=military-ui-update-20261016d';
+import { updateTransform, initEventListeners, updateAuthUI, renderGameCalendar, refreshTradeRouteOverlay, refreshSelectedMilitaryReach } from './ui.js?v=desktop-fit-20261016a';
 
 Promise.all([
     fetch(META_JSON_SRC).then(res => res.json()),
@@ -46,6 +46,26 @@ Promise.all([
     state.ty = (window.innerHeight - height * state.scale) / 2;
 
     updateTransform();
+    let previousMinScale = state.minScale;
+    let resizeFrame = 0;
+    window.addEventListener('resize', () => {
+        if (resizeFrame) cancelAnimationFrame(resizeFrame);
+        resizeFrame = requestAnimationFrame(() => {
+            resizeFrame = 0;
+            const oldScale = state.scale || previousMinScale;
+            const zoomRatio = oldScale / previousMinScale;
+            const nextMinScale = Math.min(window.innerWidth / width, window.innerHeight / height) * 0.95;
+
+            state.minScale = nextMinScale;
+            state.scale = Math.min(Math.max(nextMinScale, nextMinScale * zoomRatio), 2.5);
+            state.tx = (window.innerWidth - width * state.scale) / 2;
+            state.ty = (window.innerHeight - height * state.scale) / 2;
+            previousMinScale = nextMinScale;
+
+            updateTransform();
+            refreshSelectedMilitaryReach();
+        });
+    });
     renderActiveLayer();
     renderMilitaryGrid();
     renderMarkers();

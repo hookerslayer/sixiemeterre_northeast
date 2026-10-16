@@ -1,0 +1,4 @@
+interface:
+  display_name: "Интерфейс Sixième Terre"
+  short_description: "Исправляет UI и адаптивность проекта"
+  default_prompt: "Используй $sixiemeterre-ui для проверки и доработки интерфейса этой страницы."

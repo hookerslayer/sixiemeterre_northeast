@@ -11,6 +11,7 @@ let militaryForceActionAbort = null;
 const markerTypeLabels = { large_city: 'Крупный город', city: 'Город', monastery: 'Монастырь', fortress: 'Острог', ruins: 'Руины' };
 const markerTypeDevelopment = { large_city: 200, city: 50, monastery: 20, fortress: 10, ruins: 0 };
 const governmentForms = ['Феодальная монархия', 'Вечевая республика', 'Теократия', 'Вождество'];
+const commanderSkillLabels = { management: 'Управление', leadership: 'Лидерство', tactics: 'Тактика', planning: 'Планирование', engineering: 'Инженерия' };
 
 export function showToast(message, duration = 3000) {
     if (!elements.toastNotification) return;
@@ -47,7 +48,7 @@ function syncMilitaryMovePanel() {
         const troopCount = groups.reduce((sum, group) => sum + (Number(group.count) || 0), 0);
         const roster = groups.length ? groups.map(group => `<li>${escapeHtml(group.type)} <strong>${formatNumber(group.count)}</strong></li>`).join('') : '<li>Состав не указан</li>';
         const skills = Object.entries(force.commander_skills || {}).filter(([, value]) => Number(value) > 0)
-            .map(([name, value]) => `<span>${escapeHtml(name)} ${formatNumber(value)}</span>`).join(' · ') || 'Навыки не указаны';
+            .map(([name, value]) => `<span>${escapeHtml(commanderSkillLabels[name] || name)} ${formatNumber(value)}</span>`).join(' · ') || 'Навыки не указаны';
         info.innerHTML = `<h3>${escapeHtml(force.name || 'Армия')}</h3><p>${escapeHtml(force.owner)} · ${troopCount ? `${formatNumber(troopCount)} бойцов` : 'численность не указана'}</p><div class="army-inspector-columns"><section><strong>Состав</strong><ul>${roster}</ul></section><section><strong>Состояние</strong><p>Мораль ${formatNumber(force.morale)}% · ${formatNumber(force.action_points)} ОД</p><p>Снабжение ${force.supply_points != null || force.supply != null ? formatNumber(force.supply_points ?? force.supply) : 'не указано'}</p><p>Воевода: ${escapeHtml(force.commander_name || 'не назначен')}${force.commander_age ? ` · ${formatNumber(force.commander_age)} лет` : ''}</p><p>Навыки: ${skills}</p></section></div>`;
     } else if (info && fleet) {
         const ships = fleet.ships || [];
@@ -1368,10 +1369,11 @@ async function renderOwnerProvinces(owner) {
         <td>${escapeHtml(province.main_religion || '—')}</td><td>${formatTurns(assimilationTurns(province, 'culture', province.main_culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(province, 'religion', province.main_religion, state.stateMechanics[owner] || {}))}</td><td>${escapeHtml(province.resource || '—')}</td><td>${(() => { const report = provinceReports[province.id] || {}; const main = `${formatNumber(Number(report.production) || 0, 2)} ${escapeHtml(report.resource || province.resource || '')}`; return report.food_resource && report.food_resource !== (report.resource || province.resource) ? `${main}<br>${formatNumber(Number(report.food_production) || 0, 2)} ${escapeHtml(report.food_resource)}` : main; })()}</td><td>${formatNumber(Number(provinceReports[province.id]?.tax_income) || 0, 2)} z</td></tr>
     `).join('');
     const colonyRows = activeColonies.map(mission => `<tr><td>${escapeHtml(state.dbProvinces[Number(mission.target_province_id)]?.province_name || `Провинция ${mission.target_province_id}`)}</td><td>${mission.mission_type === 'sea' ? 'Морская' : 'Сухопутная'}</td><td>Ход ${formatNumber(mission.started_turn)} · успех ${formatNumber(mission.success_chance)}%</td></tr>`).join('');
-    const content = `${provinces.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th><th>Производство/ход</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</tbody></table></div>${canRenameProvinces ? '<div class="province-rename-actions"><button class="admin-btn" type="button" data-save-province-names>Сохранить названия провинций</button></div>' : ''}</section>` : '<div class="page-empty">За государством пока нет провинций под его законом или оккупацией.</div>'}<section class="page-panel"><header class="page-panel-heading"><div><h2>Активная колонизация</h2><p>Незавершённые миссии не считаются провинциями под контролем государства.</p></div></header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Цель</th><th>Миссия</th><th>Состояние</th></tr></thead><tbody>${colonyRows || '<tr><td colspan="3">Активных колонизационных миссий нет.</td></tr>'}</tbody></table></div></section>`;
+    const content = `${provinces.length ? `<section class="page-panel dense-table province-list-panel"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th><th>Производство/ход</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</tbody></table></div>${canRenameProvinces ? '<div class="province-rename-actions"><button class="admin-btn" type="button" data-save-province-names>Сохранить названия провинций</button></div>' : ''}</section>` : '<div class="page-empty">За государством пока нет провинций под его законом или оккупацией.</div>'}<section class="page-panel"><header class="page-panel-heading"><div><h2>Активная колонизация</h2><p>Незавершённые миссии не считаются провинциями под контролем государства.</p></div></header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Цель</th><th>Миссия</th><th>Состояние</th></tr></thead><tbody>${colonyRows || '<tr><td colspan="3">Активных колонизационных миссий нет.</td></tr>'}</tbody></table></div></section>`;
     activePageOwner = owner;
     showPageView('Провинции', content, { subtitle: owner, navId: 'nav-provinces' });
-    elements.pageView.querySelectorAll('[data-province-id]').forEach(button => button.addEventListener('click', () => {
+    elements.pageView.querySelectorAll('[data-province-id]').forEach(button => button.addEventListener('click', event => {
+        event.stopPropagation();
         closePageView();
         goToProvince(Number(button.dataset.provinceId));
     }));
@@ -1411,10 +1413,11 @@ async function renderOwnerSettlements(owner) {
         <td>${formatNumber(Number(marker.yards) || 0)}</td><td>+${formatNumber(Math.round((Number(marker.yards) || 0) * growthRate))}</td><td>${formatNumber(Number(marker.development ?? markerTypeDevelopment[marker.type] ?? 0))}</td><td>${escapeHtml(marker.culture || '—')}</td>
         <td>${escapeHtml(marker.religion || '—')}</td><td>${formatTurns(assimilationTurns(marker, 'culture', marker.culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(marker, 'religion', marker.religion, state.stateMechanics[owner] || {}))}</td><td>${formatNumber(Number(markerReports[marker.id]?.tax_income) || 0, 2)} z</td></tr>
     `).join('');
-    const content = settlements.length ? `<section class="page-panel dense-table"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
+    const content = settlements.length ? `<section class="page-panel dense-table settlement-list-panel"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
     activePageOwner = owner;
     showPageView('Города и поселения', content, { subtitle: owner, navId: 'nav-cities' });
-    elements.pageView.querySelectorAll('[data-marker-id]').forEach(button => button.addEventListener('click', () => {
+    elements.pageView.querySelectorAll('[data-marker-id]').forEach(button => button.addEventListener('click', event => {
+        event.stopPropagation();
         const marker = settlements.find(item => Number(item.id) === Number(button.dataset.markerId));
         if (!marker) return;
         closePageView();
@@ -1663,6 +1666,7 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
                 return [safe(marker.name || `Поселение #${marker.id}`), safe(markerTypeLabels[marker.type] || marker.type), `${goods}${orderResults ? `<small class="production-order-current">Прогноз по заказам: ${orderResults}</small>` : ''}`, ['city','large_city'].includes(marker.type) ? config : '—'];
             });
             if (tab === 'production') {
+              content += '<div class="production-report-grid">';
               content += productionReportTable('Производство ресурсов в провинциях', ['Провинция', 'Ресурс', 'Прогноз за ход', 'Поставка на склады'], provinceRows, 'Нет производственных данных.');
               content += productionReportTable('Производство товаров в поселениях', ['Поселение', 'Тип', 'Выпуск', 'Заказы и производственные возможности'], settlementRows, 'В государстве пока нет поселений.');
             const surplusRows = freeSurplus.map(item => [safe(item.marker_name), `${safe(item.item_name)} (${item.item_type === 'good' ? 'товар' : 'ресурс'})`, number(item.quantity)]);
@@ -1749,7 +1753,7 @@ async function renderProductionConsumption(owner, tab = 'production', playerName
                 const stock = items.filter(item => Number(item.quantity) > 0).map(item => `${safe(item.item_name)} — ${number(item.quantity)} ${item.item_type === 'good' ? 'тов.' : 'рес.'}`).join('<br>') || 'Пусто';
                 return [safe(marker.name || `Поселение #${marker.id}`), stock];
             });
-            content += productionReportTable('Текущие запасы на складах', ['Поселение', 'Остатки ресурсов и товаров'], stockRows, 'Склады пока пусты.');
+            content += productionReportTable('Текущие запасы на складах', ['Поселение', 'Остатки ресурсов и товаров'], stockRows, 'Склады пока пусты.') + '</div>';
             }
         } else {
             const consumptionRows = Object.entries(report.consumption || {}).sort(([a], [b]) => a.localeCompare(b, 'ru')).map(([item, amount]) => [safe(item), number(amount)]);
@@ -3291,12 +3295,14 @@ async function renderMilitaryPlanner(spyOnly = false) {
         upkeep.treasury = Math.round(upkeep.treasury * upkeepFactor * 100) / 100;
         for (const key of ['food','cloth','grain','fuel']) upkeep[key] = Math.round(upkeep[key] * upkeepFactor * supplyFactor * 100) / 100;
         const invalidSource = !context.province || availableQuota < 1;
+        const estimate = elements.pageView?.querySelector('#levy-estimate');
+        if (!estimate) return;
         const button = elements.pageView.querySelector('#place-military-levy-order');
         if (button) button.disabled = invalidSource;
         const roster = groups.map(group => `${group.type} — ${formatNumber(group.count)}`).join('; ') || 'Нет доступного остатка квоты';
         const sourceSummary = context.sources.map(source => `${escapeHtml(source.label)}: ${formatNumber(source.available)}`).join('; ');
         const destinationName = context.destination?.name || 'ближайшее контролируемое поселение';
-        elements.pageView.querySelector('#levy-estimate').innerHTML = `<div><span>Доступные квоты</span><strong>${formatNumber(availableQuota)} бойцов из ${formatNumber(capacity)} · уже в службе или сборе ${formatNumber(context.used)}</strong></div><div><span>По источникам</span><strong>${sourceSummary || '—'}</strong></div><div><span>Общий автоматический состав</span><strong>${escapeHtml(roster)}</strong></div><div><span>Гарнизон после сбора</span><strong>${escapeHtml(destinationName)}</strong></div><div><span>Разовая стоимость</span><strong>${formatNumber(cost.treasury, 2)} z · ${formatNumber(cost.arms, 3)} оружия · ${formatNumber(cost.cloth, 3)} одежды</strong></div><div><span>Содержание за ход</span><strong>${formatNumber(upkeep.treasury, 2)} z · ${formatNumber(upkeep.food, 2)} продовольствия · ${formatNumber(upkeep.cloth, 3)} одежды${upkeep.grain ? ` · ${formatNumber(upkeep.grain, 2)} зерна` : ''}${upkeep.fuel ? ` · ${formatNumber(upkeep.fuel, 3)} топлива` : ''}</strong></div>${invalidSource ? '<p class="page-note">Выберите провинцию с доступной квотой.</p>' : ''}`;
+        estimate.innerHTML = `<div><span>Доступные квоты</span><strong>${formatNumber(availableQuota)} бойцов из ${formatNumber(capacity)} · уже в службе или сборе ${formatNumber(context.used)}</strong></div><div><span>По источникам</span><strong>${sourceSummary || '—'}</strong></div><div><span>Общий автоматический состав</span><strong>${escapeHtml(roster)}</strong></div><div><span>Гарнизон после сбора</span><strong>${escapeHtml(destinationName)}</strong></div><div><span>Разовая стоимость</span><strong>${formatNumber(cost.treasury, 2)} z · ${formatNumber(cost.arms, 3)} оружия · ${formatNumber(cost.cloth, 3)} одежды</strong></div><div><span>Содержание за ход</span><strong>${formatNumber(upkeep.treasury, 2)} z · ${formatNumber(upkeep.food, 2)} продовольствия · ${formatNumber(upkeep.cloth, 3)} одежды${upkeep.grain ? ` · ${formatNumber(upkeep.grain, 2)} зерна` : ''}${upkeep.fuel ? ` · ${formatNumber(upkeep.fuel, 3)} топлива` : ''}</strong></div>${invalidSource ? '<p class="page-note">Выберите провинцию с доступной квотой.</p>' : ''}`;
     };
     levyProvince?.addEventListener('change', updateLevyEstimate);
     updateLevyEstimate();
