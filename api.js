@@ -1,4 +1,4 @@
-import { supabaseClient, state } from './config.js?v=military-ui-update-20261016c';
+import { supabaseClient, state } from './config.js?v=military-ui-update-20261016d';
 
 export async function loadSupabaseData() {
     const [resProvinces, resRegions, resOwners, resMarkers, resCultures, resReligions, resResources, resEstateRatios] = await Promise.all([
@@ -187,6 +187,14 @@ export async function saveStateOneOffOperations(owner, operations) {
     return data;
 }
 
+export async function adminSetStateBalances(owner, treasury, prestige) {
+    const { data, error } = await supabaseClient.rpc('admin_set_state_balances', {
+        p_owner: owner, p_treasury: Number(treasury), p_prestige: Number(prestige)
+    });
+    if (error) throw error;
+    return data;
+}
+
 export async function submitStateModifierProposal(values) {
     const { data, error } = await supabaseClient.rpc('submit_state_modifier_proposal', {
         p_effect_key: values.effectKey, p_value: values.value, p_scope_type: values.scopeType,
@@ -325,6 +333,14 @@ export async function moveMilitaryForce(forceId, path) {
     const { data, error } = await supabaseClient.rpc('move_military_force', {
         p_force_id: forceId,
         p_path: path
+    });
+    if (error) throw error;
+    return data;
+}
+
+export async function settleMilitaryForce(forceId, markerId) {
+    const { data, error } = await supabaseClient.rpc('settle_military_force', {
+        p_force_id: forceId, p_marker_id: Number(markerId)
     });
     if (error) throw error;
     return data;

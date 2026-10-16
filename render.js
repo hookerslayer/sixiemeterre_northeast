@@ -1,4 +1,4 @@
-import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=military-ui-update-20261016c';
+import { state, elements, markerImages, MILITARY_GRID_CELL_SIZE, RIVERS_MAP_SRC, LAKES_MAP_SRC, SEAS_MAP_SRC } from './config.js?v=military-ui-update-20261016d';
 
 function strokeTerrainPath(ctx) {
     ctx.lineJoin = 'round';

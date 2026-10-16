@@ -210,6 +210,7 @@ body.military-army-placement #visual-map {
 .military-map-tools[hidden], .map-finance-badge[hidden] { display: none; }
 .military-map-tools [hidden] { display: none !important; }
 .military-map-tools details { display: grid; gap: 10px; }
+.military-map-tools #map-structure-build { margin-top: 7px; }
 .military-map-tools summary { color: #e7dcc4; font-weight: 700; cursor: pointer; }
 .military-map-tools label { display: grid; gap: 5px; color: #b7b4a9; }
 .military-map-tools select { min-height: 34px; width: 100%; color-scheme: dark; color: #e8dfc8; background: #20231f; border: 1px solid #514e43; border-radius: 5px; padding: 5px 8px; }
@@ -930,7 +931,8 @@ body.military-army-placement #visual-map {
 .popup-economy-info { margin: 8px 0; padding: 7px 9px; border-left: 2px solid rgba(212, 178, 112, .55); color: #bdc0b6; background: rgba(255, 255, 255, .035); font-size: 11px; }
 .popup-economy-info strong { color: #eee2c5; }
 .transport-routes-panel { margin-top: 14px; }
-.transport-routes-panel > .page-panel-heading p { margin: -4px 0 0; color: #aeb2a7; font-size: 11px; line-height: 1.5; }
+.transport-routes-panel > .page-panel-heading { display: block; }
+.transport-routes-panel > .page-panel-heading p { margin: 8px 0 0; color: #aeb2a7; font-size: 11px; line-height: 1.5; }
 .trade-contract-route-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; margin-top: 6px; }
 .trade-contract-route-controls > span { color: #aeb2a7; font-size: 10px; }
 .trade-contract-table .page-table td:nth-child(6) { min-width: 155px; white-space: normal; }
@@ -1369,7 +1371,8 @@ body.military-army-placement #visual-map {
 .extend-militia-service { margin-top: 7px; white-space: nowrap; }
 .commander-training { display: flex; align-items: center; gap: 6px; margin-top: 7px; }
 .commander-training select { min-width: 0; max-width: 220px; }
-.commander-training .compact-add-btn { flex: 0 0 auto; min-width: 88px; white-space: nowrap; padding-inline: 10px; }
+.commander-training .compact-add-btn,
+.fleet-commander-training .compact-add-btn { box-sizing: border-box; flex: 0 0 auto; min-width: 82px; white-space: nowrap; padding: 6px 7px; font-size: 11px; line-height: 1.15; }
 .military-db-warning { margin: 10px 18px; }
 .military-battle-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; padding: 16px 18px; }
 .military-battle-controls > label:not(.military-check) { display: grid; gap: 6px; min-width: 170px; color: #aeb2a7; font-size: 12px; }
@@ -1429,7 +1432,7 @@ body.military-army-placement #visual-map {
 @media (max-width: 720px) { .military-form-grid { grid-template-columns: 1fr; } .military-form-grid [data-road-status] { grid-column: auto; } .military-order-panel { left: 12px; right: 12px; bottom: 12px; transform: none; align-items: stretch; flex-direction: column; gap: 8px; } .military-order-panel > div { justify-content: flex-end; } .military-preview-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-recruitment-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-force-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); } .military-recruitment-estimate { grid-template-columns: 1fr; } .battle-army-card > header { align-items: stretch; flex-direction: column; } .battle-army-controls { grid-template-columns: 1fr 1fr; } .military-event-card { align-items: stretch; flex-direction: column; } .battle-event-decision { grid-template-columns: 1fr; } }
 
 
-.military-capacity-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 0; }
+.military-capacity-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:14px 16px; }
 .military-capacity-summary > div { display:flex; flex-direction:column; gap:5px; padding:12px 14px; border:1px solid var(--border-color,rgba(220,210,185,.16)); border-radius:10px; background:rgba(255,255,255,.025); }
 .military-capacity-summary span,.military-capacity-summary small { color:var(--muted-color,#a9a89f); font-size:.84rem; }
 .military-capacity-summary strong { color:var(--text-color,#eee7d7); font-size:1.15rem; }
@@ -1485,12 +1488,21 @@ body.military-army-placement #visual-map {
 .province-demography .province-popup-facts > span { min-height: 54px; align-content: center; padding: 9px 11px; }
 .province-demography .province-popup-facts small { font-size: 11px; line-height: 1.35; }
 .province-demography .province-popup-facts b { font-size: 13px; line-height: 1.35; }
-.marker-demography-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin: 8px 0; }
-.marker-demography-grid section { display: grid; gap: 4px; min-width: 0; padding: 7px 9px; border: 1px solid rgba(232,223,200,.16); border-radius: 7px; background: rgba(255,255,255,.035); font-size: 11px; }
+.marker-demography-grid { display: grid; width: 100%; box-sizing: border-box; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 8px 0; }
+.marker-demography-grid section { display: grid; gap: 4px; width: 100%; box-sizing: border-box; min-width: 0; padding: 8px 10px; border: 1px solid rgba(232,223,200,.16); border-radius: 7px; background: rgba(255,255,255,.035); font-size: 11px; }
 .marker-demography-grid section > strong { color: #e8dfc8; line-height: 1.25; font-size: 12px; }
 .marker-demography-grid section > span { display: flex; justify-content: space-between; gap: 8px; color: #b9b6a9; line-height: 1.25; overflow-wrap: anywhere; }
 .marker-demography-grid b { color: #eee8da; text-align: right; }
 .military-map-tools label, .military-map-tools button, .military-map-tools select { position: relative; z-index: 1; }
+.military-recruitment-panel #place-military-levy-order,
+.military-recruitment-panel #levy-order-status { margin-left: 16px; }
+.military-recruitment-panel #levy-estimate { margin-right: 16px; margin-left: 16px; }
+.permanent-garrison-recruitment { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.permanent-garrison-recruitment select,
+.permanent-garrison-recruitment input { min-width: 0; }
+.permanent-garrison-recruitment .compact-add-btn { box-sizing: border-box; max-width: 100%; padding: 6px 7px; font-size: 11px; line-height: 1.2; white-space: normal; overflow-wrap: anywhere; }
+.admin-balance-editor { margin: 14px 0; }
+.admin-balance-editor .military-form-grid { padding: 12px; }
 @media (max-width: 420px) { .marker-demography-grid { grid-template-columns: 1fr; } }
 
 .province-name-edit { box-sizing: border-box; width: min(220px, 100%); min-width: 130px; min-height: 32px; }

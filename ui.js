@@ -1,8 +1,8 @@
-import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016c';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-update-20261016c';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, setMilitaryRiverCrossing, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=military-ui-update-20261016c';
-import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ui-update-20261016c';
-import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-20261015';
+import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016d';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-update-20261016d';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, setMilitaryRiverCrossing, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, settleMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminSetStateBalances, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=military-ui-update-20261016d';
+import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ui-update-20261016d';
+import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-prestige-base-20261016';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
 let toastTimeout = null;
@@ -77,6 +77,18 @@ function syncMilitaryMovePanel() {
     if (confirmButton) {
         confirmButton.hidden = force ? !state.militaryMoveMode || !draft : !draft;
         confirmButton.textContent = 'Завершить движение';
+    }
+    const settleButton = panel.querySelector('[data-order-settle]');
+    if (settleButton) {
+        const nearbySettlements = force ? (state.dbMarkers || []).filter(marker => marker.owner === force.owner && marker.type !== 'ruins'
+            && Math.max(Math.abs(Number(force.cell_x) - Math.floor(Number(marker.coord_1) / MILITARY_GRID_CELL_SIZE)),
+                Math.abs(Number(force.cell_y) - Math.floor(Number(marker.coord_2) / MILITARY_GRID_CELL_SIZE))) <= 1)
+            .sort((a,b) => Math.max(Math.abs(Number(force.cell_x)-Math.floor(Number(a.coord_1)/MILITARY_GRID_CELL_SIZE)),Math.abs(Number(force.cell_y)-Math.floor(Number(a.coord_2)/MILITARY_GRID_CELL_SIZE)))
+                - Math.max(Math.abs(Number(force.cell_x)-Math.floor(Number(b.coord_1)/MILITARY_GRID_CELL_SIZE)),Math.abs(Number(force.cell_y)-Math.floor(Number(b.coord_2)/MILITARY_GRID_CELL_SIZE)))) : [];
+        settleButton.hidden = !force || force.owner !== state.userProfile?.owner || force.force_kind !== 'land_army'
+            || force.status !== 'active' || force.in_pending_battle || nearbySettlements.length === 0 || state.militaryMoveMode;
+        settleButton.dataset.markerId = nearbySettlements[0]?.id || '';
+        settleButton.textContent = `Перевести в поселение${nearbySettlements.length ? `: ${nearbySettlements[0].name}` : ''}`;
     }
 }
 
@@ -2002,7 +2014,7 @@ async function renderEconomy(owner, playerName = '') {
         const oneOffPrestigeTotal = totalOf(prestigeItems);
         const treasuryNext = Number.isFinite(Number(financePreview.treasury_balance)) ? Number(financePreview.treasury_balance) : Math.max(0, treasury + treasuryIncome - treasuryFixedExpenses - oneOffTreasuryTotal);
         const prestigeFixed = Number(economy.prestige_recurring_expenses) || 0;
-        const prestigeIncome = Number(economy.prestige_recurring_income) || 0;
+        const prestigeIncome = 1 + (Number(economy.prestige_recurring_income) || 0);
         const totalPrestigeIncome = prestigeIncome + totalOf(prestigeIncomeItems);
         const prestigeNext = Number.isFinite(Number(financePreview.prestige_balance)) ? Number(financePreview.prestige_balance) : Math.max(0, prestige + totalPrestigeIncome - prestigeFixed - oneOffPrestigeTotal);
         const edit = state.userProfile?.role === 'admin' || state.userProfile?.owner === owner;
@@ -2017,12 +2029,27 @@ async function renderEconomy(owner, playerName = '') {
         ];
         const transactionTypeOptions = [['treasury_income','Доход казны','z'],['treasury_expense','Расход казны','z'],['prestige_income','Доход престижа','ОП'],['prestige_expense','Расход престижа','ОП']];
         const transactionRows = transactionEntries.map(item => `<tr data-one-off-row><td><select name="transaction_type" ${edit ? '' : 'disabled'}>${transactionTypeOptions.map(([value,label]) => `<option value="${value}" ${item.type === value ? 'selected' : ''}>${label}</option>`).join('')}</select></td><td><input name="transaction_reason" type="text" maxlength="120" placeholder="Причина или источник" value="${escapeHtml(item.reason || '')}" ${edit ? '' : 'readonly'}></td><td><input name="transaction_amount" type="number" min="0" step="0.1" value="${Number(item.amount) || 0}" ${edit ? '' : 'readonly'}> <span data-transaction-unit>${item.type.startsWith('treasury') ? 'z' : 'ОП'}</span></td><td>${edit ? '<button type="button" class="one-off-remove" aria-label="Удалить операцию" data-remove-one-off>×</button>' : ''}</td></tr>`).join('');
+        const adminBalanceEditor = isAdmin ? `<section class="economy-list page-panel admin-balance-editor"><h2>Баланс государства · правка администратора</h2><div class="military-form-grid"><label>Казна, z<input name="admin_treasury" type="number" min="0" step="0.1" value="${treasury}"></label><label>Престиж, ОП<input name="admin_prestige" type="number" min="0" max="${prestigeCap}" step="0.1" value="${prestige}"></label><button type="button" class="page-map-btn" data-admin-save-balances>Сохранить баланс</button><span data-admin-balance-status aria-live="polite"></span></div></section>` : '';
         const content = `<form id="economy-form"><div class="economy-ledgers economy-ledgers-clean">
           <section class="economy-ledger"><div class="economy-ledger-heading">${balance('Казна', treasury, treasuryNext, 'z')}</div><section class="economy-list page-panel"><h2>Доходы казны</h2>${field('Налоги · прогноз', forecastTaxIncome, 'z')}${field('Внутренняя торговля · прогноз', forecastTradeIncome, 'z')}${field('Прочие постоянные доходы', income.other_recurring, 'z')}</section><section class="economy-list page-panel"><h2>Расходы казны</h2>${field('Армия', expenses.army, 'z')}${field('Торговые расходы', expenses.trade, 'z')}${field('Прочие постоянные расходы', expenses.other_recurring, 'z')}</section></section>
-          <section class="economy-ledger"><div class="economy-ledger-heading">${balance('Престиж', prestige, prestigeNext, 'ОП', prestigeCap)}</div><section class="economy-list page-panel"><h2>Доходы престижа</h2>${field('Прочие постоянные доходы', prestigeIncome, 'ОП')}</section><section class="economy-list page-panel"><h2>Расходы престижа</h2>${field('Прочие постоянные расходы', prestigeFixed, 'ОП')}</section></section>
-          </div><section class="economy-list page-panel economy-transactions"><header><h2>Разовые операции</h2>${edit ? '<button type="button" class="compact-add-btn" data-add-transaction aria-label="Добавить операцию">+</button>' : ''}</header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип</th><th>Источник или причина</th><th>Сумма</th><th></th></tr></thead><tbody data-transaction-list>${transactionRows || `<tr class="transaction-empty"><td colspan="4">Разовых операций пока нет.</td></tr>`}</tbody></table></div></section><div class="mechanics-save-row"><button class="page-map-btn" type="submit" ${edit ? '' : 'disabled'}>Сохранить разовые операции</button><span id="economy-save-status" aria-live="polite"></span></div><p class="page-note">Налоги и торговые доходы рассчитываются автоматически. Постоянные расходы применяются при смене хода; разовые операции после расчёта списываются из списка.</p>${Number(financePreview.treasury_unpaid) > 0 || Number(financePreview.prestige_unpaid) > 0 ? `<p class="page-note">В прогнозе не хватает средств на расходы: ${Number(financePreview.treasury_unpaid) > 0 ? `${formatNumber(financePreview.treasury_unpaid, 1)} z казны` : ''}${Number(financePreview.treasury_unpaid) > 0 && Number(financePreview.prestige_unpaid) > 0 ? ', ' : ''}${Number(financePreview.prestige_unpaid) > 0 ? `${formatNumber(financePreview.prestige_unpaid, 1)} ОП` : ''}.</p>` : ''}</form>`;
+          <section class="economy-ledger"><div class="economy-ledger-heading">${balance('Престиж', prestige, prestigeNext, 'ОП', prestigeCap)}</div><section class="economy-list page-panel"><h2>Доходы престижа</h2>${field('Базовые 1 ОП + прочие доходы', prestigeIncome, 'ОП')}</section><section class="economy-list page-panel"><h2>Расходы престижа</h2>${field('Прочие постоянные расходы', prestigeFixed, 'ОП')}</section></section>
+          </div>${adminBalanceEditor}<section class="economy-list page-panel economy-transactions"><header><h2>Разовые операции</h2>${edit ? '<button type="button" class="compact-add-btn" data-add-transaction aria-label="Добавить операцию">+</button>' : ''}</header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Тип</th><th>Источник или причина</th><th>Сумма</th><th></th></tr></thead><tbody data-transaction-list>${transactionRows || `<tr class="transaction-empty"><td colspan="4">Разовых операций пока нет.</td></tr>`}</tbody></table></div></section><div class="mechanics-save-row"><button class="page-map-btn" type="submit" ${edit ? '' : 'disabled'}>Сохранить разовые операции</button><span id="economy-save-status" aria-live="polite"></span></div><p class="page-note">Налоги и торговые доходы рассчитываются автоматически. Постоянные расходы применяются при смене хода; разовые операции после расчёта списываются из списка.</p>${Number(financePreview.treasury_unpaid) > 0 || Number(financePreview.prestige_unpaid) > 0 ? `<p class="page-note">В прогнозе не хватает средств на расходы: ${Number(financePreview.treasury_unpaid) > 0 ? `${formatNumber(financePreview.treasury_unpaid, 1)} z казны` : ''}${Number(financePreview.treasury_unpaid) > 0 && Number(financePreview.prestige_unpaid) > 0 ? ', ' : ''}${Number(financePreview.prestige_unpaid) > 0 ? `${formatNumber(financePreview.prestige_unpaid, 1)} ОП` : ''}.</p>` : ''}</form>`;
         showPageView('Экономика', content, { navId: 'nav-economy', subtitle: `${owner}${playerName ? ` · игрок ${playerName}` : ''}` });
         const form = elements.pageView.querySelector('#economy-form');
+        form.querySelector('[data-admin-save-balances]')?.addEventListener('click', async event => {
+            const button = event.currentTarget;
+            const status = form.querySelector('[data-admin-balance-status]');
+            button.disabled = true;
+            try {
+                state.stateMechanics[owner] = await adminSetStateBalances(owner, form.elements.admin_treasury.value, form.elements.admin_prestige.value);
+                state.economySnapshot = await fetchEconomySnapshot();
+                showToast('Казна и престиж государства обновлены.');
+                await renderEconomy(owner, playerName);
+            } catch (error) {
+                status.textContent = `Ошибка сохранения: ${error.message}`;
+                button.disabled = false;
+            }
+        });
         const transactionList = form.querySelector('[data-transaction-list]');
         const transactionUnit = type => type.startsWith('treasury') ? 'z' : 'ОП';
         const bindTransactionRow = row => {
@@ -3506,7 +3533,7 @@ export function initEventListeners() {
         panel.id = 'military-order-panel';
         panel.className = 'military-order-panel';
         panel.hidden = true;
-        panel.innerHTML = '<div class="army-inspector-info" data-force-details></div><div class="army-inspector-actions"><p data-order-summary></p><button type="button" data-order-move-start>Переместить</button><button type="button" data-order-confirm hidden>Завершить движение</button><button type="button" data-order-raid>Набег</button><div data-card-advanced-actions></div><button type="button" data-order-cancel>Закрыть</button></div>';
+        panel.innerHTML = '<div class="army-inspector-info" data-force-details></div><div class="army-inspector-actions"><p data-order-summary></p><button type="button" data-order-move-start>Переместить</button><button type="button" data-order-confirm hidden>Завершить движение</button><button type="button" data-order-settle hidden>Перевести в поселение</button><button type="button" data-order-raid>Набег</button><div data-card-advanced-actions></div><button type="button" data-order-cancel>Закрыть</button></div>';
         document.body.append(panel);
         panel.addEventListener('click', async event => {
             const action = event.target.closest('button');
@@ -3530,6 +3557,28 @@ export function initEventListeners() {
                 state.militaryReachableCells = state.militaryMoveMode ? getReachableMilitaryCells(force) : new Set();
                 renderMilitaryGrid();
                 syncMilitaryMovePanel();
+                return;
+            }
+            if (action.matches('[data-order-settle]')) {
+                const force = state.militaryForces.find(item => item.id === state.militarySelectedForceId);
+                const markerId = Number(action.dataset.markerId);
+                if (!force || !markerId) return;
+                action.disabled = true;
+                try {
+                    await settleMilitaryForce(force.id, markerId);
+                    state.militaryForces = await fetchMilitaryForces();
+                    state.militaryCommanders = await fetchMilitaryCommanders();
+                    state.militarySelectedForceId = null;
+                    state.militaryMoveMode = false;
+                    state.militaryMoveDraft = null;
+                    state.militaryReachableCells = new Set();
+                    renderMilitaryGrid();
+                    syncMilitaryMovePanel();
+                    showToast('Армия переведена в поселение. Воевода освобождён и доступен для назначения.');
+                } catch (error) {
+                    showToast(`Не удалось перевести армию в поселение: ${error.message}`, 7000);
+                    action.disabled = false;
+                }
                 return;
             }
             if (action.matches('[data-order-attack]')) {

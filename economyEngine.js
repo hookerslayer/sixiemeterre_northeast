@@ -591,7 +591,7 @@ export function processTurnSimulation({calendar,provinces,markers,mechanics={},m
     const monasteryIncome = markers.filter(marker => marker.owner === owner && marker.type === 'monastery'
       && (!marker.military_controlled_by || marker.military_controlled_by === owner)).length
       * (settings.government_form === 'Теократия' ? 2 : 1);
-    const prestigeIncomeRecurring=Math.max(0,(Number(economy.prestige_recurring_income)||0)+modifierPct(owner,'prestige_income_op')+monasteryIncome);
+    const prestigeIncomeRecurring=Math.max(0,1+(Number(economy.prestige_recurring_income)||0)+modifierPct(owner,'prestige_income_op')+monasteryIncome);
     const prestigeIncomeOneOff=sumItems(economy.one_off_income_prestige);
     const prestigeExpenseRecurring=Math.max(0,(Number(economy.prestige_recurring_expenses)||0)+modifierPct(owner,'prestige_expense_op'));
     const prestigeExpenseOneOff=sumItems(economy.one_off_expenses_prestige)+Math.max(0,Number(economy.prestige_one_off_expenses)||0);
