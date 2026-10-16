@@ -122,7 +122,7 @@ Promise.all([
     fetchMilitaryColonizationMap().then(missions => {
         state.militaryColonizationMap = missions;
         renderActiveLayer();
-    }).catch(err => console.info('Публичная карта колонизаций пока недоступна (примените миграцию military_admin_roads_and_public_colonization_map.sql):', err.message));
+    }).catch(err => console.info('Публичная карта колонизаций пока недоступна (проверьте применение миграции military_public_colonization_anon_permissions.sql):', err.message));
     window.setInterval(async () => {
         try {
             const calendar = await fetchGameCalendar();
