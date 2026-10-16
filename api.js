@@ -304,15 +304,7 @@ export async function fetchMilitaryTerrainCells() {
 }
 
 export async function fetchMilitaryGridCells() {
-    const [data, currents] = await Promise.all([
-        fetchAllRows('military_grid_cells', ['cell_x', 'cell_y']),
-        fetchAllRows('military_water_currents', ['cell_x', 'cell_y'])
-    ]);
-    const flowByCell = new Map((currents || []).map(row => [`${row.cell_x},${row.cell_y}`, row]));
-    return data.map(cell => {
-        const flow = flowByCell.get(`${cell.cell_x},${cell.cell_y}`);
-        return flow ? { ...cell, flow_dx:Number(flow.flow_dx), flow_dy:Number(flow.flow_dy) } : cell;
-    });
+    return fetchAllRows('military_grid_cells', ['cell_x', 'cell_y']);
 }
 
 export async function syncMilitaryGridCells(cells) {
@@ -321,9 +313,9 @@ export async function syncMilitaryGridCells(cells) {
     return Number(data) || 0;
 }
 
-export async function setMilitaryWaterCurrent(cellX, cellY, dx, dy) {
-    const { data, error } = await supabaseClient.rpc('set_military_water_current', {
-        p_cell_x:Number(cellX), p_cell_y:Number(cellY), p_flow_dx:Number(dx), p_flow_dy:Number(dy)
+export async function setMilitaryWaterType(cellX, cellY, waterTypes) {
+    const { data, error } = await supabaseClient.rpc('set_military_water_type', {
+        p_cell_x:Number(cellX), p_cell_y:Number(cellY), p_water_types:Number(waterTypes)
     });
     if (error) throw error;
     return data;
@@ -565,14 +557,6 @@ export async function adminBuildMilitaryStructure(type, cellX, cellY, owner) {
 
 export async function destroyMilitaryStructure(structureId) {
     const { data, error } = await supabaseClient.rpc('destroy_military_structure', { p_structure_id: structureId });
-    if (error) throw error;
-    return data;
-}
-
-export async function setMilitaryRiverCrossing(cellX, cellY, mode) {
-    const { data, error } = await supabaseClient.rpc('set_military_river_crossing', {
-        p_cell_x: Number(cellX), p_cell_y: Number(cellY), p_mode: mode
-    });
     if (error) throw error;
     return data;
 }

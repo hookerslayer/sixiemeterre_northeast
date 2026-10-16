@@ -48,7 +48,7 @@
             <div id="admin-controls" class="layer-group admin-only" style="display: none;">
                 <span class="layer-title">Администрирование</span>
                 <button id="add-marker-mode-btn"> + Создать маркер</button>
-                <label class="military-terrain-control">Местность / течение клетки
+                <label class="military-terrain-control">Местность и водоём клетки
                     <select id="military-terrain-select">
                         <option value="plain">Равнина</option>
                         <option value="forest">Лес</option>
@@ -56,19 +56,11 @@
                         <option value="marsh">Болото</option>
                         <option value="water">Вода</option>
                         <option value="bridge">Мост через воду</option>
-                        <optgroup label="Река в клетке">
-                            <option value="river:fordable">Перейти вброд</option>
-                            <option value="river:impassable">Только через мост</option>
-                        </optgroup>
-                        <optgroup label="Направление течения реки">
-                            <option value="flow:1,0">На восток →</option>
-                            <option value="flow:1,1">На юго-восток ↘</option>
-                            <option value="flow:0,1">На юг ↓</option>
-                            <option value="flow:-1,1">На юго-запад ↙</option>
-                            <option value="flow:-1,0">На запад ←</option>
-                            <option value="flow:-1,-1">На северо-запад ↖</option>
-                            <option value="flow:0,-1">На север ↑</option>
-                            <option value="flow:1,-1">На северо-восток ↗</option>
+                        <optgroup label="Водный тип клетки (только администратору)">
+                            <option value="water-type:river">Река · 1 линия</option>
+                            <option value="water-type:lake">Озеро · круг</option>
+                            <option value="water-type:sea">Море · 3 линии</option>
+                            <option value="water-type:none">Убрать водоём</option>
                         </optgroup>
                     </select>
                 </label>
@@ -82,6 +74,7 @@
                 <span class="layer-title">Слои карты</span>
                 <button id="toggle-trade-routes-btn">Торговые маршруты</button>
                 <button id="toggle-military-grid-btn" aria-pressed="false">Военная сетка</button>
+                <button id="toggle-water-type-icons-btn" aria-pressed="false" title="Показывать или скрывать значки рек, озёр и морей на военной сетке">Иконки водоёмов: выкл.</button>
                 <button class="layer-btn active" data-layer="political">Государства</button>
                 <button class="layer-btn" data-layer="region">Регионы</button>
                 <button class="layer-btn" data-layer="culture">Культуры</button>

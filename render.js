@@ -19,17 +19,7 @@ function drawTerrainMark(ctx, terrain, x, y, size, bridge = false) {
     ctx.rect(x + 1, y + 1, Math.max(0, size - 2), Math.max(0, size - 2));
     ctx.clip();
     if (bridge) {
-        ctx.beginPath();
-        ctx.moveTo(cx - size * .3, cy + size * .3);
-        ctx.lineTo(cx + size * .3, cy - size * .3);
-        ctx.moveTo(cx - size * .2, cy + size * .4);
-        ctx.lineTo(cx + size * .4, cy - size * .2);
-        for (const t of [-.18, .02, .22]) {
-            const px = cx + size * t, py = cy - size * t;
-            ctx.moveTo(px - size * .07, py - size * .07);
-            ctx.lineTo(px + size * .07, py + size * .07);
-        }
-        strokeTerrainPath(ctx);
+        drawBridgeSymbol(ctx, cx, cy, size * .82);
     } else if (terrain === 'hill') {
         for (const scale of [1, .62]) {
             const half = size * .34 * scale, rise = size * .28 * scale;
@@ -65,6 +55,41 @@ function drawTerrainMark(ctx, terrain, x, y, size, bridge = false) {
             ctx.lineTo(rx + size * (lean + .12), cy - size * .18);
             strokeTerrainPath(ctx);
         }
+    }
+    ctx.restore();
+}
+
+function drawBridgeSymbol(ctx, cx, cy, size) {
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const stroke = () => {
+        ctx.strokeStyle = 'rgba(35, 39, 37, .98)';
+        ctx.lineWidth = Math.max(1.2, size * .14);
+        ctx.stroke();
+        ctx.strokeStyle = 'rgba(245, 235, 215, .98)';
+        ctx.lineWidth = Math.max(.8, size * .065);
+        ctx.stroke();
+    };
+
+    // A single deck and supporting arch read as a bridge at map scale;
+    // repeated crossbars made the old mark resemble a ladder.
+    const deckY = cy + size * .06;
+    ctx.beginPath();
+    ctx.moveTo(cx - size * .34, deckY);
+    ctx.lineTo(cx + size * .34, deckY);
+    stroke();
+
+    ctx.beginPath();
+    ctx.moveTo(cx - size * .27, deckY - size * .03);
+    ctx.quadraticCurveTo(cx, cy - size * .31, cx + size * .27, deckY - size * .03);
+    stroke();
+
+    for (const side of [-1, 1]) {
+        ctx.beginPath();
+        ctx.moveTo(cx + side * size * .3, deckY - size * .08);
+        ctx.lineTo(cx + side * size * .3, deckY + size * .12);
+        stroke();
     }
     ctx.restore();
 }
@@ -131,57 +156,16 @@ function isRiverPixel(mask, px, py, width, height) {
 }
 
 function analyzeRiverCell(mask, x, y, cellWidth, cellHeight, width, height) {
-    if (!mask?.data) return { contains: false, major: false };
+    if (!mask?.data) return { contains: false };
     const left = Math.floor(x * mask.width / width), top = Math.floor(y * mask.height / height);
     const right = Math.min(mask.width, Math.ceil((x + cellWidth) * mask.width / width));
     const bottom = Math.min(mask.height, Math.ceil((y + cellHeight) * mask.height / height));
-    const pixelWidth = Math.max(1, right - left), pixelHeight = Math.max(1, bottom - top);
-    const edgeBand = Math.max(1, Math.ceil(Math.min(pixelWidth, pixelHeight) * .04));
-    const riverPixels = new Uint8Array(pixelWidth * pixelHeight);
-    let count = 0;
     for (let py = top; py < bottom; py++) for (let px = left; px < right; px++) {
         const index = (py * mask.width + px) * 4;
-        if (mask.data[index + 3] < 16 || mask.data[index + 2] <= mask.data[index] + 15
-            || mask.data[index + 1] <= mask.data[index] + 5 || mask.data[index + 2] <= 60) continue;
-        riverPixels[(py - top) * pixelWidth + px - left] = 1;
-        count++;
+        if (mask.data[index + 3] >= 16 && mask.data[index + 2] > mask.data[index] + 15
+            && mask.data[index + 1] > mask.data[index] + 5 && mask.data[index + 2] > 60) return { contains: true };
     }
-    // Require one connected channel to pass through opposite sides; separate
-    // river fragments in the same cell cannot combine to form a major crossing.
-    const visited = new Uint8Array(riverPixels.length);
-    const stack = [];
-    let major = false;
-    // Rasters share the map's resolution (24px per grid cell). The former
-    // hard floor of 32 pixels exceeded the area of low-resolution cell masks,
-    // classifying every channel as fordable. Scale the threshold to the cell.
-    const minimumMajorRiverPixels = Math.max(10, Math.ceil(pixelWidth * pixelHeight * .035));
-    for (let seed = 0; seed < riverPixels.length && !major; seed++) {
-        if (!riverPixels[seed] || visited[seed]) continue;
-        stack.length = 0;
-        stack.push(seed);
-        visited[seed] = 1;
-        let componentSize = 0;
-        const sides = { north: false, east: false, south: false, west: false };
-        while (stack.length) {
-            const index = stack.pop();
-            const px = index % pixelWidth, py = Math.floor(index / pixelWidth);
-            componentSize++;
-            if (py < edgeBand) sides.north = true;
-            if (pixelWidth - 1 - px < edgeBand) sides.east = true;
-            if (pixelHeight - 1 - py < edgeBand) sides.south = true;
-            if (px < edgeBand) sides.west = true;
-            for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-                if (!dx && !dy) continue;
-                const nx = px + dx, ny = py + dy;
-                if (nx < 0 || ny < 0 || nx >= pixelWidth || ny >= pixelHeight) continue;
-                const next = ny * pixelWidth + nx;
-                if (riverPixels[next] && !visited[next]) { visited[next] = 1; stack.push(next); }
-            }
-        }
-        const crossesOppositeSides = (sides.north && sides.south) || (sides.east && sides.west);
-        major = componentSize >= minimumMajorRiverPixels && crossesOppositeSides;
-    }
-    return { contains: count > 0, major };
+    return { contains: false };
 }
 
 function riverPixelsAlongCellEdge(mask, fromX, fromY, toX, toY, width, height) {
@@ -243,21 +227,15 @@ export async function buildMilitaryGridMetadata() {
             let waterTypes = sampleCellWaterTypes(masks, width, height, x, y, actualWidth, actualHeight);
             if (containsRiver) waterTypes |= 1;
             let riverEdges = 0;
-            let fordEdges = 0;
             for (const [dx, dy, edgeFlag] of directions) {
                 const nextX = cellX + dx, nextY = cellY + dy;
                 if (nextX < 0 || nextY < 0 || nextX >= cellColumns || nextY >= cellRows) continue;
                 const oppositeEdge = {1:16, 2:32, 4:64, 8:128, 16:1, 32:2, 64:4, 128:8}[edgeFlag];
                 if (edgeFlag > oppositeEdge) continue;
                 if (!riverPixelsAlongCellEdge(masks[0], cellX, cellY, nextX, nextY, width, height)) continue;
-                const isMajor = riverCells.get(`${cellX},${cellY}`)?.major || riverCells.get(`${nextX},${nextY}`)?.major;
-                if (isMajor) {
-                    riverEdges |= edgeFlag;
-                } else {
-                    fordEdges |= edgeFlag;
-                }
+                riverEdges |= edgeFlag;
             }
-            cells.push({ cell_x: cellX, cell_y: cellY, province_id: provinceId, base_terrain: coverage > .5 ? 'water' : 'plain', river_edges: riverEdges, ford_edges: fordEdges, water_coverage: Number(coverage.toFixed(4)), water_types: waterTypes });
+            cells.push({ cell_x: cellX, cell_y: cellY, province_id: provinceId, base_terrain: coverage > .5 ? 'water' : 'plain', river_edges: riverEdges, water_coverage: Number(coverage.toFixed(4)), water_types: waterTypes });
         }
     }
     const cellsByKey = new Map(cells.map(cell => [`${cell.cell_x},${cell.cell_y}`, cell]));
@@ -267,46 +245,34 @@ export async function buildMilitaryGridMetadata() {
             const neighbor = cellsByKey.get(`${cell.cell_x + dx},${cell.cell_y + dy}`);
             if (neighbor) neighbor.river_edges |= oppositeBits[bit];
         }
-        if (cell.ford_edges & bit) {
-            const neighbor = cellsByKey.get(`${cell.cell_x + dx},${cell.cell_y + dy}`);
-            if (neighbor) neighbor.ford_edges |= oppositeBits[bit];
-        }
     }
     return cells;
 }
 
-function drawFordMark(ctx, x, y, size) {
+function drawAdminWaterType(ctx, x, y, size, waterTypes) {
+    const type = Number(waterTypes) || 0;
+    if (!type || !state.showWaterTypeIcons) return;
     const cx = x + size / 2, cy = y + size / 2;
-    const radius = Math.max(1.25, size * .035);
     ctx.save();
-    ctx.fillStyle = 'rgba(244, 235, 205, .96)';
-    ctx.strokeStyle = 'rgba(31, 42, 43, .95)';
-    ctx.lineWidth = Math.max(1, size * .018);
-    for (const dx of [-size * .12, 0, size * .12]) {
-        ctx.beginPath();
-        ctx.arc(cx + dx, cy, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.stroke();
+    ctx.strokeStyle = 'rgba(14, 37, 51, .96)';
+    ctx.lineWidth = Math.max(1.4, size * .075);
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    if (type & 2) {
+        ctx.beginPath(); ctx.arc(cx, cy, size * .2, 0, Math.PI * 2); ctx.stroke();
+    } else {
+        const count = (type & 4) ? 3 : 1;
+        const gap = size * .15;
+        for (let line = 0; line < count; line++) {
+            const yy = cy + (line - (count - 1) / 2) * gap;
+            ctx.beginPath();
+            ctx.moveTo(cx - size * .29, yy);
+            ctx.quadraticCurveTo(cx - size * .15, yy - size * .11, cx, yy);
+            ctx.quadraticCurveTo(cx + size * .15, yy + size * .11, cx + size * .29, yy);
+            ctx.stroke();
+        }
     }
     ctx.restore();
-}
-
-function drawCurrentMark(ctx, x, y, size, dx, dy) {
-    const magnitude = Math.hypot(dx, dy) || 1;
-    const ux = dx / magnitude, uy = dy / magnitude;
-    const cx = x + size * .5, cy = y + size * .5;
-    const fromX = cx - ux * size * .18, fromY = cy - uy * size * .18;
-    const toX = cx + ux * size * .18, toY = cy + uy * size * .18;
-    ctx.save();
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'rgba(15, 42, 57, .92)'; ctx.lineWidth = Math.max(4, size * .13);
-    ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY); ctx.stroke();
-    ctx.strokeStyle = 'rgba(225, 246, 255, .98)'; ctx.lineWidth = Math.max(2, size * .065);
-    ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY);
-    ctx.moveTo(toX - ux * size * .09 + uy * size * .07, toY - uy * size * .09 - ux * size * .07);
-    ctx.lineTo(toX, toY);
-    ctx.lineTo(toX - ux * size * .09 - uy * size * .07, toY - uy * size * .09 + ux * size * .07);
-    ctx.stroke(); ctx.restore();
 }
 
 export function renderMilitaryGrid() {
@@ -330,12 +296,10 @@ export function renderMilitaryGrid() {
                 const waterCoverage = synchronizedCell ? Number(synchronizedCell.water_coverage) || 0 : sampleCellWaterCoverage(mapData, waterMasks, canvas.width, canvas.height, x, y, Math.min(size, canvas.width - x), key);
                 let terrain = override?.terrain;
                 // A cell belongs to water only when water occupies more than half of it.
+                if (Number(synchronizedCell?.water_types) > 0) terrain = 'water';
                 if (!terrain) terrain = synchronizedCell?.base_terrain || (waterCoverage > .5 ? 'water' : 'plain');
                 drawTerrainMark(ctx, terrain, x, y, Math.min(size, canvas.width - x), !!override?.bridge);
-                if (Number(synchronizedCell?.ford_edges) && !override?.bridge) drawFordMark(ctx, x, y, Math.min(size, canvas.width - x));
-                if (synchronizedCell?.flow_dx != null && (Number(synchronizedCell.water_types) & 1)) {
-                    drawCurrentMark(ctx, x, y, Math.min(size, canvas.width - x), Number(synchronizedCell.flow_dx), Number(synchronizedCell.flow_dy));
-                }
+                drawAdminWaterType(ctx, x, y, Math.min(size, canvas.width - x), synchronizedCell?.water_types);
             }
         }
     }
@@ -373,7 +337,7 @@ export function renderMilitaryGrid() {
     const visibleProvinceIds = state.userProfile?.role === 'player'
         ? new Set([...state.militaryVisibleCells].map(key => Number(state.militaryGridCells.get(key)?.province_id)).filter(Number.isFinite))
         : null;
-    const structureGlyphs = { bridge:'╫', camp:'⌂', watchtower:'▲', palisade:'▥', ferry:'↔' };
+    const structureGlyphs = { camp:'⌂', watchtower:'▲', palisade:'▥', ferry:'↔' };
     for (const structure of state.militaryStructures || []) {
         if (structure.status === 'destroyed') continue;
         const key = `${structure.cell_x},${structure.cell_y}`;
@@ -394,7 +358,11 @@ export function renderMilitaryGrid() {
         ctx.fillStyle = '#fff4d6';
         ctx.font = `bold ${Math.max(11,size*.48)}px sans-serif`;
         ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(structure.status === 'broken' ? '×' : structureGlyphs[structure.structure_type] || '•',x,y);
+        if (structure.structure_type === 'bridge' && structure.status !== 'broken') {
+            drawBridgeSymbol(ctx, x, y, size * .58);
+        } else {
+            ctx.fillText(structure.status === 'broken' ? '×' : structureGlyphs[structure.structure_type] || '•',x,y);
+        }
         ctx.restore();
     }
     if (state.userProfile?.role === 'player' && state.militaryGridCells.size) {

@@ -1,7 +1,7 @@
 import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016d';
-import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=military-ui-update-20261016d';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, syncMilitaryGridCells, setMilitaryWaterCurrent, setMilitaryRiverCrossing, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, settleMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, fetchDynasticMarriageProposals, createDynasticMarriageProposal, decideDynasticMarriageProposal, fetchStateGovernance, electStateRuler, findLocalRulerSpouse, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminSetStateBalances, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=dynastic-child-marriage-20261016';
-import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=military-ui-update-20261016d';
+import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=admin-water-icons-20261016';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterType, syncMilitaryGridCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, settleMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, fetchDynasticMarriageProposals, createDynasticMarriageProposal, decideDynasticMarriageProposal, fetchStateGovernance, electStateRuler, findLocalRulerSpouse, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminSetStateBalances, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=water-markers-20261016';
+import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=water-types-bridge-only-20261016';
 import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-prestige-base-20261016';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
 
@@ -177,10 +177,9 @@ const MILITARY_OPPOSITE_BITS = {1:16,2:32,4:64,8:128,16:1,32:2,64:4,128:8};
 function getMilitaryRiverStep(from, to, dx, dy) {
     const bit = MILITARY_DIRECTION_BITS.get(`${dx},${dy}`);
     const opposite = MILITARY_OPPOSITE_BITS[bit];
-    const major = ((Number(from?.river_edges) || 0) & bit) || ((Number(to?.river_edges) || 0) & opposite);
-    const ford = ((Number(from?.ford_edges) || 0) & bit) || ((Number(to?.ford_edges) || 0) & opposite);
+    const river = ((Number(from?.river_edges) || 0) & bit) || ((Number(to?.river_edges) || 0) & opposite);
     const bridged = !!from?.bridge || !!to?.bridge;
-    return { blocked: !!major && !bridged, surcharge: !bridged && ford ? 1 : 0 };
+    return { blocked: !!river && !bridged, surcharge: 0 };
 }
 
 function getReachableMilitaryCells(force, { includeEnemyTargets = false } = {}) {
@@ -191,7 +190,7 @@ function getReachableMilitaryCells(force, { includeEnemyTargets = false } = {}) 
         const bridge = !!override?.bridge || state.militaryStructures.some(item => item.structure_type === 'bridge'
             && item.status === 'active' && Number(item.available_from_turn) <= Number(state.gameCalendar?.turn)
             && Number(item.cell_x) === x && Number(item.cell_y) === y);
-        const terrain = override?.terrain || geometry?.base_terrain;
+        const terrain = Number(geometry?.water_types) > 0 ? 'water' : override?.terrain || geometry?.base_terrain;
         return geometry ? { ...geometry, ...override, terrain: bridge && terrain === 'water' ? 'bridge' : terrain, bridge } : null;
     };
     const directions = [[1,0],[-1,0],[0,1],[0,-1],[1,1],[1,-1],[-1,1],[-1,-1]];
@@ -221,7 +220,7 @@ function getReachableMilitaryCells(force, { includeEnemyTargets = false } = {}) 
             }
             const crossing = getMilitaryRiverStep(from, to, dx, dy);
             if (crossing.blocked) continue;
-            const candidate = best + movementStepCost(to.terrain, diagonal, mobility, crossing.surcharge);
+            const candidate = best + movementStepCost(to.terrain, diagonal, mobility);
             if (candidate > budget || candidate >= (costs.get(key) ?? Infinity)) continue;
             costs.set(key, candidate);
             if (enemyAtCell) continue;
@@ -249,7 +248,7 @@ function planMilitaryMove(force, cellX, cellY) {
             && item.structure_type === 'bridge' && item.status === 'active' && Number(item.available_from_turn) <= Number(state.gameCalendar?.turn));
         if (!geometry) return null;
         const bridge = !!override?.bridge || !!structure;
-        const terrain = override?.terrain || geometry.base_terrain;
+        const terrain = Number(geometry.water_types) > 0 ? 'water' : override?.terrain || geometry.base_terrain;
         return { ...geometry, ...override, terrain: bridge && terrain === 'water' ? 'bridge' : terrain, bridge };
     };
     const directionBits = new Map([[`1,0`,1],[`1,1`,2],[`0,1`,4],[`-1,1`,8],[`-1,0`,16],[`-1,-1`,32],[`0,-1`,64],[`1,-1`,128]]);
@@ -292,7 +291,7 @@ function planMilitaryTransferPath(force, selectedUnits, target) {
             && Number(item.available_from_turn) <= Number(state.gameCalendar?.turn)
             && Number(item.cell_x) === x && Number(item.cell_y) === y);
         const hasBridge = !!override?.bridge || bridge;
-        const terrain = override?.terrain || geometry?.base_terrain;
+        const terrain = Number(geometry?.water_types) > 0 ? 'water' : override?.terrain || geometry?.base_terrain;
         return geometry ? { ...geometry, ...override, terrain: hasBridge && terrain === 'water' ? 'bridge' : terrain,
             bridge: hasBridge } : null;
     };
@@ -336,7 +335,6 @@ function planMilitaryFleetMove(fleet, cellX, cellY) {
         undercrewed,
         slowestManeuver,
         getWaterTypes:(x,y) => Number(cellAt(x,y)?.water_types) || 0,
-        getFlowDirection:(x,y) => { const cell = cellAt(x,y); return cell && cell.flow_dx != null ? { dx:Number(cell.flow_dx), dy:Number(cell.flow_dy) } : null; },
         canEnter:(x,y) => !state.militaryFleets.some(other => other.id !== fleet.id && other.status === 'active'
             && other.location_kind === 'water' && Number(other.cell_x) === x && Number(other.cell_y) === y
             && (x === cellX && y === cellY || other.owner !== fleet.owner))
@@ -2746,7 +2744,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
     const statusLabels = { pending: 'Ожидает решения и подтверждения', confirmed: 'Завершено', cancelled: 'Отменено' };
     const eventCards = battleHeaders.map(battle => `<article class="military-event-card"><div><strong>${battle.battle_type === 'naval' ? 'Морское сражение' : 'Сухопутное сражение'} · ${escapeHtml(battle.terrain)}</strong><span>${escapeHtml((battle.participant_owners || []).join(' · '))}</span><small>${statusLabels[battle.status] || battle.status}${battle.public_outcome ? ` · исход: ${battle.public_outcome === 'attacker' ? 'атакующие' : battle.public_outcome === 'defender' ? 'защитники' : 'ничья'}` : ''}</small></div><button class="page-back-btn" type="button" data-open-military-battle="${battle.id}">Открыть</button></article>`).join('');
     const eventPanel = `<section class="page-panel military-events-panel"><header class="page-panel-heading"><div><h2>Боевые события</h2><p>Приказы участников скрыты друг от друга. Полный предварительный расчёт виден только администратору.</p></div></header><p class="page-note">Событие хранит снимок состава. После подтверждения Администратором потери и мораль выбранных армий и флотилий записываются в соответствующий реестр. Предпочитаемая тактика влияет на автоматический выбор тактики в каждом цикле боя.</p>${militaryDataError ? `<p class="page-error military-db-warning">Не удалось загрузить боевые события: ${escapeHtml(militaryDataError)}. Проверьте, что применены файлы боевых событий и синхронизации сил.</p>` : ''}<div id="military-event-list" class="military-event-list">${eventCards || '<p class="page-note">Активных и завершённых боевых событий пока нет.</p>'}</div><div id="military-battle-details" class="military-battle-details" aria-live="polite"></div></section>`;
-    const fleetPanel = `<section class="page-panel military-fleets-panel"><header class="page-panel-heading"><div><h2>Флотилии</h2><p>Маршрут прокладывается по рекам, озёрам и морям, доступным всем судам в составе. В зиму внутренние воды закрыты; для использования карты после обновления водоёмов нужна синхронизация сетки.</p></div></header>${fleetDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр флотов: ${escapeHtml(fleetDataError)}. Примените supabase/military_fleets.sql.</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Корабли и экипажи</th><th>Положение</th><th>Мораль</th><th>ОД</th><th>Приказы</th></tr></thead><tbody>${fleetRows || '<tr><td colspan="7">Сохранённых флотилий пока нет.</td></tr>'}</tbody></table></div></section>`;
+    const fleetPanel = `<section class="page-panel military-fleets-panel"><header class="page-panel-heading"><div><h2>Флотилии</h2><p>Маршрут прокладывается по рекам, озёрам и морям, доступным всем судам в составе. Проходимость зависит от типа водоёма и судов; после изменения водных клеток администратор синхронизирует сетку.</p></div></header>${fleetDataError ? `<p class="page-error military-db-warning">Не удалось загрузить реестр флотов: ${escapeHtml(fleetDataError)}. Примените supabase/military_fleets.sql.</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Корабли и экипажи</th><th>Положение</th><th>Мораль</th><th>ОД</th><th>Приказы</th></tr></thead><tbody>${fleetRows || '<tr><td colspan="7">Сохранённых флотилий пока нет.</td></tr>'}</tbody></table></div></section>`;
     const prisonerPanel = militaryPrisoners.length || prisonerDataError ? `<section class="page-panel military-prisoners-panel"><header class="page-panel-heading"><div><h2>Пленные после морских сражений</h2><p>Захваченные пассажиры учитываются отдельно от корабельных экипажей и не возвращаются в состав исходной армии.</p></div></header>${prisonerDataError ? `<p class="page-error military-db-warning">Не удалось загрузить список пленных: ${escapeHtml(prisonerDataError)}</p>` : ''}<div class="page-table-wrap"><table class="page-table"><thead><tr><th>Отряд</th><th>Исходное государство</th><th>Пленители</th><th>Командир</th><th>Состав</th><th>Статус</th></tr></thead><tbody>${prisonerRows || '<tr><td colspan="6">Записей о пленных нет.</td></tr>'}</tbody></table></div></section>` : '';
     const shipServicePanel = `<p class="page-note naval-auto-service-note">Экипажи автоматически пополняются, а повреждённые суда ремонтируются при сезонном обслуживании флота в порту. Отдельного ручного обслуживания нет.</p>`;
     const content = spyOnly ? spyPanel : `${commanderPanel}${forcePanel}${isAdmin ? siegePanel : ""}${isAdmin ? raidPanel : ""}${isAdmin ? colonizationPanel : ""}${portPanel}${shipServicePanel}${fleetPanel}${prisonerPanel}${eventPanel}${recruitmentPanel}${retinuePanel}${mercenaryPanel}`;
@@ -4169,6 +4167,13 @@ export function initEventListeners() {
         renderMilitaryGrid();
         syncMilitaryMovePanel();
     });
+    elements.waterTypeIconsToggleBtn?.addEventListener('click', () => {
+        state.showWaterTypeIcons = !state.showWaterTypeIcons;
+        elements.waterTypeIconsToggleBtn.classList.toggle('active', state.showWaterTypeIcons);
+        elements.waterTypeIconsToggleBtn.setAttribute('aria-pressed', String(state.showWaterTypeIcons));
+        elements.waterTypeIconsToggleBtn.textContent = `Иконки водоёмов: ${state.showWaterTypeIcons ? 'вкл.' : 'выкл.'}`;
+        renderMilitaryGrid();
+    });
     elements.militaryGridSyncBtn?.addEventListener('click', async () => {
         if (state.userProfile?.role !== 'admin' || elements.militaryGridSyncBtn.disabled) return;
         elements.militaryGridSyncBtn.disabled = true;
@@ -4177,7 +4182,8 @@ export function initEventListeners() {
             const cells = await buildMilitaryGridMetadata();
             if (elements.militaryGridSyncStatus) elements.militaryGridSyncStatus.textContent = `Сохраняю ${cells.length.toLocaleString('ru-RU')} клеток…`;
             const count = await syncMilitaryGridCells(cells);
-            state.militaryGridCells = new Map(cells.map(cell => [`${cell.cell_x},${cell.cell_y}`, cell]));
+            const synchronizedCells = await fetchMilitaryGridCells();
+            state.militaryGridCells = new Map(synchronizedCells.map(cell => [`${cell.cell_x},${cell.cell_y}`, cell]));
             renderMilitaryGrid();
             refreshSelectedMilitaryReach();
             if (elements.militaryGridSyncStatus) elements.militaryGridSyncStatus.textContent = `Синхронизировано клеток: ${count.toLocaleString('ru-RU')}.`;
@@ -4204,7 +4210,7 @@ export function initEventListeners() {
         }
         if (elements.militaryMapTools) elements.militaryMapTools.hidden = !state.showMilitaryGrid || !['player','admin'].includes(state.userProfile?.role);
         renderMilitaryGrid();
-        if (state.editingMilitaryTerrain) showToast('Щёлкни по клетке для выбранной местности; чтобы разметить реку, выбери направление течения в списке.');
+        if (state.editingMilitaryTerrain) showToast('Щёлкни по клетке для изменения местности или водоёма. Значки водоёмов можно включить кнопкой в слоях карты.');
     });
     elements.militaryMapTools?.addEventListener('pointerdown', event => event.stopPropagation());
     elements.militaryMapTools?.addEventListener('click', event => event.stopPropagation());
@@ -4440,27 +4446,18 @@ export function initEventListeners() {
             if (imgX < 0 || imgX >= elements.hiddenCanvas.width || imgY < 0 || imgY >= elements.hiddenCanvas.height) return;
             const cellX = Math.floor(imgX / MILITARY_GRID_CELL_SIZE), cellY = Math.floor(imgY / MILITARY_GRID_CELL_SIZE);
             const selected = elements.militaryTerrainSelect?.value || 'plain';
-            if (selected === 'river:fordable' || selected === 'river:impassable') {
+            if (selected.startsWith('water-type:')) {
                 const cell = state.militaryGridCells.get(`${cellX},${cellY}`);
-                if (!(Number(cell?.water_types) & 1) || !Number(cell?.river_edges)) { showToast('Выбранная клетка не содержит отмеченного участка реки.'); return; }
+                if (!cell) { showToast('Сначала синхронизируйте сетку военной карты.'); return; }
+                const waterTypes = { 'water-type:none':0, 'water-type:river':1, 'water-type:lake':2, 'water-type:sea':4 }[selected];
                 try {
-                    const result = await setMilitaryRiverCrossing(cellX, cellY, selected === 'river:fordable' ? 'fordable' : 'impassable');
-                    state.militaryGridCells.set(`${cellX},${cellY}`, { ...cell, ford_edges: Number(result.ford_edges) });
+                    const result = await setMilitaryWaterType(cellX, cellY, waterTypes);
+                    state.militaryGridCells.set(`${cellX},${cellY}`, { ...cell, ...result });
                     renderMilitaryGrid();
-                    showToast(selected === 'river:fordable' ? 'Участок реки отмечен как брод.' : 'Участок реки требует моста.');
-                } catch (error) { showToast(`Не удалось изменить переход через реку: ${error.message}`, 7000); }
-                return;
-            }
-            if (selected.startsWith('flow:')) {
-                const cell = state.militaryGridCells.get(`${cellX},${cellY}`);
-                if (!(Number(cell?.water_types) & 1)) { showToast('Для направления течения выбери клетку, отмеченную как река.'); return; }
-                const [dx, dy] = selected.slice(5).split(',').map(Number);
-                try {
-                    await setMilitaryWaterCurrent(cellX, cellY, dx, dy);
-                    state.militaryGridCells.set(`${cellX},${cellY}`, { ...cell, flow_dx:dx, flow_dy:dy });
-                    renderMilitaryGrid();
-                    showToast(`Течение в клетке ${cellX + 1}:${cellY + 1} направлено ${elements.militaryTerrainSelect.selectedOptions[0].textContent.replace(/^На /, '').trim().toLowerCase()}.`);
-                } catch (error) { showToast(`Не удалось сохранить течение: ${error.message}`, 7000); }
+                    refreshSelectedMilitaryReach();
+                    const labels = { 0:'водоём убран', 1:'река', 2:'озеро', 4:'море' };
+                    showToast(`Клетка ${cellX + 1}:${cellY + 1}: ${labels[waterTypes]}.`);
+                } catch (error) { showToast(`Не удалось изменить тип водоёма: ${error.message}`, 7000); }
                 return;
             }
             const cellLeft = cellX * MILITARY_GRID_CELL_SIZE, cellTop = cellY * MILITARY_GRID_CELL_SIZE;

@@ -55,6 +55,7 @@ export const state = {
     editingMilitaryTerrain: false,
     activeLayer: 'political',
     showMilitaryGrid: false,
+    showWaterTypeIcons: false,
     showMarkerNames: true,
     visibleMarkerTypes: {
         large_city: true,
@@ -134,6 +135,7 @@ export const elements = {
     controlsToggleBtn: document.getElementById('controls-toggle-btn'),
     tradeRoutesToggleBtn: document.getElementById('toggle-trade-routes-btn'),
     militaryGridToggleBtn: document.getElementById('toggle-military-grid-btn'),
+    waterTypeIconsToggleBtn: document.getElementById('toggle-water-type-icons-btn'),
     militaryMapTools: document.getElementById('military-map-tools'),
     mapFinanceBadge: document.getElementById('map-finance-badge'),
     militaryTerrainEditBtn: document.getElementById('military-terrain-edit-btn'),

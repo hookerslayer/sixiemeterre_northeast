@@ -5,7 +5,6 @@ import { buildStaticModifiers, modifierValue } from './modifierSystem.js';
 
 export const BASE_COMMAND_POINTS = 1000;
 export const BASE_ACTION_POINTS = 100;
-export const RIVER_CROSSING_ACTION_POINTS = 10;
 export const MILITARY_TERRAIN = Object.freeze({
   plain: { direct: 10, diagonal: 14 },
   hill: { direct: 15, diagonal: 21 },
@@ -748,13 +747,12 @@ export function calculateArmyMobility(unitGroups = [], siegeEquipment = {}, { sn
   return clamp(composition * sizePenalty, 0.5, 1.4);
 }
 
-export function movementStepCost(terrain, diagonal, mobility = 1, riverCrossings = 0) {
+export function movementStepCost(terrain, diagonal, mobility = 1) {
   const costs = MILITARY_TERRAIN[terrain] || MILITARY_TERRAIN.plain;
   const base = diagonal ? costs.diagonal : costs.direct;
   if (!Number.isFinite(base)) return Infinity;
   const terrainCost = Math.max(1, Math.ceil(base / Math.max(0.01, Number(mobility) || 1)));
-  const crossings = Math.max(0, Math.floor(Number(riverCrossings) || 0));
-  return terrainCost + crossings * RIVER_CROSSING_ACTION_POINTS;
+  return terrainCost;
 }
 
 const cellKey = ({ x, y }) => `${Math.floor(x)},${Math.floor(y)}`;
@@ -766,8 +764,7 @@ const parseCellKey = key => key.split(',').map(Number);
 export function findMilitaryPath(start, goal, {
   getTerrain = () => 'plain', mobility = 1, remainingActionPoints = BASE_ACTION_POINTS,
   canEnter = (_x, _y, terrain) => terrain !== 'water',
-  // Return the number of river crossings on the edge from (x, y) to (nextX, nextY).
-  // A bridge-aware callback returns zero for a crossing covered by a usable bridge.
+  // A bridge-aware callback blocks any river crossing without a usable bridge.
   getRiverCrossings = () => 0, maxVisited = 100000
 } = {}) {
   const origin = { x: Math.floor(start.x), y: Math.floor(start.y) };
@@ -789,7 +786,8 @@ export function findMilitaryPath(start, goal, {
       if (!canEnter(next.x, next.y, terrain)) continue;
       if (diagonal && !canEnter(x + dx, y, getTerrain(x + dx, y)) && !canEnter(x, y + dy, getTerrain(x, y + dy))) continue;
       const crossings = getRiverCrossings(x, y, next.x, next.y);
-      const step = movementStepCost(terrain, diagonal, mobility, crossings), candidate = currentCost + step;
+      if (!Number.isFinite(crossings)) continue;
+      const step = movementStepCost(terrain, diagonal, mobility), candidate = currentCost + step;
       if (candidate > remainingActionPoints || candidate >= (distances.get(nextKey) ?? Infinity)) continue;
       distances.set(nextKey, candidate); previous.set(nextKey, currentKey); open.add(nextKey);
     }
@@ -806,7 +804,7 @@ export function findMilitaryPath(start, goal, {
 
 export function navalShipCanUseWater(shipType, waterTypes, season = '') {
   const mask = Math.max(0, Math.floor(Number(waterTypes) || 0));
-  const navigable = season === 'Зима' ? mask & 4 : mask & 7;
+  const navigable = mask & 7;
   const allowed = {
     'Ушкуй': 3,
     'Насад': 3,
@@ -819,7 +817,6 @@ export function navalShipCanUseWater(shipType, waterTypes, season = '') {
 
 export function findNavalPath(start, goal, {
   getWaterTypes = () => 0,
-  getFlowDirection = () => null,
   shipTypes = [],
   season = '',
   canEnter = () => true,
@@ -854,14 +851,6 @@ export function findNavalPath(start, goal, {
       if (dx && dy && !navigable(x + dx, y) && !navigable(x, y + dy)) continue;
       const diagonal = dx !== 0 && dy !== 0;
       let base = diagonal ? 14 : 10;
-      const fromWater = getWaterTypes(x, y), toWater = getWaterTypes(next.x, next.y);
-      if ((fromWater & 1) && (toWater & 1)) {
-        const flow = getFlowDirection(next.x, next.y) || getFlowDirection(x, y);
-        if (flow && Number.isFinite(Number(flow.dx)) && Number.isFinite(Number(flow.dy))) {
-          if (Number(flow.dx) === dx && Number(flow.dy) === dy) base = diagonal ? 12 : 8;
-          else if (Number(flow.dx) === -dx && Number(flow.dy) === -dy) base = diagonal ? 16 : 12;
-        }
-      }
       const maneuverAdjustment = slowestManeuver == null
         ? 0
         : 3 - Math.max(1, Math.min(5, Number(slowestManeuver) || 3));
