@@ -1842,7 +1842,9 @@ body.military-army-placement #visual-map {
   .rules-wiki-nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; }
   .wiki-page-button { flex: 0 0 auto; max-width: min(260px,75vw); white-space: nowrap; }
   .rules-wiki-article { padding: 16px; }
-  .rules-wiki-article table { display: block; max-width: 100%; overflow-x: auto; }
+  .rules-wiki-article .wiki-table-wrap { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+  .rules-wiki-article table { width: max-content; min-width: 560px; max-width: none; }
+  .rules-wiki-article th, .rules-wiki-article td { min-width: 130px; overflow-wrap: normal; word-break: normal; }
 }
 @media (max-width: 560px) {
   .wiki-reader-heading { align-items: stretch; flex-direction: column; }
@@ -1861,3 +1863,52 @@ body.military-army-placement #visual-map {
   .page-nav::-webkit-scrollbar, .page-table-wrap::-webkit-scrollbar, .dense-table .table-wrap::-webkit-scrollbar { height: 8px; }
 .page-nav::-webkit-scrollbar-track, .page-table-wrap::-webkit-scrollbar-track, .dense-table .table-wrap::-webkit-scrollbar-track { background: #1b1e1c; }
 .page-nav::-webkit-scrollbar-thumb, .page-table-wrap::-webkit-scrollbar-thumb, .dense-table .table-wrap::-webkit-scrollbar-thumb { border: 2px solid #1b1e1c; border-radius: 8px; background: #68685e; }
+
+/* On phones, keep map actions in one predictable row and open utility panels as sheets. */
+#mobile-map-actions { display: contents; }
+#mobile-map-actions > #legend-panel { position: fixed; top: 64px; left: 20px; z-index: 1000; }
+@media (max-width: 640px) {
+  #left-sidebar { top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); right: auto; max-height: none; }
+  .top-nav-row { height: auto; padding: 0; gap: 7px; }
+  .top-nav-row .burger-btn { width: 40px; height: 40px; }
+  .top-nav-row #open-login-btn { min-height: 40px; max-width: min(180px, 48vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #mobile-map-actions { position: fixed; z-index: 1101; top: calc(max(10px, env(safe-area-inset-top)) + 52px); right: max(8px, env(safe-area-inset-right)); left: max(8px, env(safe-area-inset-left)); display: flex; align-items: stretch; justify-content: flex-end; gap: 6px; min-width: 0; }
+  #mobile-map-actions > .game-calendar,
+  #mobile-map-actions > #legend-panel,
+  #mobile-map-actions > #controls-panel { position: static; inset: auto; top: auto; right: auto; left: auto; width: auto; min-width: 0; max-width: none; max-height: none; margin: 0; padding: 0; transform: none; box-sizing: border-box; }
+  #mobile-map-actions > .game-calendar { flex: 1 1 auto; display: flex; justify-content: center; gap: 4px; padding: 0 8px; font-size: 11px; white-space: nowrap; overflow: hidden; }
+  #mobile-map-actions > .game-calendar #game-turn-label { overflow: hidden; text-overflow: ellipsis; }
+  #mobile-map-actions .advance-turn-btn { padding: 5px 6px; font-size: 10px; white-space: nowrap; }
+  #mobile-map-actions > #legend-panel,
+  #mobile-map-actions > #controls-panel { flex: 0 0 auto; overflow: visible; }
+  #mobile-map-actions > #legend-panel .panel-header,
+  #mobile-map-actions > #controls-panel .panel-header { gap: 4px; min-height: 40px; padding: 0 7px; border: 1px solid rgba(222,210,183,.22); border-radius: 7px; background: rgba(18,22,20,.96); box-sizing: border-box; }
+  #mobile-map-actions .legend-title,
+  #mobile-map-actions .panel-title { font-size: 11px; white-space: nowrap; }
+  #mobile-map-actions .toggle-btn { min-width: 24px; min-height: 30px; padding: 0 3px !important; font-size: 19px !important; }
+  #mobile-map-actions #legend-content,
+  #mobile-map-actions #controls-content { display: none; }
+  #mobile-map-actions > #legend-panel:not(.collapsed),
+  #mobile-map-actions > #controls-panel:not(.collapsed) { position: fixed; z-index: 1500; inset: 0; display: flex; flex-direction: column; width: auto; min-width: 0; max-width: none; max-height: none; margin: 0; padding: max(14px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(14px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border: 0; border-radius: 0; overflow: hidden; box-sizing: border-box; background: rgba(18,22,20,.985); }
+  #mobile-map-actions > #legend-panel:not(.collapsed) .panel-header,
+  #mobile-map-actions > #controls-panel:not(.collapsed) .panel-header { flex: 0 0 auto; min-height: 48px; padding: 0 0 10px; border: 0; border-bottom: 1px solid rgba(222,210,183,.18); border-radius: 0; background: transparent; }
+  #mobile-map-actions > #legend-panel:not(.collapsed) .legend-title,
+  #mobile-map-actions > #controls-panel:not(.collapsed) .panel-title { font-size: 18px; }
+  #mobile-map-actions > #legend-panel:not(.collapsed) .toggle-btn,
+  #mobile-map-actions > #controls-panel:not(.collapsed) .toggle-btn { min-width: 42px; min-height: 42px; font-size: 28px !important; }
+  #mobile-map-actions > #legend-panel:not(.collapsed) #legend-content,
+  #mobile-map-actions > #controls-panel:not(.collapsed) #controls-content { display: flex; flex: 1 1 auto; min-height: 0; margin-top: 12px; padding-bottom: max(12px, env(safe-area-inset-bottom)); overflow-y: auto; overscroll-behavior: contain; }
+  #mobile-map-actions > #legend-panel:not(.collapsed) #legend-content,
+  #mobile-map-actions > #controls-panel:not(.collapsed) #controls-content { flex-direction: column; }
+  body:has(#controls-panel:not(.collapsed)) #legend-panel { display: flex; }
+
+  .rules-wiki-article { overflow-wrap: break-word; }
+  .rules-wiki-article .wiki-table-wrap { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+  .rules-wiki-article table { width: max-content; min-width: 560px; max-width: none; table-layout: auto; }
+  .rules-wiki-article th,
+  .rules-wiki-article td { min-width: 130px; max-width: 360px; white-space: normal; overflow-wrap: normal; word-break: normal; }
+  .rules-wiki-article th:first-child,
+  .rules-wiki-article td:first-child { min-width: 145px; }
+  .map-finance-badge { top: calc(max(10px, env(safe-area-inset-top)) + 100px); right: max(8px, env(safe-area-inset-right)); left: auto; max-width: calc(100vw - 16px); padding: 7px 9px; gap: 10px; justify-content: flex-end; flex-wrap: wrap; box-sizing: border-box; font-size: 12px; }
+  .map-finance-item { gap: 5px; }
+}

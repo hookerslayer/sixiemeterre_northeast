@@ -2276,6 +2276,12 @@ async function renderRulesWikiMarkdown(slug, markdown, requestId) {
         }
     });
     article.replaceChildren(template.content.cloneNode(true));
+    article.querySelectorAll('table').forEach(table => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'wiki-table-wrap';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+    });
     article.querySelectorAll('[data-wiki-slug]').forEach(link => link.addEventListener('click', event => {
         event.preventDefault();
         loadRulesWikiPage(link.dataset.wikiSlug);
@@ -4003,9 +4009,22 @@ export function initEventListeners() {
         if (elements.controlsToggleBtn) elements.controlsToggleBtn.textContent = '+';
     }
 
+    const syncMapPanelToggleLabels = () => {
+        const mobile = window.matchMedia('(max-width: 640px)').matches;
+        [[elements.legendPanel, elements.legendToggleBtn, 'Легенда карты'], [elements.controlsPanel, elements.controlsToggleBtn, 'Управление']].forEach(([panel, button, label]) => {
+            if (!panel || !button) return;
+            const collapsed = panel.classList.contains('collapsed');
+            button.textContent = collapsed ? '+' : mobile ? '×' : '−';
+            button.setAttribute('aria-label', collapsed ? `Открыть: ${label}` : `Закрыть: ${label}`);
+            button.title = collapsed ? `Открыть: ${label}` : `Закрыть: ${label}`;
+        });
+    };
+    syncMapPanelToggleLabels();
+    window.addEventListener('resize', syncMapPanelToggleLabels, { passive: true });
+
     elements.legendToggleBtn?.addEventListener('click', () => {
-        const isCollapsed = elements.legendPanel.classList.toggle('collapsed');
-        elements.legendToggleBtn.textContent = isCollapsed ? '+' : '−';
+        elements.legendPanel.classList.toggle('collapsed');
+        syncMapPanelToggleLabels();
     });
 
     elements.advanceTurnBtn?.addEventListener('click', async () => {
@@ -4024,8 +4043,8 @@ export function initEventListeners() {
     });
 
     elements.controlsToggleBtn?.addEventListener('click', () => {
-        const isCollapsed = elements.controlsPanel.classList.toggle('collapsed');
-        elements.controlsToggleBtn.textContent = isCollapsed ? '+' : '−';
+        elements.controlsPanel.classList.toggle('collapsed');
+        syncMapPanelToggleLabels();
     });
 
     elements.tradeRoutesToggleBtn?.addEventListener('click', () => {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Sixième Terre</title>
-    <link rel="stylesheet" href="map.css?v=responsive-layout-20261017b">
+    <link rel="stylesheet" href="map.css?v=mobile-map-panels-20261017c">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </head>
@@ -12,18 +12,20 @@
 
 <div id="viewport">
     <div id="toast-notification" class="toast-notification"></div>
-    <div id="game-calendar" class="game-calendar" aria-live="polite">
-        <span id="game-turn-label">Ход 1 · Осень · 1450</span>
-        <button id="advance-turn-btn" class="advance-turn-btn admin-only" style="display:none" type="button">Сменить ход</button>
-    </div>
-
 <div id="left-sidebar">
     <div class="top-nav-row">
         <button id="burger-menu-btn" class="burger-btn" title="Меню">☰</button>
         <button id="open-login-btn">Вход</button>
     </div>
     <div id="nav-dropdown-menu" class="nav-dropdown"></div>
-    
+</div>
+
+<div id="mobile-map-actions">
+    <div id="game-calendar" class="game-calendar" aria-live="polite">
+        <span id="game-turn-label">Ход 1 · Осень · 1450</span>
+        <button id="advance-turn-btn" class="advance-turn-btn admin-only" style="display:none" type="button">Сменить ход</button>
+    </div>
+
     <div id="legend-panel">
         <div class="panel-header">
             <span class="legend-title">Легенда карты</span>
@@ -31,8 +33,6 @@
         </div>
         <div id="legend-content">Загрузка...</div>
     </div>
-</div>
-
     <div id="controls-panel">
         <div class="panel-header">
             <span class="panel-title">Управление</span>
@@ -94,6 +94,7 @@
             </div>
         </div>
     </div>
+</div>
 
     <aside id="military-map-tools" class="military-map-tools" hidden aria-label="Инструменты военной карты">
         <details open>
@@ -177,7 +178,7 @@
     </section>
 </div>
 
-<script type="module" src="main.js?v=responsive-layout-20261017c"></script>
+<script type="module" src="main.js?v=mobile-map-panels-20261017b"></script>
 </body>
 </html>
 
