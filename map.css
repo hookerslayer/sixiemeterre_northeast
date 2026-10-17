@@ -200,6 +200,8 @@ body.military-army-placement #visual-map {
     color: #eee8da;
     max-height: 90vh;
     overflow-y: auto;
+    width: var(--map-controls-width, clamp(220px, 20vw, 300px));
+    box-sizing: border-box;
 }
 
 .military-map-tools {
@@ -215,7 +217,7 @@ body.military-army-placement #visual-map {
 .military-map-tools label { display: grid; gap: 5px; color: #b7b4a9; }
 .military-map-tools select { min-height: 34px; width: 100%; color-scheme: dark; color: #e8dfc8; background: #20231f; border: 1px solid #514e43; border-radius: 5px; padding: 5px 8px; }
 .map-structure-cost { padding: 8px; border-radius: 6px; background: rgba(255,255,255,.04); color: #ded6c3; line-height: 1.45; }
-.map-finance-badge { position: fixed; z-index: 1001; top: 20px; right: calc(20px + 234px + 9px); display: flex; gap: 12px; padding: 10px 13px; border: 1px solid rgba(222,210,183,.26); border-radius: 8px; color: #eee8da; background: rgba(18,22,20,.94); font-weight: 700; }
+.map-finance-badge { position: fixed; z-index: 1001; top: 20px; right: calc(20px + var(--map-controls-width, clamp(220px, 20vw, 300px)) + 9px); display: flex; gap: 12px; padding: 10px 13px; border: 1px solid rgba(222,210,183,.26); border-radius: 8px; color: #eee8da; background: rgba(18,22,20,.94); font-weight: 700; }
 .map-finance-item { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
 .finance-coin-icon { color: #e4c47d; font-size: 18px; }
 .finance-op-icon { display: inline-grid; width: 20px; height: 20px; place-items: center; border: 1px solid currentColor; border-radius: 50%; color: #d6c6ec; font-size: 10px; }
@@ -612,11 +614,17 @@ body.military-army-placement #visual-map {
 
 .popup-close {
     position: absolute;
-    top: 4px;
-    right: 8px;
+    top: 5px;
+    right: 5px;
+    display: grid;
+    width: 32px;
+    height: 32px;
+    place-items: center;
     cursor: pointer;
     color: #aaa;
-    font-size: 14px;
+    font-size: 20px;
+    line-height: 1;
+    border-radius: 5px;
 }
 
 .popup-close:hover {
@@ -730,9 +738,15 @@ body.military-army-placement #visual-map {
 .trade-route-editor button:disabled { opacity: .45; cursor: default; }
 
 .page-nav { position: fixed; inset: 0 auto 0 0; z-index: 2; display: flex; width: 222px; box-sizing: border-box; flex-direction: column; gap: 5px; padding: 28px 16px; border-right: 1px solid rgba(222, 210, 183, .15); background: rgba(11, 15, 13, .92); backdrop-filter: blur(14px); }
+.page-nav-heading { display: contents; }
+.page-nav-toggle { display: none; }
+.page-nav-items { display: flex; min-height: 0; flex-direction: column; gap: 5px; overflow-y: auto; }
 .page-nav-brand { margin: 0 0 25px; padding: 0 10px 17px; border-bottom: 1px solid rgba(222, 210, 183, .16); color: #c8c6ae; font-size: 10px; font-weight: 700; letter-spacing: .14em; line-height: 1.7; white-space: nowrap; }
 .page-nav-item { padding: 11px 12px; border: 1px solid transparent; border-radius: 6px; color: #b8b9ae; background: transparent; text-align: left; font: inherit; font-size: 13px; cursor: pointer; }
 .page-nav-item:hover, .page-nav-item.active { border-color: rgba(212, 178, 112, .2); color: #eee2c5; background: rgba(212, 178, 112, .09); }
+.table-sort-button { display: inline-flex; align-items: center; gap: 5px; max-width: 100%; padding: 2px 0; border: 0; color: inherit; background: transparent; font: inherit; font-weight: inherit; text-align: left; line-height: 1.3; cursor: pointer; }
+.table-sort-button:hover { color: #e4c47d; }
+.table-sort-indicator { flex: 0 0 auto; color: #d7bd83; font-size: 12px; }
 
 .page-shell {
     width: min(1180px, calc(100vw - 270px));
@@ -1272,9 +1286,14 @@ body.military-army-placement #visual-map {
 @media (max-width: 900px) {
   .transport-route-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .transport-route-form button { grid-column: 1 / -1; }
-    .page-nav { position: sticky; inset: auto; width: 100%; height: auto; flex-direction: row; overflow-x: auto; padding: 9px 12px; border-right: 0; border-bottom: 1px solid rgba(222, 210, 183, 0.15); }
-    .page-nav-brand { display: none; }
-    .page-nav-item { flex: 0 0 auto; padding: 9px 10px; }
+    .page-nav { position: sticky; inset: auto; width: 100%; height: auto; max-height: min(70dvh, 600px); flex-direction: column; overflow: visible; padding: 9px 12px; border-right: 0; border-bottom: 1px solid rgba(222, 210, 183, 0.15); }
+    .page-nav-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+    .page-nav-brand { display: block; margin: 0; padding: 0 4px; border: 0; font-size: 9px; }
+    .page-nav-toggle { display: inline-flex; align-items: center; justify-content: space-between; gap: 16px; min-width: 150px; min-height: 38px; padding: 7px 11px; border: 1px solid rgba(222,210,183,.22); border-radius: 6px; color: #eee2c5; background: rgba(255,255,255,.04); font: inherit; font-size: 13px; cursor: pointer; }
+    .page-nav-toggle span { color: #d7bd83; font-size: 17px; line-height: 1; }
+    .page-nav-items { display: none; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; max-height: calc(70dvh - 64px); margin-top: 8px; padding: 6px; overflow-y: auto; border: 1px solid rgba(222,210,183,.14); border-radius: 7px; background: rgba(11,15,13,.72); }
+    .page-nav.is-open .page-nav-items { display: grid; }
+    .page-nav-item { min-width: 0; padding: 9px 10px; line-height: 1.3; overflow-wrap: anywhere; }
     .page-shell { width: 100%; margin: 0; }
     .distribution-grid { grid-template-columns: 1fr; }
     .statistic-pair { grid-template-columns: minmax(0, 1fr); }
@@ -1694,6 +1713,11 @@ body.military-army-placement #visual-map {
 .enemy-army-popup button { min-height: 32px; padding: 5px 9px; color: #e8dfc8; border: 1px solid #615b49; border-radius: 6px; background: #292a24; cursor: pointer; }
 .enemy-army-popup button:disabled { opacity: .45; cursor: not-allowed; }
 
+@media (max-width: 900px) {
+    .popup { position: fixed; inset: auto auto max(12px, env(safe-area-inset-bottom)) !important; left: 50% !important; right: auto !important; width: min(560px, calc(100vw - 24px)); max-height: min(58dvh, 560px); transform: translateX(-50%); }
+    .military-order-panel { top: auto; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); left: 12px; transform: none; width: auto; max-height: min(68dvh, 620px); grid-template-columns: minmax(0, 1fr); }
+}
+
 /* Keep the map header and side panels separate on narrow phones. */
 @media (max-width: 640px) {
     .game-calendar {
@@ -1729,6 +1753,15 @@ body.military-army-placement #visual-map {
     }
 
     .map-finance-item { gap: 4px; }
+    #controls-panel { top: max(12px, env(safe-area-inset-top)); right: max(12px, env(safe-area-inset-right)); width: min(var(--map-controls-width, 300px), calc(100vw - 24px)); max-height: min(76dvh, 650px); padding: clamp(9px, 2.5vw, 12px); }
+    #controls-panel.collapsed { width: auto; }
+    #controls-panel button:not(.toggle-btn) { min-height: 36px; padding: 8px 10px; font-size: clamp(12px, 3.2vw, 14px); }
+    .search-box { width: 100%; }
+    #search-input { flex: 1 1 auto; min-width: 0; width: auto; }
+    .military-map-tools { left: max(12px, env(safe-area-inset-left)); bottom: max(12px, env(safe-area-inset-bottom)); width: min(330px, calc(100vw - 24px)); max-height: 45dvh; overflow-y: auto; box-sizing: border-box; }
+    .map-finance-badge { max-width: min(260px, calc(100vw - 24px)); }
+    .popup { position: fixed; inset: auto 8px max(8px, env(safe-area-inset-bottom)) !important; width: auto; min-width: 0; max-width: none; max-height: min(58dvh, 560px); padding: 14px 14px 12px; border-radius: 10px; transform: none; }
+    .popup-close { top: 5px; right: 5px; width: 36px; height: 36px; font-size: 22px; }
 }
 .auth-secondary-btn { margin-top: 6px; opacity: .85; }
 @media (min-width: 641px) and (max-width: 900px) {
@@ -1825,6 +1858,6 @@ body.military-army-placement #visual-map {
   scrollbar-color: #68685e #1b1e1c;
   scrollbar-width: thin;
 }
-.page-nav::-webkit-scrollbar, .page-table-wrap::-webkit-scrollbar, .dense-table .table-wrap::-webkit-scrollbar { height: 8px; }
+  .page-nav::-webkit-scrollbar, .page-table-wrap::-webkit-scrollbar, .dense-table .table-wrap::-webkit-scrollbar { height: 8px; }
 .page-nav::-webkit-scrollbar-track, .page-table-wrap::-webkit-scrollbar-track, .dense-table .table-wrap::-webkit-scrollbar-track { background: #1b1e1c; }
 .page-nav::-webkit-scrollbar-thumb, .page-table-wrap::-webkit-scrollbar-thumb, .dense-table .table-wrap::-webkit-scrollbar-thumb { border: 2px solid #1b1e1c; border-radius: 8px; background: #68685e; }

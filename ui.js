@@ -1,6 +1,6 @@
 import { state, elements, markerImages, MARKER_TYPES, MILITARY_GRID_CELL_SIZE } from './config.js?v=military-ui-update-20261016d';
 import { renderActiveLayer, renderMarkers, renderTradeRoutes, setTradeRouteHoverAt, setMilitaryGridHoverAt, highlightProvince, renderIDs, renderMilitaryGrid, buildMilitaryGridMetadata } from './render.js?v=admin-water-icons-20261016';
-import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, saveStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterType, syncMilitaryGridCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, settleMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, fetchDynasticMarriageProposals, createDynasticMarriageProposal, decideDynasticMarriageProposal, fetchStateGovernance, electStateRuler, findLocalRulerSpouse, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminSetStateBalances, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=state-symbol-save-20261016';
+import { signUpUser, signInUser, signOutUser, requestPasswordReset, updateCurrentUserPassword, updateProvinceData, renameOwnedProvince, createMarkerData, updateMarkerData, deleteMarkerData, fetchStateProfiles, fetchAdminStateUsers, fetchAdminStateNames, adminCreateState, adminDeleteState, fetchStateMechanics, saveStateMechanics, fetchEconomySnapshot, applyEconomyTurn, saveTerritoryRebellions, saveProductionOrders, saveMarkerTransportRoute, saveStateTradeContract, saveStateTradeContractRoute, saveStateTradeTransitPolicy, uploadStateSymbol, deleteStateSymbol, saveStateSymbol, loadSupabaseData, fetchMilitaryBattles, fetchMilitaryBattleDetails, saveMilitaryBattleDecision, confirmMilitaryBattle, saveMilitaryTerrainCell, setMilitaryWaterType, syncMilitaryGridCells, fetchMilitaryGridCells, fetchMilitaryForces, fetchMilitaryCommanders, hireMilitaryCommander, assignMilitaryCommander, saveMilitaryForce, fetchMilitaryFleets, fetchMilitaryPrisoners, fetchMilitaryPorts, buildMilitaryPort, startMilitaryShipBuild, fetchMilitaryShipBuildOrders, dockMilitaryFleet, launchMilitaryFleet, moveMilitaryFleet, transferMilitaryFleetCargo, embarkMilitaryForce, disembarkMilitaryForce, trainMilitaryCommander, trainMilitaryFleetCommander, fetchMilitaryMercenaryOffers, hireMilitaryMercenary, hireMilitaryMercenaryCamp, renewMilitaryMercenaryContract, fetchMilitaryLevyOrders, placeMilitaryLevyOrder, fetchMilitaryRetinueOrders, placeMilitaryRetinueOrder, mobilizeMilitaryGarrison, extendMilitaryMilitiaService, moveMilitaryForce, settleMilitaryForce, transferMilitaryTroops, splitMilitaryForceWithCommander, fetchMilitaryConditionalOrders, setMilitaryConditionalOrderZone, cancelMilitaryConditionalOrder, startMilitaryBattle, startMilitaryNavalBattle, fetchMilitaryStructures, adminBuildMilitaryStructure, destroyMilitaryStructure, fetchMilitarySieges, startMilitarySiege, setMilitarySiegeOrder, fetchMilitaryRaids, startMilitaryRaid, fetchMilitaryColonizationMissions, fetchMilitaryColonizationMap, startMilitaryColonization, startMilitarySeaColonization, cancelMilitaryColonization, setMilitaryEpidemicEvent, fetchMilitaryEpidemicEvents, fetchMilitarySpyRecords, hireMilitarySpy, assignMilitarySpyNetwork, setMilitarySpyCounterintelligence, queueMilitarySpyOperation, dismissMilitarySpy, fetchDiplomacyData, createDiplomacyProposal, decideDiplomacyProposal, fetchDynasticMarriageProposals, createDynasticMarriageProposal, decideDynasticMarriageProposal, fetchStateGovernance, electStateRuler, findLocalRulerSpouse, setStateRulerHeir, proposeStateRuler, resolveStateRulerProposal, submitStateModifierProposal, adminCreateStateModifier, adminDecideStateModifier, saveStateOneOffOperations, adminSetStateBalances, adminCreateMilitaryFleet, adminBuildMilitaryPort, attemptReligiousMission, fetchReligiousMissionEvents, recruitPermanentGarrison } from './api.js?v=responsive-layout-20261017b';
 import { calculateArmyMobility, movementStepCost, findMilitaryPath, findNavalPath, navalShipCanUseWater, LAND_UNIT_PROFILES, LAND_TACTICS, simulateLandBattle, simulateNavalBattle, NAVAL_SHIP_PROFILES, calculateLevyCapacity, calculateLevyComposition, calculateLevyCosts, calculateSeasonalUpkeep, calculateArmySupplyPoints, calculateRetinueLimit, simulateMilitaryMaintenance } from './militaryEngine.js?v=water-types-bridge-only-20261016';
 import { GOODS, RESOURCES, PRODUCTION_RECIPES, annualPopulationGrowthRate, processTurnSimulation } from './economyEngine.js?v=production-orders-prestige-base-20261016';
 import { MODIFIER_EFFECTS, MODIFIER_SCOPE_VALUES, MODIFIER_SCOPES, getOwnerModifiers, modifierLabel, modifierItemOptions, modifierValue } from './modifierSystem.js';
@@ -930,8 +930,8 @@ function showPageView(title, content, options = {}) {
     const navItems = getNavigationItems();
     elements.pageView.innerHTML = `
         <nav class="page-nav" aria-label="Разделы государства">
-            <div class="page-nav-brand">SIXIÈME TERRE</div>
-            ${navItems.map(item => `<button class="page-nav-item ${item.id === options.navId ? 'active' : ''}" data-page-nav="${item.id}" ${item.externalUrl ? `data-url="${item.externalUrl}"` : ''}>${escapeHtml(item.label)}</button>`).join('')}
+            <div class="page-nav-heading"><div class="page-nav-brand">SIXIÈME TERRE</div><button class="page-nav-toggle" type="button" aria-expanded="false" aria-controls="page-nav-items">Разделы меню <span aria-hidden="true">＋</span></button></div>
+            <div class="page-nav-items" id="page-nav-items">${navItems.map(item => `<button class="page-nav-item ${item.id === options.navId ? 'active' : ''}" data-page-nav="${item.id}" ${item.externalUrl ? `data-url="${item.externalUrl}"` : ''}>${escapeHtml(item.label)}</button>`).join('')}</div>
         </nav>
         <div class="page-shell">
             <header class="page-header">
@@ -953,6 +953,13 @@ function showPageView(title, content, options = {}) {
     syncMilitaryMovePanel();
     document.getElementById('page-map-btn')?.addEventListener('click', closePageView);
     document.getElementById('page-back-btn')?.addEventListener('click', options.onBack);
+    elements.pageView.querySelector('.page-nav-toggle')?.addEventListener('click', event => {
+        const button = event.currentTarget;
+        const expanded = button.getAttribute('aria-expanded') !== 'true';
+        button.setAttribute('aria-expanded', String(expanded));
+        button.querySelector('span').textContent = expanded ? '−' : '＋';
+        button.closest('.page-nav')?.classList.toggle('is-open', expanded);
+    });
     elements.pageView.querySelectorAll('[data-page-nav]').forEach(button => button.addEventListener('click', () => activateNavigationItem(button.dataset.pageNav, button.dataset.url)));
 }
 
@@ -1375,9 +1382,45 @@ async function renderOwnerProvinces(owner) {
         <td>${escapeHtml(province.main_religion || '—')}</td><td>${formatTurns(assimilationTurns(province, 'culture', province.main_culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(province, 'religion', province.main_religion, state.stateMechanics[owner] || {}))}</td><td>${escapeHtml(province.resource || '—')}</td><td>${(() => { const report = provinceReports[province.id] || {}; const main = `${formatNumber(Number(report.production) || 0, 2)} ${escapeHtml(report.resource || province.resource || '')}`; return report.food_resource && report.food_resource !== (report.resource || province.resource) ? `${main}<br>${formatNumber(Number(report.food_production) || 0, 2)} ${escapeHtml(report.food_resource)}` : main; })()}</td><td>${formatNumber(Number(provinceReports[province.id]?.tax_income) || 0, 2)} z</td></tr>
     `).join('');
     const colonyRows = activeColonies.map(mission => `<tr><td>${escapeHtml(state.dbProvinces[Number(mission.target_province_id)]?.province_name || `Провинция ${mission.target_province_id}`)}</td><td>${mission.mission_type === 'sea' ? 'Морская' : 'Сухопутная'}</td><td>Ход ${formatNumber(mission.started_turn)} · успех ${formatNumber(mission.success_chance)}%</td></tr>`).join('');
-    const content = `${provinces.length ? `<section class="page-panel dense-table province-list-panel"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th><th>Производство/ход</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</tbody></table></div>${canRenameProvinces ? '<div class="province-rename-actions"><button class="admin-btn" type="button" data-save-province-names>Сохранить названия провинций</button></div>' : ''}</section>` : '<div class="page-empty">За государством пока нет провинций под его законом или оккупацией.</div>'}<section class="page-panel"><header class="page-panel-heading"><div><h2>Активная колонизация</h2><p>Незавершённые миссии не считаются провинциями под контролем государства.</p></div></header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Цель</th><th>Миссия</th><th>Состояние</th></tr></thead><tbody>${colonyRows || '<tr><td colspan="3">Активных колонизационных миссий нет.</td></tr>'}</tbody></table></div></section>`;
+    const content = `${provinces.length ? `<section class="page-panel dense-table province-list-panel"><div class="page-table-wrap"><table class="page-table" data-sortable-table="provinces"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th><th>Производство/ход</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</tbody></table></div>${canRenameProvinces ? '<div class="province-rename-actions"><button class="admin-btn" type="button" data-save-province-names>Сохранить названия провинций</button></div>' : ''}</section>` : '<div class="page-empty">За государством пока нет провинций под его законом или оккупацией.</div>'}<section class="page-panel"><header class="page-panel-heading"><div><h2>Активная колонизация</h2><p>Незавершённые миссии не считаются провинциями под контролем государства.</p></div></header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Цель</th><th>Миссия</th><th>Состояние</th></tr></thead><tbody>${colonyRows || '<tr><td colspan="3">Активных колонизационных миссий нет.</td></tr>'}</tbody></table></div></section>`;
     activePageOwner = owner;
     showPageView('Провинции', content, { subtitle: owner, navId: 'nav-provinces' });
+    const provinceTable = elements.pageView.querySelector('[data-sortable-table="provinces"]');
+    provinceTable?.querySelectorAll('thead th').forEach((header, columnIndex) => {
+        const label = header.textContent.trim();
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'table-sort-button';
+        button.dataset.sortColumn = String(columnIndex);
+        button.innerHTML = `<span>${escapeHtml(label)}</span><span class="table-sort-indicator" aria-hidden="true">↕</span>`;
+        button.setAttribute('aria-label', `Сортировать по столбцу «${label}»`);
+        header.replaceChildren(button);
+        button.addEventListener('click', () => {
+            const ascending = header.dataset.sortDirection !== 'ascending';
+            provinceTable.querySelectorAll('thead th').forEach(item => { item.removeAttribute('aria-sort'); delete item.dataset.sortDirection; const indicator = item.querySelector('.table-sort-indicator'); if (indicator) indicator.textContent = '↕'; });
+            header.dataset.sortDirection = ascending ? 'ascending' : 'descending';
+            header.setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
+            button.setAttribute('aria-label', `Сортировать по столбцу «${label}» ${ascending ? 'по убыванию' : 'по возрастанию'}`);
+            button.querySelector('.table-sort-indicator').textContent = ascending ? '↑' : '↓';
+            const body = provinceTable.tBodies[0];
+            const rowsToSort = [...body.rows];
+            const getValue = row => {
+                const cell = row.cells[columnIndex];
+                const input = cell?.querySelector('input');
+                return (input?.value || cell?.textContent || '').trim().replace(/\s+/g, ' ');
+            };
+            rowsToSort.sort((rowA, rowB) => {
+                const a = getValue(rowA), b = getValue(rowB);
+                const numberA = Number(a.replace(/[^\d,.-]/g, '').replace(',', '.'));
+                const numberB = Number(b.replace(/[^\d,.-]/g, '').replace(',', '.'));
+                const numericA = /\d/.test(a) && Number.isFinite(numberA);
+                const numericB = /\d/.test(b) && Number.isFinite(numberB);
+                const comparison = numericA && numericB ? numberA - numberB : a.localeCompare(b, 'ru', { numeric: true, sensitivity: 'base' });
+                return ascending ? comparison : -comparison;
+            });
+            body.append(...rowsToSort);
+        });
+    });
     elements.pageView.querySelectorAll('[data-province-id]').forEach(button => button.addEventListener('click', event => {
         event.stopPropagation();
         closePageView();
@@ -2687,7 +2730,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         .map(row => `<tr><td>${escapeHtml(row.force_name)}</td><td>${escapeHtml(row.original_owner)}</td><td>${escapeHtml(row.captor_owner)}</td><td>${row.commander_name ? `${escapeHtml(row.commander_name)}${row.commander_age ? ` · ${formatNumber(row.commander_age)} лет` : ''}` : '—'}</td><td>${(row.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ') || '—'}</td><td>${row.status === 'held' ? 'Удерживаются в плену' : row.status === 'released' ? 'Освобождены' : row.status === 'ransomed' ? 'Выкуплены' : 'Бежали'}</td></tr>`).join('');
     const embarkShipOptions = militaryFleets.filter(fleet => fleet.owner === playerOwner && fleet.status === 'active' && !fleet.in_pending_battle)
         .flatMap(fleet => (fleet.ships || []).map((ship, index) => `<option value="${fleet.id}:${index + 1}">${escapeHtml(fleet.name)} · ${escapeHtml(ship.type)} #${index + 1}</option>`)).join('');
-    const renderForceRow = force => {
+    const renderForceRow = (force, includePosition = true) => {
         const composition = (force.unit_groups || []).map(group => `${escapeHtml(group.type)} ${formatNumber(group.count)}`).join(', ') || 'нет отрядов';
         const cargo = Object.entries(force.cargo || {}).filter(([, quantity]) => Number(quantity) > 0).map(([name, quantity]) => `${escapeHtml(name)} × ${formatNumber(quantity, 2)}`).join(', ');
         const position = force.status === 'embarked' ? 'На борту флота' : force.force_kind === 'land_army' ? `Провинция ${formatNumber(force.province_id)} · клетка ${Number(force.cell_x) + 1}:${Number(force.cell_y) + 1}` : force.marker_id ? `Поселение #${formatNumber(force.marker_id)}` : `Гарнизон провинции ${formatNumber(force.province_id)}`;
@@ -2705,7 +2748,7 @@ async function renderMilitaryPlanner(spyOnly = false) {
         const canRenewMercenary = !isAdmin && force.owner === playerOwner && force.is_mercenary && force.status === 'active' && Number(force.service_end_turn) > (Number(state.gameCalendar?.turn) || 0) && Number(force.service_end_turn) <= (Number(state.gameCalendar?.turn) || 0) + 1;
         const renewMercenaryAction = canRenewMercenary ? `<button type="button" class="compact-add-btn renew-mercenary-contract" data-force-id="${escapeHtml(force.id)}">Продлить на сезон · ${formatNumber(forcePeople * 2)} z</button>` : '';
         const terms = [force.is_retinue ? 'Постоянная дружина' : '', force.is_militia && force.service_end_turn ? `Ополчение · до хода ${formatNumber(force.service_end_turn)}` : '', force.is_mercenary && force.service_end_turn ? `Контракт · до хода ${formatNumber(force.service_end_turn)}` : ''].filter(Boolean).map(text => `<small class="military-service-term">${escapeHtml(text)}</small>`).join('');
-        return `<tr><td>${escapeHtml(force.name)}${terms}</td><td>${escapeHtml(force.owner)}</td><td>${position}</td><td>${force.commander_name ? `${escapeHtml(force.commander_name)}, ${formatNumber(force.commander_age)} лет` : '—'}</td><td>${composition}${cargo ? `<small class="military-supply-status">Добыча: ${cargo}</small>` : ''}</td><td>${formatNumber(force.morale)}%</td><td>${formatNumber(force.action_points)} ОД</td><td>${campHireAction}${mobilizeAction}${extendAction}${renewMercenaryAction}${embarkAction}</td></tr>`;
+        return `<tr><td>${escapeHtml(force.name)}${terms}</td><td>${escapeHtml(force.owner)}</td>${includePosition ? `<td>${position}</td>` : ''}<td>${force.commander_name ? `${escapeHtml(force.commander_name)}, ${formatNumber(force.commander_age)} лет` : '—'}</td><td>${composition}${cargo ? `<small class="military-supply-status">Добыча: ${cargo}</small>` : ''}</td><td>${formatNumber(force.morale)}%</td><td>${formatNumber(force.action_points)} ОД</td><td>${campHireAction}${mobilizeAction}${extendAction}${renewMercenaryAction}${embarkAction}</td></tr>`;
     };
     const liveForces = state.militaryForces.filter(force => !['disbanded','dead'].includes(force.status));
     const forceTableDefs = [
@@ -2715,7 +2758,11 @@ async function renderMilitaryPlanner(spyOnly = false) {
         ['Войска в поселении', liveForces.filter(force => force.force_kind === 'garrison' && !force.is_permanent_garrison)],
         ['Гарнизон', liveForces.filter(force => force.is_permanent_garrison)]
     ];
-    const forceTables = forceTableDefs.map(([title, forces]) => `<section class="military-force-subtable"><h3>${title}</h3><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Название</th><th>Государство</th><th>Положение</th><th>Воевода</th><th>Состав</th><th>Мораль</th><th>ОД</th><th>Действия</th></tr></thead><tbody>${forces.map(renderForceRow).join('') || `<tr><td colspan="8">${title === 'Личная дружина' ? 'Дружины пока нет.' : 'Записей нет.'}</td></tr>`}</tbody></table></div></section>`).join('');
+    const forceTables = forceTableDefs.map(([title, forces]) => {
+        const hasPosition = title !== 'Гарнизон';
+        const headers = ['Название', 'Государство', ...(hasPosition ? ['Положение'] : []), 'Воевода', 'Состав', 'Мораль', 'ОД', 'Действия'];
+        return `<section class="military-force-subtable"><h3>${title}</h3><div class="page-table-wrap"><table class="page-table"><thead><tr>${headers.map(label => `<th>${label}</th>`).join('')}</tr></thead><tbody>${forces.map(force => renderForceRow(force, hasPosition)).join('') || `<tr><td colspan="${headers.length}">${title === 'Личная дружина' ? 'Дружины пока нет.' : 'Записей нет.'}</td></tr>`}</tbody></table></div></section>`;
+    }).join('');
     const unitNames = Object.keys(LAND_UNIT_PROFILES);
     const garrisonRecruitRows = !isAdmin ? liveForces.filter(force => force.is_permanent_garrison && force.owner === playerOwner && force.status === 'active').map(force => {
         const marker = state.dbMarkers.find(item => Number(item.id) === Number(force.marker_id));
