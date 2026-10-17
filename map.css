@@ -1897,7 +1897,7 @@ body.military-army-placement #visual-map {
   .top-nav-row { height: auto; padding: 0; gap: 7px; }
   .top-nav-row .burger-btn { width: 36px; height: 36px; font-size: 18px; }
   .top-nav-row #open-login-btn { min-height: 36px; max-width: min(160px, 44vw); padding: 6px 10px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #mobile-map-actions { position: fixed; z-index: 1101; top: max(10px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); left: auto; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 5px; width: min(184px, calc(100vw - 32px)); min-width: 0; }
+  #mobile-map-actions { position: fixed; z-index: 1101; top: max(10px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); left: auto; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 5px; width: min(160px, calc(100vw - 32px)); min-width: 0; }
   #mobile-map-actions > .game-calendar,
   #mobile-map-actions > #map-finance-badge,
   #mobile-map-actions > #legend-panel,
