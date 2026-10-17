@@ -156,6 +156,10 @@ body.military-army-placement #visual-map {
     pointer-events: none;
 }
 
+@media (min-width: 641px) {
+    #left-sidebar { z-index: 1102; }
+}
+
 #open-login-btn {
     pointer-events: auto;
     padding: 8px 16px;
