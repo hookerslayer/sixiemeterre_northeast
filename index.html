@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Sixième Terre</title>
-    <link rel="stylesheet" href="map.css?v=desktop-menu-layer-20261017a">
+    <link rel="stylesheet" href="map.css?v=map-panel-order-20261017a">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </head>
@@ -76,7 +76,7 @@
                 <span class="layer-title">Слои карты</span>
                 <button id="toggle-trade-routes-btn">Торговые маршруты</button>
                 <button id="toggle-military-grid-btn" aria-pressed="false">Военная сетка</button>
-                <button id="toggle-water-type-icons-btn" aria-pressed="false" title="Показывать или скрывать значки рек, озёр и морей на военной сетке">Иконки водоёмов: выкл.</button>
+                <button id="toggle-water-type-icons-btn" aria-pressed="false" title="Показывать или скрывать значки рек, озёр и морей на военной сетке" hidden>Иконки водоёмов</button>
                 <button class="layer-btn active" data-layer="political">Государства</button>
                 <button class="layer-btn" data-layer="region">Регионы</button>
                 <button class="layer-btn" data-layer="culture">Культуры</button>
@@ -98,7 +98,7 @@
 </div>
 
     <aside id="military-map-tools" class="military-map-tools" hidden aria-label="Инструменты военной карты">
-        <details open>
+        <details>
             <summary>Строительство объектов</summary>
             <label>Объект<select id="map-structure-type"><option value="camp">Полевой лагерь</option><option value="watchtower">Сторожевая башня</option><option value="palisade">Засека</option><option value="bridge">Мост</option><option value="ferry">Волок</option><option value="river_port">Речной порт</option><option value="port">Морской порт</option></select></label>
             <label id="map-structure-settlement-wrap" hidden>Поселение<select id="map-structure-settlement"></select></label>

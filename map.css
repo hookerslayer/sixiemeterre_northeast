@@ -26,6 +26,8 @@ body, html {
     position: absolute;
     top: 0;
     left: 0;
+    pointer-events: auto;
+    touch-action: none;
     transform-origin: 0 0;
 }
 
@@ -209,7 +211,7 @@ body.military-army-placement #visual-map {
 }
 
 .military-map-tools {
-    position: fixed; z-index: 1200; left: 18px; bottom: 18px; width: min(330px, calc(100vw - 36px));
+    position: fixed; z-index: 1400; left: 18px; bottom: 18px; width: min(330px, calc(100vw - 36px));
     padding: 12px 14px; color: #eee8da; background: rgba(18,22,20,.96); border: 1px solid rgba(222,210,183,.3); border-radius: 9px;
     box-shadow: 0 8px 28px rgba(0,0,0,.38); font-size: 13px; pointer-events: auto; isolation: isolate;
 }
@@ -1562,9 +1564,9 @@ body.military-army-placement #visual-map {
   .modifier-panel .page-table th,
   .modifier-panel .page-table td { min-width: 0; white-space: normal; overflow-wrap: anywhere; vertical-align: top; }
   .province-list-panel .page-table th:nth-child(1) { width: 4%; }
-  .province-list-panel .page-table th:nth-child(2) { width: 15%; }
-  .province-list-panel .page-table th:nth-child(3) { width: 9%; }
-  .province-list-panel .page-table th:nth-child(4) { width: 10%; }
+  .province-list-panel .page-table th:nth-child(2) { width: 14%; }
+  .province-list-panel .page-table th:nth-child(3) { width: 8%; }
+  .province-list-panel .page-table th:nth-child(4) { width: 9%; }
   .province-list-panel .page-table th:nth-child(5) { width: 5%; }
   .province-list-panel .page-table th:nth-child(6) { width: 6%; }
   .province-list-panel .page-table th:nth-child(7) { width: 4%; }
@@ -1573,21 +1575,23 @@ body.military-army-placement #visual-map {
   .province-list-panel .page-table th:nth-child(10),
   .province-list-panel .page-table th:nth-child(11) { width: 6%; }
   .province-list-panel .page-table th:nth-child(12) { width: 6%; }
-  .province-list-panel .page-table th:nth-child(13) { width: 12%; }
-  .province-list-panel .page-table th:nth-child(14) { width: 5%; }
+  .province-list-panel .page-table th:nth-child(13) { width: 10%; }
+  .province-list-panel .page-table th:nth-child(14),
+  .province-list-panel .page-table th:nth-child(15) { width: 5%; }
   .province-list-panel .province-name-edit { box-sizing: border-box; width: 100%; min-width: 0; padding: 5px 4px; font-size: 11px; }
-  .settlement-list-panel .page-table th:nth-child(1) { width: 11%; }
-  .settlement-list-panel .page-table th:nth-child(2) { width: 8%; }
+  .settlement-list-panel .page-table th:nth-child(1) { width: 10%; }
+  .settlement-list-panel .page-table th:nth-child(2) { width: 7%; }
   .settlement-list-panel .page-table th:nth-child(3) { width: 5%; }
-  .settlement-list-panel .page-table th:nth-child(4) { width: 12%; }
+  .settlement-list-panel .page-table th:nth-child(4) { width: 11%; }
   .settlement-list-panel .page-table th:nth-child(5) { width: 6%; }
   .settlement-list-panel .page-table th:nth-child(6) { width: 7%; }
   .settlement-list-panel .page-table th:nth-child(7) { width: 6%; }
   .settlement-list-panel .page-table th:nth-child(8),
-  .settlement-list-panel .page-table th:nth-child(9) { width: 8%; }
+  .settlement-list-panel .page-table th:nth-child(9),
   .settlement-list-panel .page-table th:nth-child(10),
-  .settlement-list-panel .page-table th:nth-child(11) { width: 8%; }
-  .settlement-list-panel .page-table th:nth-child(12) { width: 13%; }
+  .settlement-list-panel .page-table th:nth-child(11),
+  .settlement-list-panel .page-table th:nth-child(12),
+  .settlement-list-panel .page-table th:nth-child(13) { width: 8%; }
   .military-force-subtable .page-table th:nth-child(1) { width: 12%; }
   .military-force-subtable .page-table th:nth-child(2) { width: 10%; }
   .military-force-subtable .page-table th:nth-child(3) { width: 14%; }

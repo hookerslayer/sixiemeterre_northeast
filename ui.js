@@ -432,7 +432,7 @@ function religiousMissionButton(targetType, targetId, targetOwner, targetReligio
         if (!activeTrade) return '';
     }
     const attempts = (state.religiousMissionEvents || []).filter(row => row.owner === playerOwner && row.target_type === targetType && Number(row.target_id) === Number(targetId)).length;
-    const chance = Math.min(75, 5 + attempts * 5);
+    const chance = Math.min(75, (targetOwner ? 5 : 15) + attempts * 5);
     return `<section class="map-operation-menu"><strong>Миссионерство</strong><p>Попыток: ${attempts} · шанс обращения: ${chance}% · стоимость: 5 ОП.</p><button type="button" class="admin-btn" data-religious-mission data-target-type="${targetType}" data-target-id="${Number(targetId)}">Обратить</button></section>`;
 }
 
@@ -1378,11 +1378,11 @@ async function renderOwnerProvinces(owner) {
     const rows = provinces.map(province => `
         <tr><td><button class="table-link" data-province-id="${Number(province.id)}">#${formatNumber(Number(province.id))}</button></td>
         <td>${canRenameProvinces ? `<input class="province-name-edit" data-province-name="${Number(province.id)}" maxlength="80" value="${escapeHtml(province.province_name || '')}" aria-label="Название провинции" required>` : escapeHtml(province.province_name || '—')}</td><td>${escapeHtml(province.region || '—')}</td><td>${province.occupied_by ? `Оккупирована: ${escapeHtml(province.occupied_by)}` : 'Под контролем владельца'}</td>
-        <td>${formatNumber(Number(province.yards) || 0)}</td><td>+${formatNumber(Math.round((Number(province.yards) || 0) * growthRate))}</td><td>${formatNumber(Number(province.development ?? 20))}</td><td>${escapeHtml(province.main_culture || '—')}</td>
+        <td>${territoryInstability('province', province.id)}</td><td>${formatNumber(Number(province.yards) || 0)}</td><td>+${formatNumber(Math.round((Number(province.yards) || 0) * growthRate))}</td><td>${formatNumber(Number(province.development ?? 20))}</td><td>${escapeHtml(province.main_culture || '—')}</td>
         <td>${escapeHtml(province.main_religion || '—')}</td><td>${formatTurns(assimilationTurns(province, 'culture', province.main_culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(province, 'religion', province.main_religion, state.stateMechanics[owner] || {}))}</td><td>${escapeHtml(province.resource || '—')}</td><td>${(() => { const report = provinceReports[province.id] || {}; const main = `${formatNumber(Number(report.production) || 0, 2)} ${escapeHtml(report.resource || province.resource || '')}`; return report.food_resource && report.food_resource !== (report.resource || province.resource) ? `${main}<br>${formatNumber(Number(report.food_production) || 0, 2)} ${escapeHtml(report.food_resource)}` : main; })()}</td><td>${formatNumber(Number(provinceReports[province.id]?.tax_income) || 0, 2)} z</td></tr>
     `).join('');
     const colonyRows = activeColonies.map(mission => `<tr><td>${escapeHtml(state.dbProvinces[Number(mission.target_province_id)]?.province_name || `Провинция ${mission.target_province_id}`)}</td><td>${mission.mission_type === 'sea' ? 'Морская' : 'Сухопутная'}</td><td>Ход ${formatNumber(mission.started_turn)} · успех ${formatNumber(mission.success_chance)}%</td></tr>`).join('');
-    const content = `${provinces.length ? `<section class="page-panel dense-table province-list-panel"><div class="page-table-wrap"><table class="page-table" data-sortable-table="provinces"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th><th>Производство/ход</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</tbody></table></div>${canRenameProvinces ? '<div class="province-rename-actions"><button class="admin-btn" type="button" data-save-province-names>Сохранить названия провинций</button></div>' : ''}</section>` : '<div class="page-empty">За государством пока нет провинций под его законом или оккупацией.</div>'}<section class="page-panel"><header class="page-panel-heading"><div><h2>Активная колонизация</h2><p>Незавершённые миссии не считаются провинциями под контролем государства.</p></div></header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Цель</th><th>Миссия</th><th>Состояние</th></tr></thead><tbody>${colonyRows || '<tr><td colspan="3">Активных колонизационных миссий нет.</td></tr>'}</tbody></table></div></section>`;
+    const content = `${provinces.length ? `<section class="page-panel dense-table province-list-panel"><div class="page-table-wrap"><table class="page-table" data-sortable-table="provinces"><thead><tr><th>ID</th><th>Провинция</th><th>Регион</th><th>Контроль</th><th>Нестабильность</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Ресурс</th><th>Производство/ход</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</tbody></table></div>${canRenameProvinces ? '<div class="province-rename-actions"><button class="admin-btn" type="button" data-save-province-names>Сохранить названия провинций</button></div>' : ''}</section>` : '<div class="page-empty">За государством пока нет провинций под его законом или оккупацией.</div>'}<section class="page-panel"><header class="page-panel-heading"><div><h2>Активная колонизация</h2><p>Незавершённые миссии не считаются провинциями под контролем государства.</p></div></header><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Цель</th><th>Миссия</th><th>Состояние</th></tr></thead><tbody>${colonyRows || '<tr><td colspan="3">Активных колонизационных миссий нет.</td></tr>'}</tbody></table></div></section>`;
     activePageOwner = owner;
     showPageView('Провинции', content, { subtitle: owner, navId: 'nav-provinces' });
     const provinceTable = elements.pageView.querySelector('[data-sortable-table="provinces"]');
@@ -1459,10 +1459,10 @@ async function renderOwnerSettlements(owner) {
     const rows = settlements.map(marker => `
         <tr><td><button class="table-link" data-marker-id="${Number(marker.id)}">${escapeHtml(marker.name || 'Поселение')}</button></td>
         <td>${escapeHtml(markerTypeLabels[marker.type] || marker.type || '—')}</td><td>#${formatNumber(Number(marker.province_id) || 0)}</td><td>${marker.military_controlled_by ? `Военный контроль: ${escapeHtml(marker.military_controlled_by)}` : 'Под контролем владельца'}</td>
-        <td>${formatNumber(Number(marker.yards) || 0)}</td><td>+${formatNumber(Math.round((Number(marker.yards) || 0) * growthRate))}</td><td>${formatNumber(Number(marker.development ?? markerTypeDevelopment[marker.type] ?? 0))}</td><td>${escapeHtml(marker.culture || '—')}</td>
+        <td>${territoryInstability('marker', marker.id)}</td><td>${formatNumber(Number(marker.yards) || 0)}</td><td>+${formatNumber(Math.round((Number(marker.yards) || 0) * growthRate))}</td><td>${formatNumber(Number(marker.development ?? markerTypeDevelopment[marker.type] ?? 0))}</td><td>${escapeHtml(marker.culture || '—')}</td>
         <td>${escapeHtml(marker.religion || '—')}</td><td>${formatTurns(assimilationTurns(marker, 'culture', marker.culture, state.stateMechanics[owner] || {}))}</td><td>${formatTurns(assimilationTurns(marker, 'religion', marker.religion, state.stateMechanics[owner] || {}))}</td><td>${formatNumber(Number(markerReports[marker.id]?.tax_income) || 0, 2)} z</td></tr>
     `).join('');
-    const content = settlements.length ? `<section class="page-panel dense-table settlement-list-panel"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Контроль</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
+    const content = settlements.length ? `<section class="page-panel dense-table settlement-list-panel"><div class="page-table-wrap"><table class="page-table"><thead><tr><th>Поселение</th><th>Тип</th><th>Провинция</th><th>Контроль</th><th>Нестабильность</th><th>Дворы</th><th>Ожидаемый прирост/год</th><th>Развитие</th><th>Культура</th><th>Религия</th><th>Смена культуры</th><th>Смена религии</th><th>Налоги/ход</th></tr></thead><tbody>${rows}</table></div></section>` : '<div class="page-empty">В провинциях государства пока нет поселений.</div>';
     activePageOwner = owner;
     showPageView('Города и поселения', content, { subtitle: owner, navId: 'nav-cities' });
     elements.pageView.querySelectorAll('[data-marker-id]').forEach(button => button.addEventListener('click', event => {
@@ -1478,6 +1478,14 @@ async function renderOwnerSettlements(owner) {
 }
 
 function formatTurns(turns) { return turns === null ? '—' : `${formatNumber(turns)} ходов`; }
+
+function territoryInstability(type, id) {
+    const row = (state.economySnapshot?.rebellions || []).find(item => item.territory_type === type && Number(item.territory_id) === Number(id));
+    const value = Number(row?.instability) || 0;
+    const currentTurn = Number(state.economySnapshot?.calendar?.turn ?? state.gameCalendar?.turn);
+    const activeRevolt = row?.rebellion_turn != null && Number(row.rebellion_turn) === currentTurn;
+    return `${formatNumber(value, value % 1 ? 1 : 0)}%${activeRevolt ? ' · Бунт' : ''}`;
+}
 
 function simulateEconomySnapshot(snapshot) {
     const provinces = JSON.parse(JSON.stringify(snapshot.provinces));
@@ -3757,7 +3765,7 @@ function getNavigationItems() {
     const isAdmin = state.userProfile?.role === 'admin';
     const isAuth = !!state.currentUser;
     const hasOwner = !!state.userProfile?.owner;
-    if (isAdmin) return [{ id: 'nav-map', label: 'Карта' }, { id: 'nav-stats', label: 'Статистика' }, { id: 'nav-modifiers', label: 'Модификаторы' }, ...(activePageOwner ? [{ id: 'nav-governance', label: 'Власть и династия' }, { id: 'nav-economy', label: 'Экономика' }, { id: 'nav-trade', label: 'Торговля' }, { id: 'nav-production', label: 'Производство' }, { id: 'nav-military', label: 'Военное дело' }, { id: 'nav-spy', label: 'Шпионаж и Саботаж' }, { id: 'nav-diplomacy', label: 'Дипломатия' }] : []), { id: 'nav-rules', label: 'Правила и механики' }];
+    if (isAdmin) return [{ id: 'nav-map', label: 'Карта' }, { id: 'nav-stats', label: 'Статистика' }, { id: 'nav-modifiers', label: 'Модификаторы' }, ...(activePageOwner ? [{ id: 'nav-governance', label: 'Власть и династия' }, { id: 'nav-economy', label: 'Экономика' }, { id: 'nav-trade', label: 'Торговля' }, { id: 'nav-production', label: 'Производство' }, { id: 'nav-cities', label: 'Поселения' }, { id: 'nav-provinces', label: 'Провинции' }, { id: 'nav-military', label: 'Военное дело' }, { id: 'nav-spy', label: 'Шпионаж и Саботаж' }, { id: 'nav-diplomacy', label: 'Дипломатия' }] : []), { id: 'nav-rules', label: 'Правила и механики' }];
     if (!isAuth || !hasOwner) return [{ id: 'nav-rules', label: 'Правила и механики' }, { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }];
     return [{ id: 'nav-map', label: 'Карта' }, { id: 'nav-stats', label: 'Статистика' }, { id: 'nav-governance', label: 'Власть и династия' }, { id: 'nav-economy', label: 'Экономика' }, { id: 'nav-trade', label: 'Торговля' }, { id: 'nav-production', label: 'Производство' }, { id: 'nav-cities', label: 'Города' }, { id: 'nav-provinces', label: 'Провинции' }, { id: 'nav-military', label: 'Военное дело' }, { id: 'nav-spy', label: 'Шпионаж и Саботаж' }, { id: 'nav-diplomacy', label: 'Дипломатия' }, { id: 'nav-modifiers', label: 'Модификаторы' }, { id: 'nav-rules', label: 'Правила и механики' }, { id: 'nav-vk', label: 'Сообщество VK', externalUrl: 'https://vk.ru/sixieme_terre' }];
 }
@@ -3826,6 +3834,7 @@ export function updateAuthUI() {
     }
 
     renderMapFinanceBadge();
+    if (elements.waterTypeIconsToggleBtn) elements.waterTypeIconsToggleBtn.hidden = !state.showMilitaryGrid;
     if (elements.militaryMapTools) elements.militaryMapTools.hidden = !state.showMilitaryGrid || !['player','admin'].includes(state.userProfile?.role);
     refreshMilitaryStructureOptions();
     renderNavMenu();
@@ -4236,6 +4245,7 @@ export function initEventListeners() {
         elements.militaryGridToggleBtn.classList.toggle('active', state.showMilitaryGrid);
         elements.militaryGridToggleBtn.setAttribute('aria-pressed', String(state.showMilitaryGrid));
         elements.militaryGridToggleBtn.textContent = 'Военная сетка';
+        if (elements.waterTypeIconsToggleBtn) elements.waterTypeIconsToggleBtn.hidden = !state.showMilitaryGrid;
         if (elements.militaryMapTools) elements.militaryMapTools.hidden = !state.showMilitaryGrid || !['player','admin'].includes(state.userProfile?.role);
         if (!state.showMilitaryGrid) {
             state.militarySelectedForceId = null; state.militaryMoveMode = false; state.militaryReachableCells = new Set(); state.militaryMoveDraft = null;
@@ -4248,7 +4258,7 @@ export function initEventListeners() {
         state.showWaterTypeIcons = !state.showWaterTypeIcons;
         elements.waterTypeIconsToggleBtn.classList.toggle('active', state.showWaterTypeIcons);
         elements.waterTypeIconsToggleBtn.setAttribute('aria-pressed', String(state.showWaterTypeIcons));
-        elements.waterTypeIconsToggleBtn.textContent = `Иконки водоёмов: ${state.showWaterTypeIcons ? 'вкл.' : 'выкл.'}`;
+        elements.waterTypeIconsToggleBtn.textContent = 'Иконки водоёмов';
         renderMilitaryGrid();
     });
     elements.militaryGridSyncBtn?.addEventListener('click', async () => {
@@ -4368,6 +4378,121 @@ export function initEventListeners() {
         }
         renderMarkers();
     });
+
+    let activeMapTouch = null;
+    let suppressTouchClickUntil = 0;
+    const touchPoint = touch => {
+        const rect = elements.viewport.getBoundingClientRect();
+        return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+    };
+    const touchDistance = (a, b) => Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+    elements.viewport?.addEventListener('touchstart', event => {
+        if (elements.pageView?.classList.contains('active') || event.target.closest('#popup, #controls-panel, #left-sidebar, #login-modal, #register-modal, #trade-route-editor, #military-order-panel')) return;
+        if (event.touches.length >= 2) {
+            const a = touchPoint(event.touches[0]);
+            const b = touchPoint(event.touches[1]);
+            const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+            activeMapTouch = {
+                mode: 'pinch',
+                distance: touchDistance(event.touches[0], event.touches[1]),
+                scale: state.scale,
+                center,
+                imageX: (center.x - state.tx) / state.scale,
+                imageY: (center.y - state.ty) / state.scale
+            };
+            state.isDragging = false;
+            return;
+        }
+        if (event.touches.length === 1) {
+            const point = touchPoint(event.touches[0]);
+            activeMapTouch = {
+                mode: 'pan',
+                startX: event.touches[0].clientX - state.tx,
+                startY: event.touches[0].clientY - state.ty,
+                lastX: point.x,
+                lastY: point.y
+            };
+            state.isDragging = true;
+            state.startX = event.touches[0].clientX - state.tx;
+            state.startY = event.touches[0].clientY - state.ty;
+            state.dragDistance = 0;
+        }
+    }, { passive: true });
+
+    elements.viewport?.addEventListener('touchmove', event => {
+        if (!activeMapTouch || elements.pageView?.classList.contains('active')) return;
+        event.preventDefault();
+        if (event.touches.length >= 2) {
+            if (activeMapTouch.mode !== 'pinch') {
+                const a = touchPoint(event.touches[0]);
+                const b = touchPoint(event.touches[1]);
+                const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+                activeMapTouch = {
+                    mode: 'pinch',
+                    distance: touchDistance(event.touches[0], event.touches[1]),
+                    scale: state.scale,
+                    center,
+                    imageX: (center.x - state.tx) / state.scale,
+                    imageY: (center.y - state.ty) / state.scale
+                };
+                state.isDragging = false;
+                return;
+            }
+            const a = touchPoint(event.touches[0]);
+            const b = touchPoint(event.touches[1]);
+            const center = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+            const newScale = Math.min(Math.max(state.minScale, activeMapTouch.scale * touchDistance(event.touches[0], event.touches[1]) / activeMapTouch.distance), 2.5);
+            state.tx = center.x - activeMapTouch.imageX * newScale;
+            state.ty = center.y - activeMapTouch.imageY * newScale;
+            state.scale = newScale;
+            activeMapTouch.lastX = center.x;
+            activeMapTouch.lastY = center.y;
+            state.dragDistance = Math.max(state.dragDistance, Math.abs(newScale - activeMapTouch.scale) * 100, 6);
+            updateTransform();
+            if (state.showTradeRoutes || state.tradeRouteDraft) renderTradeRoutes(state.tradeRouteOverlay || []);
+            return;
+        }
+        if (event.touches.length === 1) {
+            const touch = event.touches[0];
+            if (activeMapTouch.mode === 'pinch') {
+                activeMapTouch = {
+                    mode: 'pan',
+                    startX: touch.clientX - state.tx,
+                    startY: touch.clientY - state.ty
+                };
+                state.startX = touch.clientX - state.tx;
+                state.startY = touch.clientY - state.ty;
+                state.isDragging = true;
+            }
+            const newTx = touch.clientX - activeMapTouch.startX;
+            const newTy = touch.clientY - activeMapTouch.startY;
+            state.dragDistance += Math.hypot(newTx - state.tx, newTy - state.ty);
+            state.tx = newTx;
+            state.ty = newTy;
+            updateTransform();
+        }
+    }, { passive: false });
+
+    elements.viewport?.addEventListener('touchend', event => {
+        if (!activeMapTouch) return;
+        if (event.touches.length === 1 && activeMapTouch.mode === 'pinch') {
+            const touch = event.touches[0];
+            activeMapTouch = {
+                mode: 'pan',
+                startX: touch.clientX - state.tx,
+                startY: touch.clientY - state.ty
+            };
+            state.startX = touch.clientX - state.tx;
+            state.startY = touch.clientY - state.ty;
+            state.isDragging = true;
+            return;
+        }
+        if (event.touches.length === 0) {
+            if (state.dragDistance > 5) suppressTouchClickUntil = Date.now() + 500;
+            activeMapTouch = null;
+            state.isDragging = false;
+        }
+    }, { passive: true });
 
     elements.viewport?.addEventListener('wheel', (e) => {
         if (elements.pageView?.classList.contains('active')) return;
@@ -4509,6 +4634,11 @@ export function initEventListeners() {
 
     elements.viewport?.addEventListener('click', async (e) => {
         if (elements.pageView?.classList.contains('active')) return;
+        if (e.pointerType === 'touch' && Date.now() < suppressTouchClickUntil) {
+            suppressTouchClickUntil = 0;
+            e.preventDefault();
+            return;
+        }
         if (state.dragDistance > 5 && e.pointerType !== 'touch') return;
         if (e.target === elements.popup || elements.popup.contains(e.target) || e.target.closest('#controls-panel') || e.target.closest('#left-sidebar') || e.target.closest('#login-modal') || e.target.closest('#register-modal') || e.target.closest('#trade-route-editor')) return;
 
@@ -4818,6 +4948,12 @@ export function initEventListeners() {
         const info = hex ? state.provincesMeta[hex] : null;
 
         if (info) {
+            if (state.showMilitaryGrid && window.matchMedia('(max-width: 640px)').matches) {
+                const constructionDetails = elements.militaryMapTools?.querySelector('details');
+                if (constructionDetails) constructionDetails.open = false;
+                clearSelection();
+                return;
+            }
             highlightProvince(hex);
             showProvincePopup(imgX, imgY, info);
         } else {

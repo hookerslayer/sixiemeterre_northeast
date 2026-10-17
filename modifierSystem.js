@@ -8,7 +8,7 @@ export const MODIFIER_EFFECTS = [
     { key: 'crime_rate_pp', label: 'Преступность', unit: 'п.п.', scopes: ['state'] },
     { key: 'corruption_rate_pp', label: 'Коррупция', unit: 'п.п.', scopes: ['state'] },
     { key: 'tax_income_pct', label: 'Итоговые налоговые поступления', unit: '%', scopes: ['state'] },
-    { key: 'internal_trade_income_pct', label: 'Доход от внутренней торговли', unit: '%', scopes: ['state'] },
+    { key: 'internal_trade_income_pct', label: 'Доход от внутренней торговли', unit: '%', scopes: ['state','culture'] },
     { key: 'resource_production_pct', label: 'Производство ресурса', unit: '%', scopes: ['state','culture','religion','resource','province'], targets: ['province'] },
     { key: 'good_production_pct', label: 'Производство товара', unit: '%', scopes: ['state','culture','religion','good','marker'], targets: ['city','large_city','monastery'] },
     { key: 'guild_capacity_pct', label: 'Мощность ремесленного производства', unit: '%', scopes: ['state','culture','religion','marker'], targets: ['city','large_city'] },
@@ -49,7 +49,7 @@ export const MODIFIER_SCOPE_VALUES = {
 const CULTURE_RESOURCE_BONUSES = {
     'Низовцы': ['Зерно'], 'Галичане': ['Зерно'], 'Двиняне': ['Древесина','Морепродукты'],
     'Вятчане': ['Скот'], 'Вотяки': ['Скот'], 'Вогулы': ['Пушнина'], 'Самоеды': ['Скот','Пушнина'],
-    'Казанлы': ['Скот'], 'Башкорт': ['Скот'], 'Саамы': ['Скот','Пушнина'], 'Сумь': ['Зерно','Лён'],
+    'Башкорт': ['Скот'], 'Саамы': ['Скот','Пушнина'], 'Сумь': ['Зерно','Лён'],
     'Емь': ['Зерно','Лён'], 'Эсты': ['Зерно','Лён'], 'Водь': ['Древесина','Пушнина'],
     'Ижора': ['Морепродукты'], 'Псковичи': ['Зерно'], 'Корелы': ['Древесина','Пушнина'],
     'Поморы': ['Морепродукты'], 'Коми': ['Пушнина'], 'Весь': ['Древесина','Пушнина']
@@ -89,6 +89,7 @@ export function buildStaticModifiers(owner, settings={}) {
         add('crime_rate_pp',15);add('battle_strength_pct',10,'state',null,{target_type:'army'});add('morale_change_pp',10);
         add('guild_capacity_pct',-10);add('resource_production_pct',15);
     }
+    add('internal_trade_income_pct',15,'culture','Казанлы',{source:'Культура: Казанлы'});
     for(const [culture,items] of Object.entries(CULTURE_RESOURCE_BONUSES))for(const item_name of items){
         const value=CULTURE_RESOURCE_VALUES[culture]||10;
         add('resource_production_pct',value,'culture',culture,{item_name,source:`Культура: ${culture}`});
