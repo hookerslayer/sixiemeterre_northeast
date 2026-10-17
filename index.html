@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Sixième Terre</title>
-    <link rel="stylesheet" href="map.css?v=mobile-map-panels-20261017c">
+    <link rel="stylesheet" href="map.css?v=popup-tables-sticky-nav-20261017a">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
 </head>
@@ -25,6 +25,7 @@
         <span id="game-turn-label">Ход 1 · Осень · 1450</span>
         <button id="advance-turn-btn" class="advance-turn-btn admin-only" style="display:none" type="button">Сменить ход</button>
     </div>
+    <div id="map-finance-badge" class="map-finance-badge" hidden aria-live="polite"></div>
 
     <div id="legend-panel">
         <div class="panel-header">
@@ -110,8 +111,6 @@
         </details>
     </aside>
 
-    <div id="map-finance-badge" class="map-finance-badge" hidden aria-live="polite"></div>
-
     <div id="login-modal" class="modal-overlay">
         <div class="modal-content">
             <span id="login-modal-close" class="modal-close">&times;</span>
@@ -178,7 +177,7 @@
     </section>
 </div>
 
-<script type="module" src="main.js?v=mobile-map-panels-20261017b"></script>
+<script type="module" src="main.js?v=popup-tables-sticky-nav-20261017a"></script>
 </body>
 </html>
 

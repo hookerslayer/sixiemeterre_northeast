@@ -737,7 +737,7 @@ body.military-army-placement #visual-map {
 .trade-route-editor button:hover:not(:disabled) { border-color: rgba(212, 178, 112, .7); background: rgba(212, 178, 112, .12); }
 .trade-route-editor button:disabled { opacity: .45; cursor: default; }
 
-.page-nav { position: fixed; inset: 0 auto 0 0; z-index: 2; display: flex; width: 222px; box-sizing: border-box; flex-direction: column; gap: 5px; padding: 28px 16px; border-right: 1px solid rgba(222, 210, 183, .15); background: rgba(11, 15, 13, .92); backdrop-filter: blur(14px); }
+.page-nav { position: fixed; inset: 0 auto 0 0; z-index: 1801; display: flex; width: 222px; box-sizing: border-box; flex-direction: column; gap: 5px; padding: 28px 16px; border-right: 1px solid rgba(222, 210, 183, .15); background: rgba(11, 15, 13, .92); backdrop-filter: blur(14px); }
 .page-nav-heading { display: contents; }
 .page-nav-toggle { display: none; }
 .page-nav-items { display: flex; min-height: 0; flex-direction: column; gap: 5px; overflow-y: auto; }
@@ -1763,6 +1763,31 @@ body.military-army-placement #visual-map {
     .popup { position: fixed; inset: auto 8px max(8px, env(safe-area-inset-bottom)) !important; width: auto; min-width: 0; max-width: none; max-height: min(58dvh, 560px); padding: 14px 14px 12px; border-radius: 10px; transform: none; }
     .popup-close { top: 5px; right: 5px; width: 36px; height: 36px; font-size: 22px; }
 }
+
+/* Keep state navigation visible while page content scrolls. */
+@media (max-width: 900px) {
+  .page-view .page-nav { position: sticky; top: 0; z-index: 1801; width: 100%; background: rgba(11,15,13,.98); }
+}
+
+/* Relationship values are short, so allocate width to labels without forcing a wide table. */
+.compact-relation-table { width: 100%; min-width: 0; table-layout: fixed; white-space: normal; }
+.compact-relation-table col:nth-child(1) { width: 31%; }
+.compact-relation-table col:nth-child(2) { width: 20%; }
+.compact-relation-table col:nth-child(3) { width: 29%; }
+.compact-relation-table col:nth-child(4) { width: 20%; }
+.compact-relation-table th,
+.compact-relation-table td { min-width: 0; padding: 9px 8px; white-space: normal; overflow-wrap: normal; word-break: normal; }
+.compact-relation-table th { font-size: 10px; line-height: 1.25; }
+.compact-relation-table td:nth-child(n+2) { white-space: nowrap; }
+
+/* Keep population and estate summaries side by side in province and settlement popups. */
+.marker-demography-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.marker-demography-grid section { min-width: 0; padding: 8px; }
+.marker-demography-grid section > span { gap: 4px; min-width: 0; white-space: nowrap; font-size: 10px; }
+.marker-demography-grid b { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 420px) {
+  .marker-demography-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 .auth-secondary-btn { margin-top: 6px; opacity: .85; }
 @media (min-width: 641px) and (max-width: 900px) {
   .game-calendar { top: 10px; left: 50%; max-width: calc(100vw - 24px); transform: translateX(-50%); }
@@ -1864,28 +1889,34 @@ body.military-army-placement #visual-map {
 .page-nav::-webkit-scrollbar-track, .page-table-wrap::-webkit-scrollbar-track, .dense-table .table-wrap::-webkit-scrollbar-track { background: #1b1e1c; }
 .page-nav::-webkit-scrollbar-thumb, .page-table-wrap::-webkit-scrollbar-thumb, .dense-table .table-wrap::-webkit-scrollbar-thumb { border: 2px solid #1b1e1c; border-radius: 8px; background: #68685e; }
 
-/* On phones, keep map actions in one predictable row and open utility panels as sheets. */
+/* On phones, stack map actions into a compact right-side panel. */
 #mobile-map-actions { display: contents; }
 #mobile-map-actions > #legend-panel { position: fixed; top: 64px; left: 20px; z-index: 1000; }
 @media (max-width: 640px) {
   #left-sidebar { top: max(10px, env(safe-area-inset-top)); left: max(10px, env(safe-area-inset-left)); right: auto; max-height: none; }
   .top-nav-row { height: auto; padding: 0; gap: 7px; }
-  .top-nav-row .burger-btn { width: 40px; height: 40px; }
-  .top-nav-row #open-login-btn { min-height: 40px; max-width: min(180px, 48vw); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  #mobile-map-actions { position: fixed; z-index: 1101; top: calc(max(10px, env(safe-area-inset-top)) + 52px); right: max(8px, env(safe-area-inset-right)); left: max(8px, env(safe-area-inset-left)); display: flex; align-items: stretch; justify-content: flex-end; gap: 6px; min-width: 0; }
+  .top-nav-row .burger-btn { width: 36px; height: 36px; font-size: 18px; }
+  .top-nav-row #open-login-btn { min-height: 36px; max-width: min(160px, 44vw); padding: 6px 10px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #mobile-map-actions { position: fixed; z-index: 1101; top: max(10px, env(safe-area-inset-top)); right: max(8px, env(safe-area-inset-right)); left: auto; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 5px; width: min(184px, calc(100vw - 32px)); min-width: 0; }
   #mobile-map-actions > .game-calendar,
+  #mobile-map-actions > #map-finance-badge,
   #mobile-map-actions > #legend-panel,
   #mobile-map-actions > #controls-panel { position: static; inset: auto; top: auto; right: auto; left: auto; width: auto; min-width: 0; max-width: none; max-height: none; margin: 0; padding: 0; transform: none; box-sizing: border-box; }
-  #mobile-map-actions > .game-calendar { flex: 1 1 auto; display: flex; justify-content: center; gap: 4px; padding: 0 8px; font-size: 11px; white-space: nowrap; overflow: hidden; }
+  #mobile-map-actions > .game-calendar { flex: 0 0 auto; display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 34px; padding: 0 7px; font-size: 11px; white-space: nowrap; overflow: hidden; }
   #mobile-map-actions > .game-calendar #game-turn-label { overflow: hidden; text-overflow: ellipsis; }
-  #mobile-map-actions .advance-turn-btn { padding: 5px 6px; font-size: 10px; white-space: nowrap; }
+  #mobile-map-actions .advance-turn-btn { padding: 4px 5px; font-size: 10px; white-space: nowrap; }
+  #mobile-map-actions > #map-finance-badge[hidden] { display: none; }
+  #mobile-map-actions > #map-finance-badge:not([hidden]) { display: flex; flex: 0 0 auto; justify-content: flex-end; gap: 8px; width: 100%; padding: 5px 7px; font-size: 11px; box-sizing: border-box; }
+  #mobile-map-actions > #map-finance-badge .map-finance-item { gap: 4px; }
+  #mobile-map-actions > #map-finance-badge .finance-coin-icon { font-size: 15px; }
+  #mobile-map-actions > #map-finance-badge .finance-op-icon { width: 17px; height: 17px; font-size: 9px; }
   #mobile-map-actions > #legend-panel,
-  #mobile-map-actions > #controls-panel { flex: 0 0 auto; overflow: visible; }
+  #mobile-map-actions > #controls-panel { flex: 0 0 auto; width: 100%; overflow: visible; }
   #mobile-map-actions > #legend-panel .panel-header,
-  #mobile-map-actions > #controls-panel .panel-header { gap: 4px; min-height: 40px; padding: 0 7px; border: 1px solid rgba(222,210,183,.22); border-radius: 7px; background: rgba(18,22,20,.96); box-sizing: border-box; }
+  #mobile-map-actions > #controls-panel .panel-header { gap: 4px; min-height: 34px; padding: 0 7px; border: 1px solid rgba(222,210,183,.22); border-radius: 7px; background: rgba(18,22,20,.96); box-sizing: border-box; }
   #mobile-map-actions .legend-title,
   #mobile-map-actions .panel-title { font-size: 11px; white-space: nowrap; }
-  #mobile-map-actions .toggle-btn { min-width: 24px; min-height: 30px; padding: 0 3px !important; font-size: 19px !important; }
+  #mobile-map-actions .toggle-btn { min-width: 24px; min-height: 26px; padding: 0 3px !important; font-size: 17px !important; }
   #mobile-map-actions #legend-content,
   #mobile-map-actions #controls-content { display: none; }
   #mobile-map-actions > #legend-panel:not(.collapsed),
@@ -1909,6 +1940,4 @@ body.military-army-placement #visual-map {
   .rules-wiki-article td { min-width: 130px; max-width: 360px; white-space: normal; overflow-wrap: normal; word-break: normal; }
   .rules-wiki-article th:first-child,
   .rules-wiki-article td:first-child { min-width: 145px; }
-  .map-finance-badge { top: calc(max(10px, env(safe-area-inset-top)) + 100px); right: max(8px, env(safe-area-inset-right)); left: auto; max-width: calc(100vw - 16px); padding: 7px 9px; gap: 10px; justify-content: flex-end; flex-wrap: wrap; box-sizing: border-box; font-size: 12px; }
-  .map-finance-item { gap: 5px; }
 }
